@@ -1,9 +1,8 @@
 # BruinMeet
 BruinMeet is a web application designed for users to create a time-based and location-based public event navigator visible to all other users on the app, offer in-app services to organize and share the event, and allow attendees to rate and review the events and the hosts, which are made public to all app users.
 
-
 ## Directory Structure
-Explain how the code is organized
+Frontend code in src. Backend in server.
 
 ## Installation/Run instructions
 npm install
