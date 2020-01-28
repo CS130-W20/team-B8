@@ -1,0 +1,4 @@
+db = db.getSiblingDB("ServiceDb");
+db.createCollection("Users");
+db.createCollection("Events");
+

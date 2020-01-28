@@ -6,7 +6,12 @@ Frontend code in src. Backend in server.
 
 ## Installation/Run instructions
 npm install
-  Instal all required npm modules
+  Install all required npm modules
+
+Install and start mongodb server using instructions below 
+  https://docs.mongodb.com/manual/installation/
+
+Run 'mongo < dbsetup' to create required dbs and collections
 
 npm start (within app)
   Starts the development server.
