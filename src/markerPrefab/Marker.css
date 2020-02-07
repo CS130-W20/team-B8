@@ -1,0 +1,17 @@
+.marker {
+    z-index: 1;
+    position: absolute;
+    max-width: 10px;
+    max-height: 10px;
+    border: 2px solid #fff;
+    box-shadow: 0 0 10px 5px rgba(0, 140, 186, 0.5);
+    border-radius: 100%;
+    user-select: none;
+}
+
+.markerIcon {
+    width: 10px;
+    display: grid;
+    align-items: center;
+    justify-items: center;
+}
