@@ -76,6 +76,8 @@ class SimpleMap extends Component {
   }
 }
 
+// Add API Key as String
+// AIzaSyD2EzcDG507GgPgPHVEoVpgFngvsMGIElg
 export default GoogleApiWrapper({
-  apiKey: 'AIzaSyD2EzcDG507GgPgPHVEoVpgFngvsMGIElg'
+  apiKey: 
 })(SimpleMap);
