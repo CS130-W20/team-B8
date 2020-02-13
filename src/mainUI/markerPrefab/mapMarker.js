@@ -1,10 +1,9 @@
-import React, {Component} from 'react';
+import React from 'react';
 import { Marker } from 'google-maps-react';
 import './Marker.css';
 
 // TODO: Import images more efficiently
 import djImg from './BruinMeet/dj.png';
-import baloonImg from './BruinMeet/baloons.png'
 import danceImg from './BruinMeet/dance.png'
 import foodImg from './BruinMeet/food.png'
 import gameImg from './BruinMeet/gaming.png'
@@ -13,7 +12,6 @@ import hatImg from './BruinMeet/hats.png'
 // TODO: Modify depending on marker types
 export const markerTypes = {
     dj: djImg,
-    baloon: baloonImg,
     dance: danceImg,
     food: foodImg,
     gaming: gameImg,

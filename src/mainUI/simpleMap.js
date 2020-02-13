@@ -1,19 +1,17 @@
 import React, { Component } from 'react';
 import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
-import logo from './logo.svg';
-import './App.css';
-import CustomMarker, { markerTypes } from './markerPrefab/mapMarker';
+import logo from './../logo.svg';
+import './../App.css';
+import { markerTypes } from './markerPrefab/mapMarker';
+import Dimensions from 'react-dimensions'
 
-const mapStyles = {
-  width: '100%',
-  height: '100%',
-};
 
 class SimpleMap extends Component {
 
   // Define a constructor
   constructor(props){
     super(props);
+    this.current = React.createRef();
     this.state = {
         markers: [],
     }
@@ -24,11 +22,11 @@ class SimpleMap extends Component {
   componentDidMount() {
     this.setState({
       markers: [
-        {"name" : "Test 1", "lat": 32.00, "lng": 122.00, "type": markerTypes.baloon},
+        {"name" : "Test 1", "lat": 32.00, "lng": 122.00, "type": markerTypes.gaming},
         {"name" : "Test 2", "lat": 23.00, "lng": -126.00, "type": markerTypes.food},
         {"name" : "Test 3", "lat": 35.00, "lng": 104.00, "type": markerTypes.dj},
         {"name" : "Test 4", "lat": 45.00, "lng": 203.00, "type": markerTypes.dance},
-      ]
+      ],
     })
   }
 
@@ -41,7 +39,7 @@ class SimpleMap extends Component {
 
   // TODO: Change rendered markers based on filters
   filterMarkers() {
-
+    
   }
 
   renderMarker(marker) {
@@ -59,7 +57,10 @@ class SimpleMap extends Component {
       <Map
         google={this.props.google}
         zoom={8}
-        style={mapStyles}
+        style={{
+          width: this.props.containerWidth,
+          height: this.props.containerHeight
+        }}
         initialCenter={{ lat: 47.444, lng: -122.176}}>
         {this.state.markers.map((marker, i) =>{
               console.log(marker);
@@ -78,6 +79,6 @@ class SimpleMap extends Component {
 
 // Add API Key as String
 // AIzaSyD2EzcDG507GgPgPHVEoVpgFngvsMGIElg
-export default GoogleApiWrapper({
-  apiKey: 
-})(SimpleMap);
+export default Dimensions({elementResize: true, className: 'react-dimensions-wrapper'})(GoogleApiWrapper({
+  apiKey: "AIzaSyD2EzcDG507GgPgPHVEoVpgFngvsMGIElg"
+})(SimpleMap));
