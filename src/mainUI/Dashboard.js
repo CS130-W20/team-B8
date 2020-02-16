@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -12,13 +12,20 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import SimpleMap from './simpleMap';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import MapIcon from '@material-ui/icons/Map';
+import FaceIcon from '@material-ui/icons/Face';
+import DateRangeIcon from '@material-ui/icons/DateRange';
+
+import GMap from './Map/GMap';
+import EventList from './Events/EventList';
+import Profile from './Profile/Profile';
 
 // TODO: Re-organize everything and customize everything because this is built off an existing template
 
@@ -33,6 +40,12 @@ function Copyright() {
       {'.'}
     </Typography>
   );
+}
+
+const AppComponents = {
+  "Map": <GMap />,
+  "Profile": <Profile />,
+  "Events": <EventList />,
 }
 
 const drawerWidth = 240;
@@ -107,106 +120,96 @@ const useStyles = makeStyles(theme => ({
     overflow: 'auto',
     backgroundColor: '#b83b5e'
   },
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
-  },
-  paper: {
-    padding: theme.spacing(2),
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column',
-  },
-  fixedHeight: {
-    height: 240,
-  },
   customDivider: {
     backgroundColor: 'rgba(0, 0, 0, 0)'
   },
   customDrawerIcons: {
     color: 'white',
   },
+  container: {
+    height: "100%",
+    paddingTop: theme.spacing(4),
+    paddingBottom: theme.spacing(4),
+}
 }));
 
 export default function Dashboard() {
-  const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+    const classes = useStyles();
+    const [open, setOpen] = React.useState(false);
+    const [dashboardPage, setPage] = React.useState('Map');
+    const handleDrawerOpen = () => {
+      setOpen(true);
+    };
+    const handleDrawerClose = () => {
+      setOpen(false);
+    };
 
-  return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
-        <Toolbar className={classes.toolbar}>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
-          >
-          <MenuIcon />
-          </IconButton>
-          <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            BruinMeet
-          </Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        variant="permanent"
-        classes={{
-          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
-        }}
-        open={open}>
-        <div className={classes.toolbarIcon}>
-          <IconButton onClick={handleDrawerClose}>
-            <ChevronLeftIcon className={clsx(classes.customDrawerIcons)}/>
-          </IconButton>
-        </div>
-        <Divider className={clsx(classes.customDivider)}/>
-        <List>
-
-        </List>
-        <Divider className={clsx(classes.customDivider)}/>
-        <List></List>
-      </Drawer>
-      <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
-          <Grid container spacing={3}>
-            {/* Chart */}
-            <Grid item xs={12} md={8} lg={9}>
-              <Paper className={fixedHeightPaper}>
-                <SimpleMap />
-              </Paper>
-            </Grid>
-            {/* Recent Deposits */}
-            <Grid item xs={12} md={4} lg={3}>
-              <Paper className={fixedHeightPaper}>
-              </Paper>
-            </Grid>
-            {/* Recent Orders */}
-            <Grid item xs={12}>
-              <Paper className={classes.paper}>
-              </Paper>
-            </Grid>
-          </Grid>
-          <Box pt={4}>
-            <Copyright />
-          </Box>
-        </Container>
-      </main>
-    </div>
-  );
+    return (
+      <div className={classes.root}>
+        <CssBaseline />
+        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+          <Toolbar className={classes.toolbar}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
+            >
+            <MenuIcon />
+            </IconButton>
+            <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
+              BruinMeet
+            </Typography>
+            <IconButton color="inherit">
+              <Badge badgeContent={4} color="secondary">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          variant="permanent"
+          classes={{
+            paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
+          }}
+          open={open}>
+          <div className={classes.toolbarIcon}>
+            <IconButton onClick={handleDrawerClose}>
+              <ChevronLeftIcon className={clsx(classes.customDrawerIcons)}/>
+            </IconButton>
+          </div>
+          <Divider className={clsx(classes.customDivider)}/>
+          <List>
+            <ListItem button onClick={() => setPage("Profile")}>
+                  <ListItemIcon>
+                  <FaceIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Profile" />
+              </ListItem>
+              <ListItem button onClick={() => setPage("Map")}>
+                  <ListItemIcon>
+                  <MapIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Event Map" />
+              </ListItem>
+              <ListItem button onClick={() => setPage("Events")}>
+                  <ListItemIcon>
+                  <DateRangeIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Your Events" />
+              </ListItem>
+          </List>
+        </Drawer>
+        <main className={classes.content}>
+          <div className={classes.appBarSpacer} />
+          <Container maxWidth="lg" className={classes.container}>
+            {AppComponents[dashboardPage]}
+            <Box pt={4}>
+              <Copyright />
+            </Box>
+          </Container>
+        </main>
+      </div>
+    );
 }

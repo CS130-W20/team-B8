@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
 import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
-import logo from './../logo.svg';
-import './../App.css';
-import { markerTypes } from './markerPrefab/mapMarker';
-import Dimensions from 'react-dimensions'
+import { markerTypes } from './../markerPrefab/mapMarker';
+import Dimensions from 'react-dimensions';
 
 
 class SimpleMap extends Component {
 
-  // Define a constructor
   constructor(props){
     super(props);
     this.current = React.createRef();
@@ -69,7 +66,7 @@ class SimpleMap extends Component {
                   position={{ lat: marker.lat, lng: marker.lng}}
                   name={marker.name}
                   key={i}
-                  icon={marker.type}/>
+                  icon={{url: marker.type, scaleSize: (.5, .5)}}/>
               )
         })}
       </Map>

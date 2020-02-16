@@ -1,15 +1,11 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import SimpleMap from './mainUI/simpleMap';
 import Dashboard from './mainUI/Dashboard';
 
-function App() {
+export default function App() {
   return (
     <div>
-      {Dashboard()}
+      <Dashboard />
     </div>
   );
 }
-
-export default App;
