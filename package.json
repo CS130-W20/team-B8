@@ -14,10 +14,13 @@
     "@types/google-maps-react": "^2.0.4",
     "date-fns": "^2.9.0",
     "google-maps-react": "^2.0.2",
+    "material-ui-places": "^1.1.7",
+    "mui-places-autocomplete": "^2.0.0",
     "react": "^16.12.0",
     "react-container-dimensions": "^1.4.1",
     "react-dimensions": "^1.3.1",
     "react-dom": "^16.12.0",
+    "react-places-autocomplete": "^7.2.1",
     "react-scripts": "3.3.0",
     "typescript": "^3.7.5"
   },

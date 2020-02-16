@@ -9,7 +9,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import { IconButton } from '@material-ui/core';
 import EventForm from './EventForm';
 import EventEdit from './EditEvent';
 import EventDelete from './DeleteEvent';

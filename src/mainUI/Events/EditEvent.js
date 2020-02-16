@@ -18,7 +18,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import EditIcon from '@material-ui/icons/Edit';
 import { IconButton } from '@material-ui/core';
-
+import LocationSearchInput from './LocationSearcher';
 
 const useStyles = makeStyles(theme => ({
     formControl: {
@@ -62,72 +62,73 @@ export default function EventEdit() {
         setOpen(true);
     };
 
-  return (
-    <div>
-      <IconButton onClick={handleClickOpen}>
-        <EditIcon />
-      </IconButton>
-      <Dialog open={dialogopen} onClose={handleClickClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Update Your Event</DialogTitle>
-        <DialogContent>
-            <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Name of Event"
-            type="email"
-            fullWidth/>
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <KeyboardDatePicker
-            margin="normal"
-            id="date-picker-dialog"
-            label="Date picker dialog"
-            format="MM/dd/yyyy"
-            value={selectedDate}
-            onChange={handleDateChange}
-            KeyboardButtonProps={{
-            'aria-label': 'change date',
-            }}/>
-            <KeyboardTimePicker
-            margin="normal"
-            id="time-picker"
-            label="Time picker"
-            value={selectedDate}
-            onChange={handleDateChange}
-            KeyboardButtonProps={{
-            'aria-label': 'change time',
-            }}/>
-            </MuiPickersUtilsProvider>
-            <FormControl className={classes.formControl}>
-            <InputLabel id="demo-controlled-open-select-label">Event Type</InputLabel>
-            <Select
-            labelId="demo-controlled-open-select-label"
-            id="demo-controlled-open-select"
-            open={open}
-            onClose={handleClose}
-            onOpen={handleOpen}
-            value={age}
-            onChange={handleChange}>
-            <MenuItem value="">
-                <em>None</em>
-            </MenuItem>
-            <MenuItem value={10}>Bar Hopping</MenuItem>
-            <MenuItem value={20}>Rave</MenuItem>
-            <MenuItem value={30}>House Party</MenuItem>
-            <MenuItem value={40}>Music Concert/Festival</MenuItem>
-            </Select>
-            </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClickClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleClickClose} color="primary">
-            {/* TODO: ADD TO DB AND UPDATE */}
-            Update
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
-  );
+    return (
+      <div>
+        <IconButton onClick={handleClickOpen}>
+          <EditIcon />
+        </IconButton>
+        <Dialog open={dialogopen} onClose={handleClickClose} aria-labelledby="form-dialog-title">
+          <DialogTitle id="form-dialog-title">Update Your Event</DialogTitle>
+          <DialogContent>
+              <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              label="Name of Event"
+              type="email"
+              fullWidth/>
+              <LocationSearchInput/>
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <KeyboardDatePicker
+              margin="normal"
+              id="date-picker-dialog"
+              label="Date picker dialog"
+              format="MM/dd/yyyy"
+              value={selectedDate}
+              onChange={handleDateChange}
+              KeyboardButtonProps={{
+              'aria-label': 'change date',
+              }}/>
+              <KeyboardTimePicker
+              margin="normal"
+              id="time-picker"
+              label="Time picker"
+              value={selectedDate}
+              onChange={handleDateChange}
+              KeyboardButtonProps={{
+              'aria-label': 'change time',
+              }}/>
+              </MuiPickersUtilsProvider>
+              <FormControl className={classes.formControl}>
+              <InputLabel id="demo-controlled-open-select-label">Event Type</InputLabel>
+              <Select
+              labelId="demo-controlled-open-select-label"
+              id="demo-controlled-open-select"
+              open={open}
+              onClose={handleClose}
+              onOpen={handleOpen}
+              value={age}
+              onChange={handleChange}>
+              <MenuItem value="">
+                  <em>None</em>
+              </MenuItem>
+              <MenuItem value={10}>Bar Hopping</MenuItem>
+              <MenuItem value={20}>Rave</MenuItem>
+              <MenuItem value={30}>House Party</MenuItem>
+              <MenuItem value={40}>Music Concert/Festival</MenuItem>
+              </Select>
+              </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClickClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleClickClose} color="primary">
+              {/* TODO: ADD TO DB AND UPDATE */}
+              Update
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    );
 }

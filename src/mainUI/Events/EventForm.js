@@ -16,6 +16,7 @@ import {
 import DateFnsUtils from '@date-io/date-fns';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
+import LocationSearchInput from './LocationSearcher';
 
 const useStyles = makeStyles(theme => ({
     button: {
@@ -78,6 +79,7 @@ export default function EventForm() {
             label="Name of Event"
             type="email"
             fullWidth/>
+            <LocationSearchInput/>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
             <KeyboardDatePicker
             margin="normal"
