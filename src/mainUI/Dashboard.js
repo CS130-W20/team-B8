@@ -22,10 +22,12 @@ import ListItemText from '@material-ui/core/ListItemText';
 import MapIcon from '@material-ui/icons/Map';
 import FaceIcon from '@material-ui/icons/Face';
 import DateRangeIcon from '@material-ui/icons/DateRange';
+import RateReviewIcon from '@material-ui/icons/RateReview';
 
 import GMap from './Map/GMap';
 import EventList from './Events/EventList';
 import Profile from './Profile/Profile';
+import EventHistory from './Rating/EventHistory';
 
 // TODO: Re-organize everything and customize everything because this is built off an existing template
 
@@ -46,6 +48,7 @@ const AppComponents = {
   "Map": <GMap />,
   "Profile": <Profile />,
   "Events": <EventList />,
+  "Rate": <EventHistory />
 }
 
 const drawerWidth = 240;
@@ -154,8 +157,7 @@ export default function Dashboard() {
               color="inherit"
               aria-label="open drawer"
               onClick={handleDrawerOpen}
-              className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
-            >
+              className={clsx(classes.menuButton, open && classes.menuButtonHidden)}>
             <MenuIcon />
             </IconButton>
             <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
@@ -198,6 +200,12 @@ export default function Dashboard() {
                   <DateRangeIcon />
                   </ListItemIcon>
                   <ListItemText primary="Your Events" />
+              </ListItem>
+              <ListItem button onClick={() => setPage("Rate")}>
+                  <ListItemIcon>
+                  <RateReviewIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Write Reviews" />
               </ListItem>
           </List>
         </Drawer>

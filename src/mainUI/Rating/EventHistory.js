@@ -9,12 +9,8 @@ import TableRow from '@material-ui/core/TableRow';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import { IconButton } from '@material-ui/core';
-import EventForm from './EventForm';
-import EventEdit from './EditEvent';
-import EventDelete from './DeleteEvent';
-import EventMessage from './MessageEvent';
 
+import EventRater from './EventRater';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -57,7 +53,6 @@ export default function EventList() {
             <Grid item xs={12}>
               <Paper className={classes.paper}>
               <React.Fragment>
-              <EventForm/>
                     <Table size="small">
                     <TableHead>
                         <TableRow>
@@ -77,10 +72,8 @@ export default function EventList() {
                             <TableCell>{row.location}</TableCell>
                             <TableCell>{row.time}</TableCell>
                             <TableCell>{row.attendees}</TableCell>
-                            <TableCell align="right" style={{display: 'grid', gridTemplateRows: '1fr', gridTemplateColumns: '1fr 1fr 1fr'}}>
-                                <EventEdit />
-                                <EventMessage/>
-                                <EventDelete />
+                            <TableCell align="right">
+                                <EventRater />
                             </TableCell>
                         </TableRow>
                         ))}
