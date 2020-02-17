@@ -41,16 +41,16 @@ module.exports.getUser = function(username){
 			const collection = db.collection('Users');
 			// Find some documents
 			
-			let query = {'name': name} ;
+			let query = {'name': username} ;
 			console.log(query);
 
-		 	let dbRes = collection.findOne(query, (function(err, docs) {
+		 	collection.findOne(query, function(err, doc) {
 			if(err == null){
 				console.log("getUser() query Success");
 				resolve(doc);
 			} else{
 				console.log("getUser() query Failed");
-				reject(error);
+				reject(err);
 			}
 		});
 	});
@@ -67,7 +67,7 @@ module.exports.addUser = function(name, email, password){
 				resolve(result);
 			} else{
 				console.log("addUser() query failed: " + name);
-				reject(error);
+				reject(err);
 			}
 		});
 	});
@@ -87,7 +87,7 @@ module.exports.updateUserPassword = function(name, password){
 				resolve(result);
 			} else{
 				console.log("updateUserPassword() Failed: " + name);
-				reject(error);
+				reject(err);
 			}
 		});
 	});
@@ -106,7 +106,7 @@ module.exports.updateUserInterests = function(name, interestList){
 				resolve(result);
 			} else{
 				console.log("updateUserInterests() Failed: " + name);
-				reject(error);
+				reject(err);
 			}
 		});
 	});
@@ -123,7 +123,7 @@ module.exports.updateUserInterests = function(name, interestList){
 	locationName: String
 	host: String (username)
 	attendees: [String]
-	reviews:[{score:Int, review:String}]
+	reviews:[{user: String, score:Int, review:String}]
 }
 */
 
@@ -136,43 +136,197 @@ module.exports.getAllEvents = function(){
 				'attendees': 0, 
 				'reviews': 0
 			}).sort('timeDate',-1);
-			dbRes.toArray((function(err, docs) {
+			dbRes.toArray(function(err, docs) {
 			if(err == null){
 				console.log("getAllEvents() query Success");
-				resolve(doc);
+				resolve(docs);
 			} else{
 				console.log("getAllEvents() query Failed");
-				reject(error);
+				reject(err);
 			}
 		});
 	});
 };
 
-module.exports.getEventsInRange = function(upperBound, lowerBound, numberBound){
+module.exports.queryEvents = function(keywordRegex, upperBound, lowerBound, numberBound){
+	// keywordRegex is a RegExp Obj corresponding to the keywords	
+	return new Promise(	
+		function (resolve, reject) {
+			const collection = db.collection('Events');
+			let doc = {};
+			if (keywordRegex != null) {
+				doc['title'] = keywordRegex;
+			}
+
+			let andList = [];
+			if (upperBound != null) {
+				andList.push({'$lte': upperBound});
+			}
+			if (lowerBound != null) {
+				andList.push({'$gt': lowerBound});
+			}
+			if (andList.length != 0) {
+				doc['$timeDate']['$and'] = andList;
+			}
+
+		 	let dbRes = collection.find(doc,{
+				'attendees': 0, 
+				'reviews': 0
+			}).sort('timeDate',1);
+			if (numberBound != null) {
+				dbRes = dbRes.limit(numberBound);
+			}
+			dbRes.toArray(function(err, doc) {
+			if(err == null){
+				console.log("queryEvents() query Success");
+				resolve(doc);
+			} else{
+				console.log("queryEvents() query Failed");
+				reject(err);
+			}
+		});
+	});
+};
+
+module.exports.getEvent = function(eventID){
 	return new Promise(	
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			// Find some documents
-			let doc = {'timeDate' : { '$lte': uBound,'$gte': lBound}};
-		 	let dbRes = collection.find(doc).sort('timeDate',1);
-			if (numberBound != null) {
-				dbRes = dbRes.limit(numberBound);
-			}
-			dbRes.toArray((function(err, docs) {
+			
+			let query = {'eventID': eventID} ;
+			console.log(query);
+
+		 	collection.findOne(query, function(err, doc) {
 			if(err == null){
-				console.log("getAllEvents() query Success");
+				console.log("getEvent() query Success");
 				resolve(doc);
 			} else{
-				console.log("getAllEvents() query Failed");
-				reject(error);
+				console.log("getEvent() query Failed");
+				reject(err);
 			}
 		});
 	});
 };
 
+module.exports.addEvent = function(eventID, title, tag, location, locationName, host){
+	return new Promise(	
+		function (resolve, reject) {
+			const collection = db.collection('Posts');
+			let doc = {
+				'eventID': eventID,
+				'title': title,
+				'timeDate': new Date(),
+				'tag': tag,
+				'location': location,
+				'locationName': locationName,
+				'host': host,
+				'attendees': [],
+				'reviews':[]
+			};
+		 	collection.insertOne(doc,{},function(err, result) {
+			if(err == null){
+				console.log("addEvent() query Success: " + title);
+				resolve(result);
+			} else{
+				console.log("addEvent() query failed: " + title);
+				reject(err);
+			}
+		});
+	});
+};
 
+module.exports.updateEvent = function(eventID, title, tag, location, locationName){
+	return new Promise(	
+		function (resolve, reject) {
+			const collection = db.collection('Posts');
+			let doc = {
+				'title': title,
+				'timeDate': new Date(),
+				'tag': tag,
+				'location': location,
+				'locationName': locationName
+			};
+		 	collection.updateOne({'eventID': eventID},{ '$set': doc},
+		 			{'upsert':false},function(err, result) {
+			if(err == null){
+				console.log("updateEvent() Success: " + eventID);
+				resolve(result);
+			} else{
+				console.log("updateEvent() Failed: " + eventID);
+				reject(err);
+			}
+		});
+	});
+};
 
+module.exports.addEventAttendee = function(eventID, attendee){
+	return new Promise(	
+		function (resolve, reject) {
+			const collection = db.collection('Posts');
+			let doc = {
+				'$push':{
+					'attendees': attendee
+					}
+			};
+		 	collection.updateOne({'eventID': eventID},{ '$set': doc},
+		 			{'upsert':false},function(err, result) {
+			if(err == null){
+				console.log("addEventAttendee() Success: " + eventID);
+				resolve(result);
+			} else{
+				console.log("addEventAttendee() Failed: " + eventID);
+				reject(err);
+			}
+		});
+	});
+};
 
+module.exports.removeEventAttendee = function(eventID, attendee){
+	return new Promise(	
+		function (resolve, reject) {
+			const collection = db.collection('Posts');
+			let doc = {
+				'$pull':{
+					'attendees': attendee
+					}
+			};
+		 	collection.updateOne({'eventID': eventID},{ '$set': doc},
+		 			{'upsert':false},function(err, result) {
+			if(err == null){
+				console.log("addEventAttendee() Success: " + eventID);
+				resolve(result);
+			} else{
+				console.log("addEventAttendee() Failed: " + eventID);
+				reject(err);
+			}
+		});
+	});
+};
+
+module.exports.addEventReview = function(eventID, user, score, review){
+	return new Promise(	
+		function (resolve, reject) {
+			const collection = db.collection('Posts');
+			let doc = {
+				'$push':{
+					user: 'user',
+					score: 'score',
+					review: 'review'
+				}
+			};
+		 	collection.updateOne({'eventID': eventID},{ '$set': doc},
+		 			{'upsert':false},function(err, result) {
+			if(err == null){
+				console.log("addEventReview() Success: " + eventID);
+				resolve(result);
+			} else{
+				console.log("addEventReview() Failed: " + eventID);
+				reject(err);
+			}
+		});
+	});
+};
 
 
 
