@@ -59,7 +59,7 @@ module.exports.getUser = function(username){
 module.exports.addUser = function(name, email, password){
 	return new Promise(	
 		function (resolve, reject) {
-			const collection = db.collection('Posts');
+			const collection = db.collection('Users');
 			let doc = {'name': name, 'email': email, 'password': password}
 		 	collection.insertOne(doc,{},function(err, result) {
 			if(err == null){
@@ -77,7 +77,7 @@ module.exports.addUser = function(name, email, password){
 module.exports.updateUserPassword = function(name, password){
 	return new Promise(	
 		function (resolve, reject) {
-			const collection = db.collection('Posts');
+			const collection = db.collection('Users');
 			let doc = {};
 			doc.password = password;
 
@@ -96,7 +96,7 @@ module.exports.updateUserPassword = function(name, password){
 module.exports.updateUserInterests = function(name, interestList){
 	return new Promise(	
 		function (resolve, reject) {
-			const collection = db.collection('Posts');
+			const collection = db.collection('Users');
 			let doc = {};
 			doc.interests = interestList;
 
@@ -212,7 +212,7 @@ module.exports.getEvent = function(eventID){
 module.exports.addEvent = function(eventID, title, tag, location, locationName, host){
 	return new Promise(	
 		function (resolve, reject) {
-			const collection = db.collection('Posts');
+			const collection = db.collection('Events');
 			let doc = {
 				'eventID': eventID,
 				'title': title,
@@ -239,7 +239,7 @@ module.exports.addEvent = function(eventID, title, tag, location, locationName, 
 module.exports.updateEvent = function(eventID, title, tag, location, locationName){
 	return new Promise(	
 		function (resolve, reject) {
-			const collection = db.collection('Posts');
+			const collection = db.collection('Events');
 			let doc = {
 				'title': title,
 				'timeDate': new Date(),
@@ -263,7 +263,7 @@ module.exports.updateEvent = function(eventID, title, tag, location, locationNam
 module.exports.addEventAttendee = function(eventID, attendee){
 	return new Promise(	
 		function (resolve, reject) {
-			const collection = db.collection('Posts');
+			const collection = db.collection('Events');
 			let doc = {
 				'$push':{
 					'attendees': attendee
@@ -285,7 +285,7 @@ module.exports.addEventAttendee = function(eventID, attendee){
 module.exports.removeEventAttendee = function(eventID, attendee){
 	return new Promise(	
 		function (resolve, reject) {
-			const collection = db.collection('Posts');
+			const collection = db.collection('Events');
 			let doc = {
 				'$pull':{
 					'attendees': attendee
@@ -307,7 +307,7 @@ module.exports.removeEventAttendee = function(eventID, attendee){
 module.exports.addEventReview = function(eventID, user, score, review){
 	return new Promise(	
 		function (resolve, reject) {
-			const collection = db.collection('Posts');
+			const collection = db.collection('Events');
 			let doc = {
 				'$push':{
 					user: 'user',
