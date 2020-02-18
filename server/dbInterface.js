@@ -265,11 +265,9 @@ module.exports.addEventAttendee = function(eventID, attendee){
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
-				'$push':{
-					'attendees': attendee
-					}
+				'attendees': attendee
 			};
-		 	collection.updateOne({'eventID': eventID},{ '$set': doc},
+		 	collection.updateOne({'eventID': eventID},{ '$push': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("addEventAttendee() Success: " + eventID);
@@ -287,11 +285,9 @@ module.exports.removeEventAttendee = function(eventID, attendee){
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
-				'$pull':{
-					'attendees': attendee
-					}
+				'attendees': attendee
 			};
-		 	collection.updateOne({'eventID': eventID},{ '$set': doc},
+		 	collection.updateOne({'eventID': eventID},{ '$pull': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("addEventAttendee() Success: " + eventID);
@@ -309,13 +305,13 @@ module.exports.addEventReview = function(eventID, user, score, review){
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
-				'$push':{
-					user: 'user',
-					score: 'score',
-					review: 'review'
+				'reviews':{
+					'user': user,
+					'score': score,
+					'review': review
 				}
 			};
-		 	collection.updateOne({'eventID': eventID},{ '$set': doc},
+		 	collection.updateOne({'eventID': eventID},{ '$push': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("addEventReview() Success: " + eventID);
