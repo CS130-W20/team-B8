@@ -56,11 +56,19 @@ module.exports.getUser = function(username){
 	});
 };
 
-module.exports.addUser = function(name, email, password){
+module.exports.addUser = function(name, email, password, phone){
 	return new Promise(	
 		function (resolve, reject) {
 			const collection = db.collection('Users');
-			let doc = {'name': name, 'email': email, 'password': password}
+			let doc = {
+				'name': name, 
+				'email': email, 
+				'password': password,
+				'interests': [], 
+				'phone': phone,
+				'eventsAttending': [],
+				'eventsHosting':[]
+			}
 		 	collection.insertOne(doc,{},function(err, result) {
 			if(err == null){
 				console.log("addUser() query Success: " + name);
@@ -93,19 +101,116 @@ module.exports.updateUserPassword = function(name, password){
 	});
 };
 
-module.exports.updateUserInterests = function(name, interestList){
+module.exports.updateUserDetails = function(name, interestList, phone){
 	return new Promise(	
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			let doc = {};
 			doc.interests = interestList;
+			doc.phone = phone;
 
 		 	collection.updateOne({'name': name},{ '$set': doc}, {'upsert':false},function(err, result) {
 			if(err == null){
-				console.log("updateUserInterests() Success: " + name);
+				console.log("updateUserDetails() Success: " + name);
 				resolve(result);
 			} else{
-				console.log("updateUserInterests() Failed: " + name);
+				console.log("updateUserDetailss() Failed: " + name);
+				reject(err);
+			}
+		});
+	});
+};
+
+module.exports.addUserAttendingEvent = function(name, eventID){
+	return new Promise(	
+		function (resolve, reject) {
+			const collection = db.collection('Users');
+			let doc = {
+				'eventsAttending': eventID
+			};
+		 	collection.updateOne({'name': name},{ '$push': doc},
+		 			{'upsert':false},function(err, result) {
+			if(err == null){
+				console.log("addUserAttendingEvent() Success: " 
+				+ name
+				+ ":" + eventID);
+				resolve(result);
+			} else{
+				console.log("addUserAttendingEvent() Failed: "
+				+ name
+				+ ":" + eventID);
+				reject(err);
+			}
+		});
+	});
+};
+
+module.exports.removeUserAttendingEvent = function(name, eventID){
+	return new Promise(	
+		function (resolve, reject) {
+			const collection = db.collection('Users');
+			let doc = {
+				'eventsAttending': eventID
+			};
+		 	collection.updateOne({'name': name},{ '$pull': doc},
+		 			{'upsert':false},function(err, result) {
+			if(err == null){
+				console.log("removeUserAttendingEvent() Success: " 
+				+ name
+				+ ":" + eventID);
+				resolve(result);
+			} else{
+				console.log("removeUserAttendingEvent() Failed: "
+				+ name
+				+ ":" + eventID);
+				reject(err);
+			}
+		});
+	});
+};
+
+module.exports.addUserHostingEvent = function(name, eventID){
+	return new Promise(	
+		function (resolve, reject) {
+			const collection = db.collection('Users');
+			let doc = {
+				'eventsHosting': eventID
+			};
+		 	collection.updateOne({'name': name},{ '$push': doc},
+		 			{'upsert':false},function(err, result) {
+			if(err == null){
+				console.log("addUserHostingEvent() Success: " 
+				+ name
+				+ ":" + eventID);
+				resolve(result);
+			} else{
+				console.log("addUserHostingEvent() Failed: "
+				+ name
+				+ ":" + eventID);
+				reject(err);
+			}
+		});
+	});
+};
+
+module.exports.removeUserHostingEvent = function(name, eventID){
+	return new Promise(	
+		function (resolve, reject) {
+			const collection = db.collection('Users');
+			let doc = {
+				'eventsHosting': eventID
+			};
+		 	collection.updateOne({'name': name},{ '$pull': doc},
+		 			{'upsert':false},function(err, result) {
+			if(err == null){
+				console.log("removeUserHostingEvent() Success: " 
+				+ name
+				+ ":" + eventID);
+				resolve(result);
+			} else{
+				console.log("removeUserHostingEvent() Failed: "
+				+ name
+				+ ":" + eventID);
 				reject(err);
 			}
 		});
