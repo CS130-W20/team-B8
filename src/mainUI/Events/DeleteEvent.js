@@ -2,52 +2,39 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
-import { makeStyles } from '@material-ui/core/styles';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { IconButton } from '@material-ui/core';
 
-
-const useStyles = makeStyles(theme => ({
-    formControl: {
-      margin: theme.spacing(1),
-      minWidth: 120,
-    },
-  }));
-
+/**
+ * Function component that uses Google Material UI Dialog Boxes
+ * Uses IconButton to toggle display, and allows users Delete Events.
+ * Currently incomplete, as we still need to display event information.
+ * @see https://material-ui.com/components/dialogs/
+ * @see https://material-ui.com/components/pickers/
+ * 
+ * @author Phipson Lee
+ * @since 2020-02-15
+ */
 export default function EventDelete() {
-    const classes = useStyles();
+  /**
+   * @var dialogopen Hook set to false to indicate state of dashboard
+   * @var setDOpen Function that changes the state variable open
+   */
     const [dialogopen, setDOpen] = React.useState(false);
 
+  /**
+   * @var handleClickOpen Function that sets the dialog box to close
+   */
     const handleClickOpen = () => {
         setDOpen(true);
     };
 
+  /**
+   * @var handleClickClose Function that sets the dialog box to close
+   */
     const handleClickClose = () => {
         setDOpen(false);
-    };
-
-    // The first commit of Material-UI
-    const [selectedDate, setSelectedDate] = React.useState(new Date('2014-08-18T21:11:54'));
-
-    const handleDateChange = date => {
-        setSelectedDate(date);
-    };
-
-    const [age, setAge] = React.useState('');
-  
-    const handleChange = event => {
-      setAge(event.target.value);
-    };
-
-    const [open, setOpen] = React.useState(false);
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-    const handleOpen = () => {
-        setOpen(true);
     };
 
   return (

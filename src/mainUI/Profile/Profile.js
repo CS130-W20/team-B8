@@ -9,6 +9,11 @@ import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import Title from './Title';
 
+/**
+ * @var useStyle Function object that generates a style off of default MaterialsUI Theme
+ * @see https://github.com/mui-org/material-ui/tree/master/docs/src/pages/getting-started/templates/dashboard
+ * @see https://material-ui.com/styles/basics/
+ */
 const useStyles = makeStyles(theme => ({
     paper: {
       paddingTop: theme.spacing(2),
@@ -29,9 +34,23 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
+/**
+ * Function component that uses Google Material UI
+ * Displays a simple user profile 
+ * Still working in progress as we have yet to integrate with database/backend
+ * 
+ * @author Phipson Lee
+ * @since 2020-02-15
+ */
 export default function Profile() {
+    /**
+   * @var classes Calls Material-UI useStyles to generate/inherit material UI styles generated from a default theme
+   */
     const classes = useStyles();
   
+    /**
+   * Renders User profile onto screen
+   */
     return (
       <Container component="main" maxWidth="xs">
         <Grid item xs={12}>

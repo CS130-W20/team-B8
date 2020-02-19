@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
-import Box from '@material-ui/core/Box';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
@@ -12,7 +11,6 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
-import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
@@ -29,21 +27,12 @@ import EventList from './Events/EventList';
 import Profile from './Profile/Profile';
 import EventHistory from './Rating/EventHistory';
 
-// TODO: Re-organize everything and customize everything because this is built off an existing template
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
+/**
+ * @var AppComponents Dictionary that maps specific state of dashboard to a component
+ * Toggles what is visible on DOM when a button is pressed
+ * Used in Dashboard component
+ */
 const AppComponents = {
   "Map": <GMap />,
   "Profile": <Profile />,
@@ -51,8 +40,16 @@ const AppComponents = {
   "Rate": <EventHistory />
 }
 
+/**
+ * @var drawerWidth CSS Style for setting width of dashboard drawer
+ */
 const drawerWidth = 240;
 
+/**
+ * @var useStyle Function object that generates a style off of default MaterialsUI Theme
+ * @see https://github.com/mui-org/material-ui/tree/master/docs/src/pages/getting-started/templates/dashboard
+ * @see https://material-ui.com/styles/basics/
+ */
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
@@ -136,17 +133,51 @@ const useStyles = makeStyles(theme => ({
 }
 }));
 
+/**
+ * Function component that uses Google Material UI Dashboard Template
+ * Customized to include a state machine that switches views on button click
+ * @see https://material-ui.com/getting-started/templates/dashboard/
+ * @see https://github.com/mui-org/material-ui/tree/master/docs/src/pages/getting-started/templates/dashboard
+ * 
+ * @author Phipson Lee
+ * @since 2020-02-15
+ */
 export default function Dashboard() {
+  /**
+   * @var classes Calls Material-UI useStyles to generate/inherit material UI styles generated from a default theme
+   */
     const classes = useStyles();
+
+  /**
+   * @var open Hook set to false to indicate state of dashboard
+   * @var setOpen Function that changes the state variable open
+   */
     const [open, setOpen] = React.useState(false);
+
+  /**
+   * @var dashboardPage Hook to display specific component based on button click
+   * @var setPage Function that changes the state variable dashboardPage
+   */
     const [dashboardPage, setPage] = React.useState('Map');
+
+  /**
+   * @var handleDrawerOpen Function that sets the state of open. Passed to onClick events.
+   */
     const handleDrawerOpen = () => {
       setOpen(true);
     };
+
+  /**
+   * @var handleDrawerOpen Function that sets the state of open. Passed to onClick events.
+   */
     const handleDrawerClose = () => {
       setOpen(false);
     };
 
+  /**
+   * Default return function that renders dashboard onto browser
+   * Uses open and dashboardPage variables to change the state of the dashboardUI
+   */
     return (
       <div className={classes.root}>
         <CssBaseline />
@@ -213,9 +244,6 @@ export default function Dashboard() {
           <div className={classes.appBarSpacer} />
           <Container maxWidth="lg" className={classes.container}>
             {AppComponents[dashboardPage]}
-            <Box pt={4}>
-              <Copyright />
-            </Box>
           </Container>
         </main>
       </div>

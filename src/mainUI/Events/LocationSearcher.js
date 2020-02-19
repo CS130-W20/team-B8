@@ -4,11 +4,21 @@ import PlacesAutocomplete, {
   getLatLng,
 } from 'react-places-autocomplete';
 import TextField from '@material-ui/core/TextField';
- 
+
+
+/**
+ * Helper class/module that references example code obtained from external npm library
+ * @see react-places-autocomplete https://www.npmjs.com/package/react-places-autocomplete
+ * 
+ * Used to fetch location based on search query to give users a list of potential auto-complete locations
+ * Integrated with Material-UI
+ */ 
 export default class LocationSearchInput extends React.Component {
   constructor(props) {
     super(props);
     this.state = { address: '' };
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSelect = this.handleSelect.bind(this);
   }
  
   handleChange = address => {

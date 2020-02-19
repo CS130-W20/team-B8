@@ -18,6 +18,11 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import LocationSearchInput from './LocationSearcher';
 
+/**
+ * @var useStyle Function object that generates a style off of default MaterialsUI Theme
+ * @see https://github.com/mui-org/material-ui/tree/master/docs/src/pages/getting-started/templates/dashboard
+ * @see https://material-ui.com/styles/basics/
+ */
 const useStyles = makeStyles(theme => ({
     button: {
       display: 'block',
@@ -29,41 +34,89 @@ const useStyles = makeStyles(theme => ({
     },
   }));
 
+/**
+ * Function component that uses Google Material UI Dialog Boxes
+ * Uses IconButton to toggle display, and allows users create Events.
+ * @see https://material-ui.com/components/dialogs/
+ * @see https://material-ui.com/components/pickers/
+ * 
+ * @author Phipson Lee
+ * @since 2020-02-15
+ */
 export default function EventForm() {
-    const classes = useStyles();
+  /**
+   * @var classes Calls Material-UI useStyles to generate/inherit material UI styles generated from a default theme
+   */
+  const classes = useStyles();
+
+  /**
+   * @var dialogopen Hook set to false to indicate state of dashboard
+   * @var setDOpen Function that changes the state variable open
+   */
     const [dialogopen, setDOpen] = React.useState(false);
 
+  /**
+   * @var handleClickOpen Function that sets the dialog box to close
+   */
     const handleClickOpen = () => {
         setDOpen(true);
     };
 
+  /**
+   * @var handleClickClose Function that sets the dialog box to close
+   */
     const handleClickClose = () => {
         setDOpen(false);
     };
 
-    // The first commit of Material-UI
+  /**
+   * @var selectedDate Hook set to default date. Changes date of event
+   * @var setSelectedDate Function that changes the state variable selectedDate
+   * @see https://material-ui.com/components/pickers/
+   */
     const [selectedDate, setSelectedDate] = React.useState(new Date('2014-08-18T21:11:54'));
 
+  /**
+   * @var handleDateChange Function that takes in a date and updates the selected date for event
+   * @param {*} date 
+   */
     const handleDateChange = date => {
         setSelectedDate(date);
     };
 
-    const [age, setAge] = React.useState('');
+  /**
+   * @var type Hook set to none by default. Configures the type of event user wants.
+   * @var setType Function that changes the state variable type
+   */
+    const [type, setType] = React.useState('');
   
     const handleChange = event => {
-      setAge(event.target.value);
+      setType(event.target.value);
     };
 
+  /**
+   * @var open Hook set to false to indicate state of select menu
+   * @var setOpen Function that changes the state variable open
+   */
     const [open, setOpen] = React.useState(false);
 
+  /**
+   * @var handleClose Function that sets the select menu to close
+   */
     const handleClose = () => {
         setOpen(false);
     };
 
+  /**
+   * @var handleClose Function that sets the select box to open
+   */
     const handleOpen = () => {
         setOpen(true);
     };
 
+  /**
+   * Renders event form based on button click and state changes. Creates event upon submission of form.
+   */
   return (
     <div style={{justifyContent: 'center', width: "100%", display: "grid", padding: "1.5%"}}>
       <Button variant="contained" color="primary" onClick={handleClickOpen}>
@@ -109,7 +162,7 @@ export default function EventForm() {
             open={open}
             onClose={handleClose}
             onOpen={handleOpen}
-            value={age}
+            value={type}
             onChange={handleChange}>
             <MenuItem value="">
                 <em>None</em>

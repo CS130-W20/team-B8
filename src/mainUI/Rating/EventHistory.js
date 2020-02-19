@@ -12,6 +12,10 @@ import Paper from '@material-ui/core/Paper';
 
 import EventRater from './EventRater';
 
+/**
+ * @var useStyle Function object that generates a style off of default MaterialsUI Theme
+ * @see https://material-ui.com/styles/basics/
+ */
 const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
@@ -35,10 +39,23 @@ function preventDefault(event) {
     event.preventDefault();
   }
 
+/**
+ * Helper function to display data of each event based on entry
+ * @see  https://github.com/mui-org/material-ui/tree/master/docs/src/pages/getting-started/templates/dashboard
+ * @param {Integer} id Unique id of event for internal use
+ * @param {String} date Date of event in terms of DD/MM/YYYY
+ * @param {String} name Name of Event
+ * @param {String} location Location of Event
+ * @param {String} time Time of event in AM/PM
+ * @param {Integer} attendees Number of attendees for that event
+ */
 function createData(id, date, name, location, time, attendees) {
     return { id, date, name, location, time, attendees};
 }
 
+/**
+ * @var rows Simple test data used to query and fetch events for display
+ */
 const rows = [
     createData(0, '16 Mar, 2019', 'Event A', 'Tupelo, MS', '6AM', 44),
     createData(1, '16 Mar, 2019', 'Event B', 'London, UK', '6AM', 99),
@@ -47,8 +64,25 @@ const rows = [
     createData(4, '15 Mar, 2019', 'Event E', 'Long Branch, NJ', '6AM', 79),
   ];
 
-export default function EventList() {
+/**
+ * Function component that uses Google Material UI Dialog Boxes
+ * Uses IconButton to toggle display, and allows users to rate events they have attended
+ * @see https://material-ui.com/components/dialogs/
+ * @see https://material-ui.com/components/pickers/
+ * @see EventRater
+ * 
+ * @author Phipson Lee
+ * @since 2020-02-15
+ */
+export default function EventHistory() {
+    /**
+     * @var classes Calls useStyles to generate CSS style inherited from Materials UI Theme
+     */
     const classes = useStyles();
+
+    /**
+     * Renders a table showing the events that the user has attended (currently using test data)
+     */
     return (
             <Grid item xs={12}>
               <Paper className={classes.paper}>

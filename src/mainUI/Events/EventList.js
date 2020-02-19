@@ -14,7 +14,10 @@ import EventEdit from './EditEvent';
 import EventDelete from './DeleteEvent';
 import EventMessage from './MessageEvent';
 
-
+/**
+ * @var useStyle Function object that generates a style off of default MaterialsUI Theme
+ * @see https://material-ui.com/styles/basics/
+ */
 const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
