@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {Component} from 'react';
 import PlacesAutocomplete, {
   geocodeByAddress,
   getLatLng,
 } from 'react-places-autocomplete';
 import TextField from '@material-ui/core/TextField';
+import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
 
 
 /**
@@ -13,7 +14,7 @@ import TextField from '@material-ui/core/TextField';
  * Used to fetch location based on search query to give users a list of potential auto-complete locations
  * Integrated with Material-UI
  */ 
-export default class LocationSearchInput extends React.Component {
+class LocationSearchInput extends Component {
   constructor(props) {
     super(props);
     this.state = { address: this.props.default };
@@ -47,7 +48,10 @@ export default class LocationSearchInput extends React.Component {
               <TextField
                 autoFocus
                 margin="dense"
-                id="location"
+                inputProps={{
+                  "data-testid":"event-location"
+                }}
+                id="event-location"
                 value={this.state.address}
                 type="email"
                 fullWidth
@@ -84,3 +88,7 @@ export default class LocationSearchInput extends React.Component {
     );
   }
 }
+
+export default (GoogleApiWrapper({
+  apiKey: "AIzaSyD2EzcDG507GgPgPHVEoVpgFngvsMGIElg"
+})(LocationSearchInput));

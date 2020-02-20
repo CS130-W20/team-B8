@@ -66,8 +66,8 @@ class SimpleMap extends Component {
 
 /**
  * Sets the state of the component when it mounts. Default function that is available for all reactJS components
- * In this case, for testing purposes, we have defined a set of markers based on markerTypes
- * @see markerTypes from './../markerPrefab/mapMarker'
+ * In particular, we will get all events and then push them onto a buffer before updating our state
+ * this.state.markers will then be rendered on the DOM
  */
   componentDidMount() {
     var markerList = []

@@ -71,8 +71,13 @@ class EventForm extends Component {
     this.createEvent = this.createEvent.bind(this);
   }
 
+  /**
+   * @function createEvent Helper function to query mongoDB server and create event object
+   */
   createEvent() {
-    console.log(this.state.location);
+    if (this.state == null)
+      this.handleClickClose();
+    //console.log(this.state.location);
     Geocode.fromAddress(this.state.location).then(
       response => {
         const { lat, lng } = response.results[0].geometry.location;
@@ -88,7 +93,6 @@ class EventForm extends Component {
 
         console.log(newEvent);
 
-        //socket.emit('addEvent', newEvent.eventId, newEvent.title, newEvent.tag, newEvent.host, newEvent.location, newEvent.locationName);
         socket.emit('addEvent', newEvent.eventId, newEvent.title, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.host);
 
 
@@ -189,16 +193,19 @@ class EventForm extends Component {
     const {classes} = this.props;
   return (
     <div style={{justifyContent: 'center', width: "100%", display: "grid", padding: "1.5%"}}>
-      <Button variant="contained" color="primary" onClick={this.handleClickOpen}>
+      <Button data-testid="event-create-button" variant="contained" color="primary" onClick={this.handleClickOpen}>
         Host a New Event
       </Button>
-      <Dialog open={this.state.dialogopen} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">Update Your Event</DialogTitle>
+      <Dialog data-testid="event-create-dialog" open={this.state.dialogopen} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
+          <DialogTitle id="form-dialog-title">Create A New Event</DialogTitle>
           <DialogContent>
               <TextField
               autoFocus
               margin="dense"
-              id="name"
+              inputProps={{
+                "data-testid" :"event-title"
+              }}
+              id="event-title"
               label="Name of Event"
               value={this.state.title}
               onChange={this.handleTextChange}
@@ -210,7 +217,10 @@ class EventForm extends Component {
               <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <KeyboardDatePicker
               margin="normal"
-              id="date-picker-dialog"
+              id="event-date"
+              inputProps={{
+                "data-testid" :"event-date"
+              }}
               format="MM/dd/yyyy"
               value={this.state.date}
               onChange={this.handleDateChange}
@@ -219,7 +229,10 @@ class EventForm extends Component {
               }}/>
               <KeyboardTimePicker
               margin="normal"
-              id="time-picker"
+              id="event-time"
+              inputProps={{
+                "data-testid":"event-time"
+              }}
               value={this.state.date}
               onChange={this.handleDateChange}
               KeyboardButtonProps={{
@@ -229,8 +242,11 @@ class EventForm extends Component {
               <FormControl className={classes.formControl}>
               <InputLabel id="demo-controlled-open-select-label">Event Type</InputLabel>
               <Select
+              inputProps={{
+                "data-testid":"event-select"
+              }}
               labelId="demo-controlled-open-select-label"
-              id="demo-controlled-open-select"
+              id="event-select"
               open={this.state.open}
               onClose={this.handleClose}
               onOpen={this.handleOpen}
@@ -250,9 +266,9 @@ class EventForm extends Component {
             <Button onClick={this.handleClickClose} color="primary">
               Cancel
             </Button>
-            <Button onClick={this.createEvent} color="primary">
+            <Button onClick={this.createEvent} color="primary" data-testid="event-create">
               {/* TODO: ADD TO DB AND UPDATE */}
-              Update
+              Create
             </Button>
           </DialogActions>
         </Dialog>

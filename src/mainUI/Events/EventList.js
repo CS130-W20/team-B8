@@ -42,11 +42,18 @@ const styles = theme => ({
 });
 
 /**
+ * React Component used to display and visualize table of events that the user is currently hosting
  * @author Phipson Lee
  * @date 02-19-2020
  */
 class EventList extends Component {
 
+    /**
+     * Default constructor for initializing state
+     * @param {Object} props 
+     * @var hostEvents An array of events that the user is a part of (queried from mongoDB server)
+     * @function resetList A helper function that re-renders the visual component whenever an event has been edited/created
+     */
     constructor(props) {
         super(props);
         this.state = {
@@ -55,6 +62,9 @@ class EventList extends Component {
         this.resetList = this.resetList.bind(this);
     };
 
+    /**
+     * called when the component is added to the DOM; we call resetList() to ensure that the component is updated
+     */
     componentDidMount() {
         this.resetList();
     }
@@ -94,7 +104,7 @@ class EventList extends Component {
     render() {
     const { classes } = this.props;
     return (
-            <Grid item xs={12}>
+            <Grid data-testid="Events" item xs={12}>
               <Paper className={classes.paper}>
               <React.Fragment>
               <EventForm updateFunction={this.resetList}/>
@@ -111,7 +121,7 @@ class EventList extends Component {
                     </TableHead>
                     <TableBody>
                         {this.state.hostEvents.map(row => (
-                        <TableRow key={row.id}>
+                        <TableRow data-testid="event-rows" key={row.id}>
                             <TableCell>{row.date}</TableCell>
                             <TableCell>{row.name}</TableCell>
                             <TableCell>{row.location}</TableCell>

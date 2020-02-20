@@ -1,131 +1,141 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import {render, fireEvent } from '@testing-library/react';
-import EventList from '../mainUI/Dashboard';
+import {render, fireEvent, queryByText } from '@testing-library/react';
+import EventList from '../mainUI/Events/EventList';
 
 /**
  * @author Phipson Lee
  * @date 02-18-2020
+ * Test scripts for different scenarios for EventList ReactJS Component
+ * Currently in the process of modifying the EventList component itself 
+ * such that 'dummy data' can be passed for further testing
  */
 
 /**
- * @test To verify that the default screen that the dashboard is on is the GMaps component
+ * @test To verify that the event table has been initialized correctly
  */
-test('Test 1: Verifying correct dashboard initialization', () => {
+test('Test 1: Verifying Event Table Initialization', () => {
     const { getByText, queryByTestId } = render(<EventList/>);
 
     /**
-     * Google Maps should be visible by default
-     * All navigation menu items should be available
-     * Drawer should be closed (and the button is thus visible)
+     * Table headers should be visible by default
      * Dialog box should also be invisible
      */
-    expect(queryByTestId('Map')).toBeVisible();
-    expect(getByText('Event Map')).toBeInTheDocument();
-    expect(getByText('Profile')).toBeInTheDocument();
-    expect(getByText('Your Events')).toBeInTheDocument();
-    expect(getByText('Write Reviews')).toBeInTheDocument();
-    expect(queryByTestId('hamburger-button')).toBeVisible();
-
-    /**
-     * Verify that other components not rendered are not visible
-     */
-    expect(queryByTestId('Events')).toBeNull();
-    expect(queryByTestId('Profile')).toBeNull();
-    expect(queryByTestId('Ratings')).toBeNull();
-})
-
-/**
- * @test Testing behavior on pressing iconbar button for navigation
- */
-test('Test 2: Pressing Toolbar Button on Dashboard', () => {
-    const { queryByTestId, getByText } = render(<Dashboard/>);
-    
-    /**
-     * Open drawer and button should change state but rest should remain the same
-     */
-    fireEvent.click(queryByTestId('hamburger-button'));
-    expect(queryByTestId('Map')).toBeVisible();
-    expect(getByText('Event Map')).toBeInTheDocument();
-    expect(getByText('Profile')).toBeInTheDocument();
-    expect(getByText('Your Events')).toBeInTheDocument();
-    expect(getByText('Write Reviews')).toBeInTheDocument();
-    expect(queryByTestId('hamburger-button')).not.toBeVisible();
-
-    /**
-     * Click on returning drawer button and the icon button should be visible again
-     */
-    fireEvent.click(queryByTestId('left-button'));
-    expect(queryByTestId('Map')).toBeVisible();
-    expect(getByText('Event Map')).toBeInTheDocument();
-    expect(getByText('Profile')).toBeInTheDocument();
-    expect(getByText('Your Events')).toBeInTheDocument();
-    expect(getByText('Write Reviews')).toBeInTheDocument();
-    expect(queryByTestId('hamburger-button')).toBeVisible();
-})
-
-/**
- * @test Testing interface behavior when switching screens
- */
-test('Test 3: Switching between Components', () => {
-    const { queryByTestId } = render(<Dashboard/>);
-    
-    /**
-     * Open drawer and navigate to Profile
-     */
-    fireEvent.click(queryByTestId('hamburger-button'));
-    fireEvent.click(queryByTestId('profile-button'));
-
-    expect(queryByTestId('Profile')).toBeVisible();
-    expect(queryByTestId('Map')).toBeNull();
-    expect(queryByTestId('Events')).toBeNull();
-    expect(queryByTestId('Ratings')).toBeNull();
-    expect(queryByTestId('hamburger-button')).not.toBeVisible();
-
-    /**
-     * Navigate to Map
-     */
-    fireEvent.click(queryByTestId('map-button'));
-    expect(queryByTestId('Map')).toBeVisible();
-    expect(queryByTestId('Profile')).toBeNull();
-    expect(queryByTestId('Events')).toBeNull();
-    expect(queryByTestId('Ratings')).toBeNull();
-    expect(queryByTestId('hamburger-button')).not.toBeVisible();
-
-    /**
-     * Navigate to Events
-     */
-    fireEvent.click(queryByTestId('events-button'));
     expect(queryByTestId('Events')).toBeVisible();
-    expect(queryByTestId('Profile')).toBeNull();
-    expect(queryByTestId('Map')).toBeNull();
-    expect(queryByTestId('Ratings')).toBeNull();
-    expect(queryByTestId('hamburger-button')).not.toBeVisible();
+    expect(queryByTestId('event-row')).toBeNull();
+    expect(getByText('Date')).toBeInTheDocument();
+    expect(getByText('Name')).toBeInTheDocument();
+    expect(getByText('Location')).toBeInTheDocument();
+    expect(getByText('Time')).toBeInTheDocument();
+    expect(getByText('Attendees')).toBeInTheDocument();
+
+});
+
+/**
+ * @test Testing behavior upon pressing the "Host A New Event" Button
+ */
+test('Test 2: Testing Event Creation', () => {
+    const { queryByTestId, getByText} = render(<EventList/>);
+    
+    /**
+     * Click button and verify state is correct
+     */
+    fireEvent.click(queryByTestId('event-create-button'));
+    expect(queryByTestId('event-create-dialog')).toBeVisible();
+    expect(getByText('Create A New Event')).toBeInTheDocument();
+    expect(getByText('Event Type')).toBeInTheDocument();
 
     /**
-     * Navigate to Ratings
+     * Update form and submit
+     * Note: There are some limitations testing with date/time picker
+     * Due to the fact that MaterialUI nests the elements it is currently unsupported/undocumented
      */
-    fireEvent.click(queryByTestId('rating-button'));
-    expect(queryByTestId('Ratings')).toBeVisible();
-    expect(queryByTestId('Profile')).toBeNull();
-    expect(queryByTestId('Events')).toBeNull();
-    expect(queryByTestId('Map')).toBeNull();
-    expect(queryByTestId('hamburger-button')).not.toBeVisible();
+    fireEvent.change(queryByTestId('event-title'), {
+        target: {value: 'Test Event'}
+    });
+    expect(queryByTestId('event-title').value).toBe('Test Event');
 
     /**
-     * Click on returning drawer button and the icon button should be visible again
+     * User should be able to select from the selection menu upon click
      */
-    fireEvent.click(queryByTestId('left-button'));
-    expect(queryByTestId('hamburger-button')).toBeVisible();
+    fireEvent.click(queryByTestId('event-select'));
+    expect(queryByText('Rave')).not.toBeNull();
+    expect(queryByText('House Party')).not.toBeNull();
+    expect(queryByText('Music Concert/Festival')).not.toBeNull();
+    expect(queryByText('Bar Hopping')).not.toBeNull();
+
+
+    /**
+     * After creating event, the dialog box should disappear
+     */
+    fireEvent.click(queryByTestId('event-create'));
+    expect(getByText('Event Type')).toBeNull();
+    expect(getByText('Create A New Event')).toBeNull();
 })
 
 /**
- * @test Testing for visibility of dialog boxes without anything pressed
- * Issue with testing map: The Google Map interface is wrapped in as an object, so markers/UI events can't be tested
+ * @test Testing interface behavior when editing events; Note that this will fail 
+ * if there are no existing events in the Component
  */
-test('Test 4: Verifying Dialog Boxes are Hidden', () => {
-    const { queryByTestId } = render(<Dashboard/>);
+test('Test 3: Testing Event Editing (Fails when there are no Events)', () => {
+    const { queryByTestId, getByText} = render(<EventList/>);
+    
+    /**
+     * Click button and verify state is correct
+     */
+    fireEvent.click(queryByTestId('event-edit-button'));
+    expect(queryByTestId('event-edit-dialog')).toBeVisible();
+    expect(getByText('Edit Event')).toBeInTheDocument();
+    expect(getByText('Event Type')).toBeInTheDocument();
 
-    expect(queryByTestId('map-dialog')).toBeNull();
+    /**
+     * Update form and submit
+     * Note: There are some limitations testing with date/time picker
+     * Due to the fact that MaterialUI nests the elements it is currently unsupported/undocumented
+     */
+    fireEvent.change(queryByTestId('event-edit-title'), {
+        target: {value: 'Edited Event'}
+    });
+    expect(queryByTestId('event-title').value).toBe('Edited Event');
+
+    fireEvent.click(queryByTestId('event-edit-select'));
+    expect(queryByTestId('event-edit-select')).not.toBeNull();
+
+    fireEvent.click(queryByTestId('event-edit'));
+    expect(getByText('Event Type')).toBeNull();
+    expect(getByText('Edit Event')).toBeNull();
+})
+
+/**
+ * @test Testing interface behavior when messaging attendees for an event; Note that this will fail 
+ * if there are no existing events in the Component
+ */
+test('Test 4: Testing Event Message', () => {
+    const { queryByTestId } = render(<EventList/>);
+
+    fireEvent.click(queryByTestId('event-message-button'));
+    expect(getByText('Send a Message to your Attendees')).toBeInTheDocument();
+
+    fireEvent.change(queryByTestId('event-message-text'), {
+        target: {value: 'New Message'}
+    });
+    expect(queryByTestId('event-message-text').value).toBe('New Message');
+
+    fireEvent.click(queryByTestId('event-message'));
+    expect(getByText('Send a Message to your Attendees')).toBeNull();
+});
+
+/**
+ * @test Testing interface behavior when deleting events; Note that this will fail 
+ * if there are no existing events in the Component
+ */
+test('Test 5: Testing Event Deletion', () => {
+    const { queryByTestId } = render(<EventList/>);
+
+    fireEvent.click(queryByTestId('event-delete-button'));
+    expect(getByText('You are about to delete this event. You cannot undo this action. Would you wish to continue?')).toBeInTheDocument();
+
+    fireEvent.click(queryByTestId('event-delete'));
+    expect(getByText('You are about to delete this event. You cannot undo this action. Would you wish to continue?')).toBeNull();
 
 });

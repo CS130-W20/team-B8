@@ -58,6 +58,17 @@ Geocode.enableDebug();
  * @since 2020-02-15
  */
 class EventEdit extends Component{
+/**
+ * Default constructor for component, as with all ReactJS Components
+ * this.state is used to keep track of any changes in the FormInput and also (by default)
+ * store the existing information of the event (in case the user wants to cancel)
+ * 
+ * Constructor also uses Google Maps API to fetch user's current location.
+ * @param props This is a key-value object that is maintained to pass arguments
+ * on construction; we are passing 1. the Event object and 2. a function object to update the EventList
+ * @see google-maps-react For more information on navigator.geolocation
+ * @see markerTypes
+ */
   constructor(props) {
     super(props);
     this.state = {
@@ -80,6 +91,10 @@ class EventEdit extends Component{
     this.handleTextChange = this.handleTextChange.bind(this);
   }
 
+  /**
+   * Function is called when component is loaded onto DOM. In particular, we use this to 
+   * Pass the arguments from the event (given in props) to the state
+   */
   componentDidMount() {
     console.log(this.props.event);
     console.log(this.state.event);
