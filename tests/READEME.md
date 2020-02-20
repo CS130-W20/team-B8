@@ -1,0 +1,1 @@
+Tests folder contains several test scripts for different features and functionality. The tests in particular are divided up according to stories/tasks and ReactJS components. The subdirectories are as follows:
