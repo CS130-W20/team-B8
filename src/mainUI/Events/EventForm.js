@@ -18,6 +18,8 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import LocationSearchInput from './LocationSearcher';
 
+import { addEvent } from '../../sockets/sockets.js';
+
 /**
  * @var useStyle Function object that generates a style off of default MaterialsUI Theme
  * @see https://github.com/mui-org/material-ui/tree/master/docs/src/pages/getting-started/templates/dashboard
@@ -40,7 +42,7 @@ const useStyles = makeStyles(theme => ({
  * @see https://material-ui.com/components/dialogs/
  * @see https://material-ui.com/components/pickers/
  * 
- * @author Phipson Lee
+ * @author Phipson Lee, Lawrence Lee
  * @since 2020-02-15
  */
 export default function EventForm() {
@@ -48,6 +50,9 @@ export default function EventForm() {
    * @var classes Calls Material-UI useStyles to generate/inherit material UI styles generated from a default theme
    */
   const classes = useStyles();
+
+  const titleId = "title";
+  const locationNameId = "location";
 
   /**
    * @var dialogopen Hook set to false to indicate state of dashboard
@@ -114,6 +119,29 @@ export default function EventForm() {
         setOpen(true);
     };
 
+  const [waitingForLocation, setWaitingForLocation] = React.useState(false);
+  const [location, setLocation] = React.useState({});
+
+  /**
+    * @var handleClickCreate Function that submits form after clicking create
+    */
+  const handleClickCreate = () => {
+    let title = document.getElementById(titleId).value;
+    let date = selectedDate;
+    let tag = [];
+    let locationName = document.getElementById(locationNameId).value;
+    //let location = location;
+    let host = "me";
+    addEvent({title, date, tag, location, locationName, type, host});
+    setDOpen(false);
+  };
+  /**
+    * @var handleClickCancel Function that cancels current event form
+    */
+  const handleClickCancel = () => {
+      setDOpen(false);
+  };
+
   /**
    * Renders event form based on button click and state changes. Creates event upon submission of form.
    */
@@ -126,59 +154,62 @@ export default function EventForm() {
         <DialogTitle id="form-dialog-title">Create a New Event</DialogTitle>
         <DialogContent>
             <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Name of Event"
-            type="email"
-            fullWidth/>
-            <LocationSearchInput/>
+              autoFocus
+              margin="dense"
+              id={titleId}
+              label="Name of Event"
+              type="email"
+              fullWidth
+            />
+            <LocationSearchInput locationNameId={locationNameId} setLocation={setLocation} setWaitingForLocation={setWaitingForLocation}/>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
             <KeyboardDatePicker
-            margin="normal"
-            id="date-picker-dialog"
-            label="Date picker dialog"
-            format="MM/dd/yyyy"
-            value={selectedDate}
-            onChange={handleDateChange}
-            KeyboardButtonProps={{
-            'aria-label': 'change date',
-            }}/>
+              margin="normal"
+              id="date-picker-dialog"
+              label="Date picker dialog"
+              format="MM/dd/yyyy"
+              value={selectedDate}
+              onChange={handleDateChange}
+              KeyboardButtonProps={{
+                'aria-label': 'change date',
+              }}
+            />
             <KeyboardTimePicker
-            margin="normal"
-            id="time-picker"
-            label="Time picker"
-            value={selectedDate}
-            onChange={handleDateChange}
-            KeyboardButtonProps={{
-            'aria-label': 'change time',
-            }}/>
+              margin="normal"
+              id="time-picker"
+              label="Time picker"
+              value={selectedDate}
+              onChange={handleDateChange}
+              KeyboardButtonProps={{
+                'aria-label': 'change time',
+              }}
+            />
             </MuiPickersUtilsProvider>
             <FormControl className={classes.formControl}>
-            <InputLabel id="demo-controlled-open-select-label">Event Type</InputLabel>
-            <Select
-            labelId="demo-controlled-open-select-label"
-            id="demo-controlled-open-select"
-            open={open}
-            onClose={handleClose}
-            onOpen={handleOpen}
-            value={type}
-            onChange={handleChange}>
-            <MenuItem value="">
-                <em>None</em>
-            </MenuItem>
-            <MenuItem value={10}>Bar Hopping</MenuItem>
-            <MenuItem value={20}>Rave</MenuItem>
-            <MenuItem value={30}>House Party</MenuItem>
-            <MenuItem value={40}>Music Concert/Festival</MenuItem>
+              <InputLabel id="demo-controlled-open-select-label">Event Type</InputLabel>
+              <Select
+                labelId="demo-controlled-open-select-label"
+                id="demo-controlled-open-select"
+                open={open}
+                onClose={handleClose}
+                onOpen={handleOpen}
+                value={type}
+                onChange={handleChange}>
+                  <MenuItem value="">
+                      <em>None</em>
+                  </MenuItem>
+                  <MenuItem value={10}>Bar Hopping</MenuItem>
+                  <MenuItem value={20}>Rave</MenuItem>
+                  <MenuItem value={30}>House Party</MenuItem>
+                  <MenuItem value={40}>Music Concert/Festival</MenuItem>
             </Select>
             </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClickClose} color="primary">
+          <Button onClick={handleClickCancel} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleClickClose} color="primary">
+          <Button onClick={handleClickCreate} disabled={waitingForLocation} color="primary">
             {/* TODO: ADD TO DB AND UPDATE */}
             Create
           </Button>

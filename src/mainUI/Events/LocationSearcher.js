@@ -24,15 +24,27 @@ export default class LocationSearchInput extends React.Component {
   handleChange = address => {
     this.setState({ address });
   };
- 
+
   handleSelect = address => {
+    const {
+      setLocation, setWaitingForLocation
+    } = this.props;
+
+    this.setState({address});
+    setWaitingForLocation(true);
     geocodeByAddress(address)
       .then(results => getLatLng(results[0]))
-      .then(latLng => console.log('Success', latLng))
+      .then(latLng => { setLocation(latLng); setWaitingForLocation(false)})
       .catch(error => console.error('Error', error));
   };
  
   render() {
+    const {
+      locationNameId,
+      setLocation,
+      setWaitingForLocation
+    } = this.props;
+
     return (
       <PlacesAutocomplete
         value={this.state.address}
@@ -44,7 +56,7 @@ export default class LocationSearchInput extends React.Component {
               <TextField
                 autoFocus
                 margin="dense"
-                id="name"
+                id={locationNameId}
                 type="email"
                 fullWidth
                 {...getInputProps({

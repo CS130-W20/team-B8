@@ -176,8 +176,8 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('addEvent', (eventId, title, tag, location, locationName, host) => {
-    let prom = dbInterface.addEvent(eventId, title, tag, location, locationName, host);
+  socket.on('addEvent', (title, date, tag, location, locationName, type, host) => {
+    let prom = dbInterface.addEvent(title, date, tag, location, locationName, type, host);
     prom.then( (docs) => {
       console.log("NEW EVENT", docs);
       socket.emit("serverReply", docs);
