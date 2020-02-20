@@ -29,6 +29,7 @@ test('Test 1: Verifying correct dashboard initialization', () => {
 
     /**
      * Verify that other components not rendered are not visible
+     * The events, profile, and ratings page should not be rendered at this point
      */
     expect(queryByTestId('Events')).toBeNull();
     expect(queryByTestId('Profile')).toBeNull();
@@ -43,6 +44,7 @@ test('Test 2: Pressing Toolbar Button on Dashboard', () => {
     
     /**
      * Open drawer and button should change state but rest should remain the same
+     * The buttons to the menu bar should also be available, as indicated by the text
      */
     fireEvent.click(queryByTestId('hamburger-button'));
     expect(queryByTestId('Map')).toBeVisible();
@@ -54,6 +56,7 @@ test('Test 2: Pressing Toolbar Button on Dashboard', () => {
 
     /**
      * Click on returning drawer button and the icon button should be visible again
+     * The buttons should still be available in the document, although they are hidden from view
      */
     fireEvent.click(queryByTestId('left-button'));
     expect(queryByTestId('Map')).toBeVisible();
@@ -76,6 +79,9 @@ test('Test 3: Switching between Components', () => {
     fireEvent.click(queryByTestId('hamburger-button'));
     fireEvent.click(queryByTestId('profile-button'));
 
+    /**
+     * Only profile page should be visible
+     */
     expect(queryByTestId('Profile')).toBeVisible();
     expect(queryByTestId('Map')).toBeNull();
     expect(queryByTestId('Events')).toBeNull();
@@ -84,6 +90,7 @@ test('Test 3: Switching between Components', () => {
 
     /**
      * Navigate to Map
+     * Only Map should be visible
      */
     fireEvent.click(queryByTestId('map-button'));
     expect(queryByTestId('Map')).toBeVisible();
@@ -94,6 +101,7 @@ test('Test 3: Switching between Components', () => {
 
     /**
      * Navigate to Events
+     * Only Events should be visible
      */
     fireEvent.click(queryByTestId('events-button'));
     expect(queryByTestId('Events')).toBeVisible();
@@ -104,6 +112,7 @@ test('Test 3: Switching between Components', () => {
 
     /**
      * Navigate to Ratings
+     * Only Ratings should be visible
      */
     fireEvent.click(queryByTestId('rating-button'));
     expect(queryByTestId('Ratings')).toBeVisible();
@@ -114,6 +123,7 @@ test('Test 3: Switching between Components', () => {
 
     /**
      * Click on returning drawer button and the icon button should be visible again
+     * The menu bar should behave consistently regardless of where and when we press it
      */
     fireEvent.click(queryByTestId('left-button'));
     expect(queryByTestId('hamburger-button')).toBeVisible();
@@ -126,6 +136,14 @@ test('Test 3: Switching between Components', () => {
 test('Test 4: Verifying Dialog Boxes are Hidden', () => {
     const { queryByTestId } = render(<Dashboard/>);
 
+    /**
+     * Verify that the dialog box for the map is null upon initialization
+     */
     expect(queryByTestId('map-dialog')).toBeNull();
+
+    /**
+     * TODO: Need to find alternative libraries to access Markers in Google Maps, as the current library 
+     * is unable to query and click the markers in Google Map
+     */
 
 });

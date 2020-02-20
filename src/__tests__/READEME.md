@@ -1,4 +1,4 @@
-Tests folder contains several test scripts for different features and functionality. The tests in particular are divided up according to stories/tasks and ReactJS components. The subdirectories are as follows:
+Tests folder contains several test scripts for different features and functionality. The tests in particular are divided up according to stories/tasks and ReactJS components. Please refer to the commends in each script for more details of the test oracle. The subdirectories are as follows:
 
 dashboardTest.js - Unit Testing; Test cases for dashboard component in app. Used to test the visibility and state changes in menu, navigation, as well as verifying that certain components, such as different pages, are hidden until onClick events. Done in isolation to database and server.
 1. Make sure that map is displayed on start and the icon bar is closed
