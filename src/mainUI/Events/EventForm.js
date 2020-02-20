@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { Component } from 'react';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Select from '@material-ui/core/Select';
@@ -17,13 +17,19 @@ import DateFnsUtils from '@date-io/date-fns';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import LocationSearchInput from './LocationSearcher';
+import Geocode from "react-geocode";
+import { markerTypes } from './../markerPrefab/mapMarker';
+ 
+const
+    io = require("socket.io-client"),
+    socket = io.connect("http://localhost:8000");
 
 /**
  * @var useStyle Function object that generates a style off of default MaterialsUI Theme
  * @see https://github.com/mui-org/material-ui/tree/master/docs/src/pages/getting-started/templates/dashboard
  * @see https://material-ui.com/styles/basics/
  */
-const useStyles = makeStyles(theme => ({
+const styles = theme => ({
     button: {
       display: 'block',
       marginTop: theme.spacing(2),
@@ -32,7 +38,7 @@ const useStyles = makeStyles(theme => ({
       margin: theme.spacing(1),
       minWidth: 120,
     },
-  }));
+  });
 
 /**
  * Function component that uses Google Material UI Dialog Boxes
@@ -43,147 +49,215 @@ const useStyles = makeStyles(theme => ({
  * @author Phipson Lee
  * @since 2020-02-15
  */
-export default function EventForm() {
-  /**
-   * @var classes Calls Material-UI useStyles to generate/inherit material UI styles generated from a default theme
-   */
-  const classes = useStyles();
+class EventForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      date: '',
+      location: '',
+      title: '',
+      dialogopen: false,
+      open: false,
+      type: '',
+    }
+    this.handleClickOpen = this.handleClickOpen.bind(this);
+    this.handleClickClose = this.handleClickClose.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+    this.handleOpen = this.handleOpen.bind(this);
+    this.handleLocChange = this.handleLocChange.bind(this);
+    this.handleTextChange = this.handleTextChange.bind(this);
+    this.createEvent = this.createEvent.bind(this);
+  }
+
+  createEvent() {
+    console.log(this.state.location);
+    Geocode.fromAddress(this.state.location).then(
+      response => {
+        const { lat, lng } = response.results[0].geometry.location;
+
+        var newEvent = {
+          eventId: 1,
+          title: this.state.title,
+          tag: [this.state.type],
+          location: {lat: lat, lng: lng},
+          locationName: this.state.location,
+          host: 'Sean Derman'
+        }
+
+        console.log(newEvent);
+
+        //socket.emit('addEvent', newEvent.eventId, newEvent.title, newEvent.tag, newEvent.host, newEvent.location, newEvent.locationName);
+        socket.emit('addEvent', newEvent.eventId, newEvent.title, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.host);
+
+
+        socket.on('serverReply', (event) => {
+          console.log("serverReply: ", event);
+          this.props.updateFunction();
+        })
+
+      },
+      error => {
+        console.error(error);
+      }
+    );
+    this.handleClickClose();
+  }
+
 
   /**
-   * @var dialogopen Hook set to false to indicate state of dashboard
-   * @var setDOpen Function that changes the state variable open
+   * @function handleClickOpen Function that sets the dialog box to close
    */
-    const [dialogopen, setDOpen] = React.useState(false);
-
-  /**
-   * @var handleClickOpen Function that sets the dialog box to close
-   */
-    const handleClickOpen = () => {
-        setDOpen(true);
+    handleClickOpen = () => {
+      this.setState({
+        dialogopen: true
+      })    
     };
 
   /**
-   * @var handleClickClose Function that sets the dialog box to close
+   * @function handleClickClose Function that sets the dialog box to close
    */
-    const handleClickClose = () => {
-        setDOpen(false);
+    handleClickClose = () => {
+      this.setState({
+        dialogopen: false
+      })    
     };
 
   /**
-   * @var selectedDate Hook set to default date. Changes date of event
-   * @var setSelectedDate Function that changes the state variable selectedDate
-   * @see https://material-ui.com/components/pickers/
+   * @function handleDateChange Function that takes in a date and updates the selected date for event
+   * @param {String} date Date of the anticipated event passed as a string
    */
-    const [selectedDate, setSelectedDate] = React.useState(new Date('2014-08-18T21:11:54'));
-
-  /**
-   * @var handleDateChange Function that takes in a date and updates the selected date for event
-   * @param {*} date 
-   */
-    const handleDateChange = date => {
-        setSelectedDate(date);
+    handleDateChange = date => {
+      this.setState({
+        date: date
+      })    
     };
 
   /**
-   * @var type Hook set to none by default. Configures the type of event user wants.
-   * @var setType Function that changes the state variable type
+   * @function handleChange Function that changes the state variable type based on selected event type
+   * @param {String} event Type of event based on onClick event listener
    */
-    const [type, setType] = React.useState('');
   
-    const handleChange = event => {
-      setType(event.target.value);
+    handleChange = event => {
+      this.setState({
+        type: event.target.value
+      })    
     };
 
   /**
-   * @var open Hook set to false to indicate state of select menu
-   * @var setOpen Function that changes the state variable open
+   * @function handleClose Function that sets the select menu to close
    */
-    const [open, setOpen] = React.useState(false);
-
-  /**
-   * @var handleClose Function that sets the select menu to close
-   */
-    const handleClose = () => {
-        setOpen(false);
+    handleClose = () => {
+      this.setState({
+        open: false
+      })    
     };
 
   /**
-   * @var handleClose Function that sets the select box to open
+   * @function handleClose Function that sets the select box to open
    */
-    const handleOpen = () => {
-        setOpen(true);
+    handleOpen = () => {
+      this.setState({
+        open: true
+      })    
     };
+
+  /**
+   * @function handleLocChange Function that sets the select box to open
+   */
+    handleLocChange = address => {
+      console.log('updated ' + address);
+      this.setState({
+        location: address
+      })
+    }
+
+  /**
+   * @function handleTextChange Function that sets the select box to open
+   */
+    handleTextChange = text => {
+      this.setState({
+        title: text.target.value
+      })
+    }
 
   /**
    * Renders event form based on button click and state changes. Creates event upon submission of form.
    */
+  render(){
+    const {classes} = this.props;
   return (
     <div style={{justifyContent: 'center', width: "100%", display: "grid", padding: "1.5%"}}>
-      <Button variant="contained" color="primary" onClick={handleClickOpen}>
+      <Button variant="contained" color="primary" onClick={this.handleClickOpen}>
         Host a New Event
       </Button>
-      <Dialog open={dialogopen} onClose={handleClickClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Create a New Event</DialogTitle>
-        <DialogContent>
-            <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Name of Event"
-            type="email"
-            fullWidth/>
-            <LocationSearchInput/>
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <KeyboardDatePicker
-            margin="normal"
-            id="date-picker-dialog"
-            label="Date picker dialog"
-            format="MM/dd/yyyy"
-            value={selectedDate}
-            onChange={handleDateChange}
-            KeyboardButtonProps={{
-            'aria-label': 'change date',
-            }}/>
-            <KeyboardTimePicker
-            margin="normal"
-            id="time-picker"
-            label="Time picker"
-            value={selectedDate}
-            onChange={handleDateChange}
-            KeyboardButtonProps={{
-            'aria-label': 'change time',
-            }}/>
-            </MuiPickersUtilsProvider>
-            <FormControl className={classes.formControl}>
-            <InputLabel id="demo-controlled-open-select-label">Event Type</InputLabel>
-            <Select
-            labelId="demo-controlled-open-select-label"
-            id="demo-controlled-open-select"
-            open={open}
-            onClose={handleClose}
-            onOpen={handleOpen}
-            value={type}
-            onChange={handleChange}>
-            <MenuItem value="">
-                <em>None</em>
-            </MenuItem>
-            <MenuItem value={10}>Bar Hopping</MenuItem>
-            <MenuItem value={20}>Rave</MenuItem>
-            <MenuItem value={30}>House Party</MenuItem>
-            <MenuItem value={40}>Music Concert/Festival</MenuItem>
-            </Select>
-            </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClickClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleClickClose} color="primary">
-            {/* TODO: ADD TO DB AND UPDATE */}
-            Create
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Dialog open={this.state.dialogopen} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
+          <DialogTitle id="form-dialog-title">Update Your Event</DialogTitle>
+          <DialogContent>
+              <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              label="Name of Event"
+              value={this.state.title}
+              onChange={this.handleTextChange}
+              type="email"
+              fullWidth/>
+              <LocationSearchInput
+                default={this.state.location}
+                updateFunction={this.handleLocChange}/>
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <KeyboardDatePicker
+              margin="normal"
+              id="date-picker-dialog"
+              format="MM/dd/yyyy"
+              value={this.state.date}
+              onChange={this.handleDateChange}
+              KeyboardButtonProps={{
+              'aria-label': 'change date',
+              }}/>
+              <KeyboardTimePicker
+              margin="normal"
+              id="time-picker"
+              value={this.state.date}
+              onChange={this.handleDateChange}
+              KeyboardButtonProps={{
+              'aria-label': 'change time',
+              }}/>
+              </MuiPickersUtilsProvider>
+              <FormControl className={classes.formControl}>
+              <InputLabel id="demo-controlled-open-select-label">Event Type</InputLabel>
+              <Select
+              labelId="demo-controlled-open-select-label"
+              id="demo-controlled-open-select"
+              open={this.state.open}
+              onClose={this.handleClose}
+              onOpen={this.handleOpen}
+              value={this.state.type}
+              onChange={this.handleChange}>
+              <MenuItem value="">
+                  <em>None</em>
+              </MenuItem>
+              <MenuItem value={markerTypes.food}>Bar Hopping</MenuItem>
+              <MenuItem value={markerTypes.dance}>Rave</MenuItem>
+              <MenuItem value={markerTypes.hats}>House Party</MenuItem>
+              <MenuItem value={markerTypes.dj}>Music Concert/Festival</MenuItem>
+              </Select>
+              </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleClickClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={this.createEvent} color="primary">
+              {/* TODO: ADD TO DB AND UPDATE */}
+              Update
+            </Button>
+          </DialogActions>
+        </Dialog>
     </div>
-  );
+  );}
 }
+
+export default withStyles(styles, {withTheme: true})(EventForm);

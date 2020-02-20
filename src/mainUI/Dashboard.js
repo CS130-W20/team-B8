@@ -220,25 +220,25 @@ export default function Dashboard() {
           </div>
           <Divider className={clsx(classes.customDivider)}/>
           <List>
-            <ListItem button onClick={() => setPage("Profile")}>
+            <ListItem data-testid="profile-button" button onClick={() => setPage("Profile")}>
                   <ListItemIcon>
                   <FaceIcon />
                   </ListItemIcon>
                   <ListItemText primary="Profile" />
               </ListItem>
-              <ListItem button onClick={() => setPage("Map")}>
+              <ListItem data-testid="map-button" button onClick={() => setPage("Map")}>
                   <ListItemIcon>
                   <MapIcon />
                   </ListItemIcon>
                   <ListItemText primary="Event Map" />
               </ListItem>
-              <ListItem button onClick={() => setPage("Events")}>
+              <ListItem data-testid="events-button" button onClick={() => setPage("Events")}>
                   <ListItemIcon>
                   <DateRangeIcon />
                   </ListItemIcon>
                   <ListItemText primary="Your Events" />
               </ListItem>
-              <ListItem button onClick={() => setPage("Rate")}>
+              <ListItem data-testid="rating-button" button onClick={() => setPage("Rate")}>
                   <ListItemIcon>
                   <RateReviewIcon />
                   </ListItemIcon>

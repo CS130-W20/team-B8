@@ -8,6 +8,11 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import Geocode from "react-geocode";
+
+const
+    io = require("socket.io-client"),
+    socket = io.connect("http://localhost:8000");
 
 /**
 * SimpleMap is a ReactJS Component that displays events on a google map
@@ -36,6 +41,7 @@ class SimpleMap extends Component {
       this.state = {
           markers: [],
           open: false,
+          currEvent: {},
     }
     
     this.addMarker = this.addMarker.bind(this);
@@ -64,13 +70,31 @@ class SimpleMap extends Component {
  * @see markerTypes from './../markerPrefab/mapMarker'
  */
   componentDidMount() {
-    this.setState({
-      markers: [
-        {"name" : "Test 1", "lat": 34.06, "lng": -118.45, "type": markerTypes.gaming},
-        {"name" : "Test 2", "lat": 34.07, "lng": -118.44, "type": markerTypes.food},
-        {"name" : "Test 3", "lat": 34.06, "lng": -118.44, "type": markerTypes.dj},
-        {"name" : "Test 4", "lat": 34.06, "lng": -118.46, "type": markerTypes.dance},
-      ],
+    var markerList = []
+    socket.emit('getAllEvents');
+
+    socket.on('serverReply', (response) => {
+      console.log("serverReply: ", response);
+      response.map(event => {
+        if (event.location) {
+          markerList.push({
+            name: event.title,
+            lat: event.location.lat,
+            lng: event.location.lng,
+            type: event.tag[0],
+            dateTime: event.dateTime,
+            description: 'new event!',
+            locationName: event.LocationName,
+            host: event.host
+          })
+        }
+      });
+
+      this.setState({
+        markers: markerList
+      });
+
+      markerList = [];
     })
   }
 
@@ -96,10 +120,11 @@ class SimpleMap extends Component {
   /**
    * Event function that will be used for detecting button click and display event details
    */
-  handleClickOpen() {
+  handleClickOpen(marker) {
     this.setState({
       open: true,
-    })
+      currEvent: marker
+    });
   };
 
   /**
@@ -155,7 +180,7 @@ class SimpleMap extends Component {
                 //this.renderMarker(marker, i);
                 return(
                   <Marker
-                    onClick={this.handleClickOpen}
+                    onClick={() => this.handleClickOpen(marker)}
                     position={{ lat: marker.lat, lng: marker.lng}}
                     name={marker.name}
                     key={i}
@@ -163,17 +188,14 @@ class SimpleMap extends Component {
                 )
           })}
         </Map>
-        <Dialog open={this.state.open} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Event Name</DialogTitle>
+        <Dialog data-testid="map-dialog" open={this.state.open} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">{this.state.currEvent.name}</DialogTitle>
                 <DialogContent>
                 <Typography gutterBottom>
-                    Event Details
+                  Details: {this.state.currEvent.description}
                 </Typography>
                 <Typography gutterBottom>
-                    Event Host
-                </Typography>
-                <Typography gutterBottom>
-                    Event Description
+                  Hosted by: {this.state.currEvent.host}
                 </Typography>
                 </DialogContent>
                 <DialogActions>

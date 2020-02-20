@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import {render, fireEvent } from '@testing-library/react';
-import Dashboard from '../mainUI/Dashboard';
+import EventList from '../mainUI/Dashboard';
 
 /**
  * @author Phipson Lee
@@ -12,7 +12,7 @@ import Dashboard from '../mainUI/Dashboard';
  * @test To verify that the default screen that the dashboard is on is the GMaps component
  */
 test('Test 1: Verifying correct dashboard initialization', () => {
-    const { getByText, queryByTestId } = render(<Dashboard/>);
+    const { getByText, queryByTestId } = render(<EventList/>);
 
     /**
      * Google Maps should be visible by default

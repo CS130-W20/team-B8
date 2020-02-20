@@ -1,5 +1,5 @@
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import React, { Component } from 'react';
+import { withStyles } from "@material-ui/core/styles";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -14,11 +14,15 @@ import EventEdit from './EditEvent';
 import EventDelete from './DeleteEvent';
 import EventMessage from './MessageEvent';
 
+const
+    io = require("socket.io-client"),
+    socket = io.connect("http://localhost:8000");
+
 /**
  * @var useStyle Function object that generates a style off of default MaterialsUI Theme
  * @see https://material-ui.com/styles/basics/
  */
-const useStyles = makeStyles(theme => ({
+const styles = theme => ({
     root: {
         display: 'flex',
     },
@@ -35,31 +39,65 @@ const useStyles = makeStyles(theme => ({
         paddingTop: theme.spacing(2),
         paddingBottom: theme.spacing(2)
     },
-}));
+});
 
-function preventDefault(event) {
-    event.preventDefault();
-  }
+/**
+ * @author Phipson Lee
+ * @date 02-19-2020
+ */
+class EventList extends Component {
 
-function createData(id, date, name, location, time, attendees) {
-    return { id, date, name, location, time, attendees};
-}
+    constructor(props) {
+        super(props);
+        this.state = {
+            hostEvents: [],
+        }
+        this.resetList = this.resetList.bind(this);
+    };
 
-const rows = [
-    createData(0, '16 Mar, 2019', 'Event A', 'Tupelo, MS', '6AM', 44),
-    createData(1, '16 Mar, 2019', 'Event B', 'London, UK', '6AM', 99),
-    createData(2, '16 Mar, 2019', 'Event C', 'Boston, MA', '6AM', 81),
-    createData(3, '16 Mar, 2019', 'Event D', 'Gary, IN', '6AM', 39),
-    createData(4, '15 Mar, 2019', 'Event E', 'Long Branch, NJ', '6AM', 79),
-  ];
+    componentDidMount() {
+        this.resetList();
+    }
 
-export default function EventList() {
-    const classes = useStyles();
+    /**
+     * @function resetList Resets the view of the list of events based on whether an event has been edited or created
+     */
+    resetList() {
+        console.log("Updating Table");
+        let eventList = [];
+        socket.emit('getAllEvents');
+
+        socket.on('serverReply', (response) => {
+            console.log(eventList);
+            response.map((event) => {
+                if (event.location) {
+                    eventList.push({
+                        id: event.eventID,
+                        name: event.title, 
+                        date: event.timeDate,
+                        location: event.locationName,
+                        attendees: 1,
+                        host: event.host,
+                        tag: event.tag,
+                    })
+                }
+            });
+            this.setState({
+                hostEvents: eventList
+            });
+            
+            eventList = []; // MUST CLEAR eventList before getting more events         
+            console.log(this.state.hostEvents)
+        });
+    }
+
+    render() {
+    const { classes } = this.props;
     return (
-            <Grid data-testid="Events" item xs={12}>
+            <Grid item xs={12}>
               <Paper className={classes.paper}>
               <React.Fragment>
-              <EventForm/>
+              <EventForm updateFunction={this.resetList}/>
                     <Table size="small">
                     <TableHead>
                         <TableRow>
@@ -72,24 +110,24 @@ export default function EventList() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows.map(row => (
+                        {this.state.hostEvents.map(row => (
                         <TableRow key={row.id}>
                             <TableCell>{row.date}</TableCell>
                             <TableCell>{row.name}</TableCell>
                             <TableCell>{row.location}</TableCell>
-                            <TableCell>{row.time}</TableCell>
+                            <TableCell>{row.date}</TableCell>
                             <TableCell>{row.attendees}</TableCell>
                             <TableCell align="right" style={{display: 'grid', gridTemplateRows: '1fr', gridTemplateColumns: '1fr 1fr 1fr'}}>
-                                <EventEdit />
-                                <EventMessage/>
-                                <EventDelete />
+                                <EventEdit event={row} updateFunction={this.resetList}/>
+                                <EventMessage event={row}/>
+                                <EventDelete event={row}/>
                             </TableCell>
                         </TableRow>
                         ))}
                     </TableBody>
                     </Table>
                     <div className={classes.seeMore}>
-                    <Link color="primary" href="#" onClick={preventDefault}>
+                    <Link color="primary" href="#">
                         See more Events
                     </Link>
                     </div>
@@ -97,4 +135,7 @@ export default function EventList() {
               </Paper>
             </Grid>     
     );
+    }
 };
+
+export default withStyles(styles, {withTheme: true})(EventList);

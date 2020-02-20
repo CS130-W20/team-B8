@@ -16,20 +16,23 @@ import TextField from '@material-ui/core/TextField';
 export default class LocationSearchInput extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { address: '' };
+    this.state = { address: this.props.default };
     this.handleChange = this.handleChange.bind(this);
     this.handleSelect = this.handleSelect.bind(this);
   }
  
-  handleChange = address => {
-    this.setState({ address });
+  handleChange = newAddress => {
+    this.setState({ address: newAddress });
+    //this.props.updateFunction(newAddress);
   };
  
-  handleSelect = address => {
-    geocodeByAddress(address)
+  handleSelect = newAddress => {
+    this.setState({ address: newAddress });
+    geocodeByAddress(newAddress)
       .then(results => getLatLng(results[0]))
       .then(latLng => console.log('Success', latLng))
       .catch(error => console.error('Error', error));
+    this.props.updateFunction(newAddress);
   };
  
   render() {
@@ -44,7 +47,8 @@ export default class LocationSearchInput extends React.Component {
               <TextField
                 autoFocus
                 margin="dense"
-                id="name"
+                id="location"
+                value={this.state.address}
                 type="email"
                 fullWidth
                 {...getInputProps({
@@ -67,6 +71,7 @@ export default class LocationSearchInput extends React.Component {
                       className,
                       style,
                     })}
+                    onClick={() => {this.handleSelect(suggestion.description)}}
                   >
                     <span>{suggestion.description}</span>
                   </div>
