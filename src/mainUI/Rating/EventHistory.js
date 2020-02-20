@@ -84,7 +84,7 @@ export default function EventHistory() {
      * Renders a table showing the events that the user has attended (currently using test data)
      */
     return (
-            <Grid item xs={12}>
+            <Grid data-testid="Ratings" item xs={12}>
               <Paper className={classes.paper}>
               <React.Fragment>
                     <Table size="small">

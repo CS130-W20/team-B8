@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => ({
 export default function GMap() {
     const classes = useStyles();
     return(
-        <Grid container spacing={3} style={{height: "80vh"}}>
+        <Grid data-testid="Map" container spacing={3} style={{height: "80vh"}}>
             {/* Map */}
             <Grid item xs={12} md={8} lg={9} style={{height: "100%"}}>
                 <Paper className={classes.paperElement}>

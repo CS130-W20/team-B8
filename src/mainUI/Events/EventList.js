@@ -56,7 +56,7 @@ const rows = [
 export default function EventList() {
     const classes = useStyles();
     return (
-            <Grid item xs={12}>
+            <Grid data-testid="Events" item xs={12}>
               <Paper className={classes.paper}>
               <React.Fragment>
               <EventForm/>

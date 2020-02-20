@@ -87,6 +87,7 @@ const useStyles = makeStyles(theme => ({
   },
   menuButtonHidden: {
     display: 'none',
+    visibility: "hidden",
   },
   title: {
     flexGrow: 1,
@@ -125,6 +126,10 @@ const useStyles = makeStyles(theme => ({
   },
   customDrawerIcons: {
     color: 'white',
+    visibility: "visible"
+  },
+  drawerOpenIcon: {
+    visibility: 'hidden',
   },
   container: {
     height: "100%",
@@ -184,6 +189,7 @@ export default function Dashboard() {
         <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
           <Toolbar className={classes.toolbar}>
             <IconButton
+              data-testid="hamburger-button"
               edge="start"
               color="inherit"
               aria-label="open drawer"
@@ -208,7 +214,7 @@ export default function Dashboard() {
           }}
           open={open}>
           <div className={classes.toolbarIcon}>
-            <IconButton onClick={handleDrawerClose}>
+            <IconButton data-testid="left-button" onClick={handleDrawerClose}>
               <ChevronLeftIcon className={clsx(classes.customDrawerIcons)}/>
             </IconButton>
           </div>
