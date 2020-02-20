@@ -10,9 +10,8 @@ import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import EventForm from './EventForm';
-import EventEdit from './EditEvent';
-import EventDelete from './DeleteEvent';
-import EventMessage from './MessageEvent';
+
+import BMeetEventFactory from './EventFactory';
 
 /**
  * @var useStyle Function object that generates a style off of default MaterialsUI Theme
@@ -53,8 +52,11 @@ const rows = [
     createData(4, '15 Mar, 2019', 'Event E', 'Long Branch, NJ', '6AM', 79),
   ];
 
-export default function EventList() {
+
+
+export default function EventList(props) {
     const classes = useStyles();
+    const events = props.events; 
     return (
             <Grid item xs={12}>
               <Paper className={classes.paper}>
@@ -72,20 +74,7 @@ export default function EventList() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows.map(row => (
-                        <TableRow key={row.id}>
-                            <TableCell>{row.date}</TableCell>
-                            <TableCell>{row.name}</TableCell>
-                            <TableCell>{row.location}</TableCell>
-                            <TableCell>{row.time}</TableCell>
-                            <TableCell>{row.attendees}</TableCell>
-                            <TableCell align="right" style={{display: 'grid', gridTemplateRows: '1fr', gridTemplateColumns: '1fr 1fr 1fr'}}>
-                                <EventEdit />
-                                <EventMessage/>
-                                <EventDelete />
-                            </TableCell>
-                        </TableRow>
-                        ))}
+                        {events.map(event => BMeetEventFactory.createEvent(event.type, event))}
                     </TableBody>
                     </Table>
                     <div className={classes.seeMore}>

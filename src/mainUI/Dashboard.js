@@ -27,18 +27,26 @@ import EventList from './Events/EventList';
 import Profile from './Profile/Profile';
 import EventHistory from './Rating/EventHistory';
 
+const io = require("socket.io-client"),
+socket = io.connect("http://localhost:8000");
 
 /**
  * @var AppComponents Dictionary that maps specific state of dashboard to a component
  * Toggles what is visible on DOM when a button is pressed
  * Used in Dashboard component
  */
-const AppComponents = {
-  "Map": <GMap />,
-  "Profile": <Profile />,
-  "Events": <EventList />,
-  "Rate": <EventHistory />
-}
+const getAppComponent = (page, events) => {
+  switch(page){
+    case "Map":
+      return <GMap />
+    case "Profile":
+      return <Profile />
+    case "Events":
+      return <EventList events={events}/>
+    case "Rate":
+      return <EventHistory/>
+  }
+};
 
 /**
  * @var drawerWidth CSS Style for setting width of dashboard drawer
@@ -160,6 +168,12 @@ export default function Dashboard() {
    */
     const [dashboardPage, setPage] = React.useState('Map');
 
+    const [events, handleEventsIn] = React.useState([]);
+    socket.on('getEventsReply', (events) => {
+        handleEventsIn(events);
+    });
+    socket.emit('getEvents', 'me');
+
   /**
    * @var handleDrawerOpen Function that sets the state of open. Passed to onClick events.
    */
@@ -243,7 +257,7 @@ export default function Dashboard() {
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <Container maxWidth="lg" className={classes.container}>
-            {AppComponents[dashboardPage]}
+            {getAppComponent(dashboardPage, events)}
           </Container>
         </main>
       </div>

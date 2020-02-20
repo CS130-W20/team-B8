@@ -176,6 +176,18 @@ io.on("connection", (socket) => {
     })
   })
 
+  socket.on('getEvents', (host) => {
+    let prom = dbInterface.getEventByHost(host);
+    prom.then( (docs) => {
+      console.log("EVENTS", docs);
+      socket.emit("getEventsReply", docs);
+    })
+    .catch( (error) =>  {
+      console.log("ERROR:", error);
+      socket.emit("serverError", error)
+    })
+  })
+
   socket.on('addEvent', (title, date, tag, location, locationName, type, host) => {
     let prom = dbInterface.addEvent(title, date, tag, location, locationName, type, host);
     prom.then( (docs) => {

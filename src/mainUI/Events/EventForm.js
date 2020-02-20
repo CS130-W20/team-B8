@@ -198,10 +198,10 @@ export default function EventForm() {
                   <MenuItem value="">
                       <em>None</em>
                   </MenuItem>
-                  <MenuItem value={10}>Bar Hopping</MenuItem>
-                  <MenuItem value={20}>Rave</MenuItem>
-                  <MenuItem value={30}>House Party</MenuItem>
-                  <MenuItem value={40}>Music Concert/Festival</MenuItem>
+                  <MenuItem value={"bar"}>Bar Hopping</MenuItem>
+                  <MenuItem value={"rave"}>Rave</MenuItem>
+                  <MenuItem value={"house"}>House Party</MenuItem>
+                  <MenuItem value={"concert"}>Music Concert/Festival</MenuItem>
             </Select>
             </FormControl>
         </DialogContent>

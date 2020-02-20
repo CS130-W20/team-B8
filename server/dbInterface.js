@@ -314,6 +314,25 @@ module.exports.getEvent = function(eventID){
 	});
 };
 
+module.exports.getEventByHost = function(host){
+	return new Promise(
+		function (resolve, reject) {
+			const collection = db.collection('Events');
+			let query = {'host': host};
+			collection.find(query, function(err, doc) {
+				if(err == null){
+					console.log("getEventByHost() query Success");
+					var docs = doc.toArray();
+					resolve(docs);
+				} else{
+					console.log("getEventByHost() query Failed");
+					reject(err);
+				}
+			})
+		}
+	)
+}
+
 module.exports.addEvent = function(title, date, tag, location, locationName, type, host){
 	return new Promise(	
 		function (resolve, reject) {
