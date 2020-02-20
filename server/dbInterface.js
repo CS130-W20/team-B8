@@ -263,17 +263,16 @@ module.exports.queryEvents = function(keywordRegex, upperBound, lowerBound, numb
 				doc['title'] = keywordRegex;
 			}
 
-			let andList = [];
+			let dateRange = {};
 			if (upperBound != null) {
-				andList.push({'$lte': upperBound});
+				dateRange['$lte'] = upperBound;
 			}
 			if (lowerBound != null) {
-				andList.push({'$gt': lowerBound});
+				dateRange['$gt'] = lowerBound;
 			}
-			if (andList.length != 0) {
-				doc['$timeDate']['$and'] = andList;
+			if (Object.keys(dateRange).length != 0) {
+				doc['timeDate'] = dateRange;
 			}
-
 		 	let dbRes = collection.find(doc,{
 				'attendees': 0, 
 				'reviews': 0
@@ -314,14 +313,14 @@ module.exports.getEvent = function(eventID){
 	});
 };
 
-module.exports.addEvent = function(eventID, title, tag, location, locationName, host){
+module.exports.addEvent = function(eventID, title, timeDate, tag, location, locationName, host){
 	return new Promise(	
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
 				'eventID': eventID,
 				'title': title,
-				'timeDate': new Date(),
+				'timeDate': timeDate,
 				'tag': tag,
 				'location': location,
 				'locationName': locationName,
@@ -341,13 +340,13 @@ module.exports.addEvent = function(eventID, title, tag, location, locationName, 
 	});
 };
 
-module.exports.updateEvent = function(eventID, title, tag, location, locationName){
+module.exports.updateEvent = function(eventID, title, timeDate, tag, location, locationName){
 	return new Promise(	
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
 				'title': title,
-				'timeDate': new Date(),
+				'timeDate': timeDate,
 				'tag': tag,
 				'location': location,
 				'locationName': locationName
