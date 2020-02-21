@@ -45,11 +45,13 @@ const useStyles = makeStyles(theme => ({
  * @author Phipson Lee, Lawrence Lee
  * @since 2020-02-15
  */
-export default function EventForm() {
+export default function EventForm(props) {
   /**
    * @var classes Calls Material-UI useStyles to generate/inherit material UI styles generated from a default theme
    */
   const classes = useStyles();
+
+  const socket= props.socket;
 
   const titleId = "title";
   const locationNameId = "location";
@@ -132,8 +134,9 @@ export default function EventForm() {
     let locationName = document.getElementById(locationNameId).value;
     //let location = location;
     let host = "me";
-    addEvent({title, date, tag, location, locationName, type, host});
+    addEvent(socket, {title, date, tag, location, locationName, type, host});
     setDOpen(false);
+    props.refreshEvents();
   };
   /**
     * @var handleClickCancel Function that cancels current event form

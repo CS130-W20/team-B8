@@ -11,7 +11,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import EventForm from './EventForm';
 
-import BMeetEventFactory from './EventFactory';
+import EventRow from './EventListRow';
 
 /**
  * @var useStyle Function object that generates a style off of default MaterialsUI Theme
@@ -61,7 +61,7 @@ export default function EventList(props) {
             <Grid item xs={12}>
               <Paper className={classes.paper}>
               <React.Fragment>
-              <EventForm/>
+              <EventForm refreshEvents={props.refreshEvents} socket={props.socket}/>
                     <Table size="small">
                     <TableHead>
                         <TableRow>
@@ -74,7 +74,7 @@ export default function EventList(props) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {events.map(event => BMeetEventFactory.createEvent(event.type, event))}
+                        {events.map(event => event.createEventListRow())}
                     </TableBody>
                     </Table>
                     <div className={classes.seeMore}>

@@ -26,23 +26,21 @@ import GMap from './Map/GMap';
 import EventList from './Events/EventList';
 import Profile from './Profile/Profile';
 import EventHistory from './Rating/EventHistory';
-
-const io = require("socket.io-client"),
-socket = io.connect("http://localhost:8000");
+import BMeetEvent from './Events/EventInterface';
 
 /**
  * @var AppComponents Dictionary that maps specific state of dashboard to a component
  * Toggles what is visible on DOM when a button is pressed
  * Used in Dashboard component
  */
-const getAppComponent = (page, events) => {
+const getAppComponent = (page, socket, events, refreshEvents) => {
   switch(page){
     case "Map":
-      return <GMap />
+      return <GMap events={events}/>
     case "Profile":
       return <Profile />
     case "Events":
-      return <EventList events={events}/>
+      return <EventList events={events} refreshEvents={refreshEvents} socket={socket}/>
     case "Rate":
       return <EventHistory/>
   }
@@ -150,7 +148,10 @@ const useStyles = makeStyles(theme => ({
  * @author Phipson Lee
  * @since 2020-02-15
  */
-export default function Dashboard() {
+export default function Dashboard(props) {
+
+  const socket = props.socket; 
+
   /**
    * @var classes Calls Material-UI useStyles to generate/inherit material UI styles generated from a default theme
    */
@@ -163,16 +164,32 @@ export default function Dashboard() {
     const [open, setOpen] = React.useState(false);
 
   /**
+   * @var events Hook set to [] to indicate current events
+   * @var handleEventsIn Function that changes the state variable events
+   */
+    const [events, handleEventsIn] = React.useState([]);
+
+    socket.on('getEventsReply', (events) => {
+        let BMeetEvents = events.map(event => new BMeetEvent(event))
+        handleEventsIn(BMeetEvents);
+    });
+
+    const refreshEvents = () => {
+      socket.emit('getEvents', 'me');
+    }
+
+  /**
    * @var dashboardPage Hook to display specific component based on button click
    * @var setPage Function that changes the state variable dashboardPage
    */
     const [dashboardPage, setPage] = React.useState('Map');
 
-    const [events, handleEventsIn] = React.useState([]);
-    socket.on('getEventsReply', (events) => {
-        handleEventsIn(events);
-    });
-    socket.emit('getEvents', 'me');
+    const setDashboardPage = (page) => {
+      if(page == "Events" || page =="Map"){
+        refreshEvents();
+      }
+      setPage(page);
+    }
 
   /**
    * @var handleDrawerOpen Function that sets the state of open. Passed to onClick events.
@@ -228,25 +245,25 @@ export default function Dashboard() {
           </div>
           <Divider className={clsx(classes.customDivider)}/>
           <List>
-            <ListItem button onClick={() => setPage("Profile")}>
+            <ListItem button onClick={() => setDashboardPage("Profile")}>
                   <ListItemIcon>
                   <FaceIcon />
                   </ListItemIcon>
                   <ListItemText primary="Profile" />
               </ListItem>
-              <ListItem button onClick={() => setPage("Map")}>
+              <ListItem button onClick={() => setDashboardPage("Map")}>
                   <ListItemIcon>
                   <MapIcon />
                   </ListItemIcon>
                   <ListItemText primary="Event Map" />
               </ListItem>
-              <ListItem button onClick={() => setPage("Events")}>
+              <ListItem button onClick={() => setDashboardPage("Events")}>
                   <ListItemIcon>
                   <DateRangeIcon />
                   </ListItemIcon>
                   <ListItemText primary="Your Events" />
               </ListItem>
-              <ListItem button onClick={() => setPage("Rate")}>
+              <ListItem button onClick={() => setDashboardPage("Rate")}>
                   <ListItemIcon>
                   <RateReviewIcon />
                   </ListItemIcon>
@@ -257,7 +274,7 @@ export default function Dashboard() {
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <Container maxWidth="lg" className={classes.container}>
-            {getAppComponent(dashboardPage, events)}
+            {getAppComponent(dashboardPage, socket, events, refreshEvents)}
           </Container>
         </main>
       </div>

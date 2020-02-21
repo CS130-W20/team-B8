@@ -6,20 +6,17 @@ export default class BMeetEventFactory {
     static createEvent(type, props) {
         switch (type) {
             case "bar":
-                return <BMeetEvent {...props}/>;
-                break;
+                return new BMeetEvent(props);
             
             case "rave":
-                return <BMeetEvent {...props}/>;
-                break;
+                return new BMeetEvent(props);
+
 
             case "house":
-                return <BMeetEvent {...props}/>;
-                break;
+                return new BMeetEvent(props);
 
             case "concert":
-                return <BMeetEvent {...props}/>;
-                break;
+                return new BMeetEvent(props);
 
             default:
                 break;

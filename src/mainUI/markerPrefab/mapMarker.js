@@ -18,6 +18,21 @@ export const markerTypes = {
     hats: hatImg,
 };
 
+export const getMarkerType = (eventType) => {
+  switch(eventType){
+    case "bar":
+      return markerTypes.food;
+    case "house":
+      return markerTypes.gaming;
+    case "rave":
+      return markerTypes.dj;
+    case "concert":
+      return markerTypes.dance;
+    default:
+      return markerTypes.hats;
+  }
+}
+
 class CustomMarker extends Marker {
   constructor(props) {
     super(props);

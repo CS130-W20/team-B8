@@ -18,14 +18,14 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function GMap() {
+export default function GMap(props) {
     const classes = useStyles();
     return(
         <Grid container spacing={3} style={{height: "80vh"}}>
             {/* Map */}
             <Grid item xs={12} md={8} lg={9} style={{height: "100%"}}>
                 <Paper className={classes.paperElement}>
-                    <SimpleMap />
+                    <SimpleMap events={props.events}/>
                 </Paper>
             </Grid>
             {/* Map Settings? */}
