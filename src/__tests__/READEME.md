@@ -14,7 +14,8 @@ eventTest.js - Unit Testing; Test cases for for event component in app. Used to 
 5. Make sure that users can delete events.
 
 registration_loginTest.js - Unit Testing: Test cases for user registration and login. 
-1.When the user register with an existing username, should be an error message to indicate username already taken
-2.After a successful registration, users should be able to login to the account
-3.When the user input an incorrect username or password, should be an error message to indicate incorrect username or password
-4.When an user input correct username and password, should be able to access their account
+1. When the user register with an existing username, should be an error message to indicate username already taken
+2. After a successful registration, users should be able to login to the account
+3. When the user input an incorrect username or password, should be an error message to indicate incorrect username or password
+4. When an user input correct username and password, should be able to access their account
+
