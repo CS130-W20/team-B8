@@ -41,8 +41,7 @@ class LocationSearchInput extends Component {
       <PlacesAutocomplete
         value={this.state.address}
         onChange={this.handleChange}
-        onSelect={this.handleSelect}
-      >
+        onSelect={this.handleSelect}>
         {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
           <div style={{paddingTop: "2.5%", paddingBottom: "2.5%"}}>
               <TextField
