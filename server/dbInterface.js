@@ -253,7 +253,7 @@ module.exports.getAllEvents = function(){
 	});
 };
 
-module.exports.queryEvents = function(keywordRegex, upperBound, lowerBound, numberBound){
+module.exports.queryEvents = function(keywordRegex, tags, upperBound, lowerBound, numberBound){
 	// keywordRegex is a RegExp Obj corresponding to the keywords	
 	return new Promise(	
 		function (resolve, reject) {
@@ -261,6 +261,9 @@ module.exports.queryEvents = function(keywordRegex, upperBound, lowerBound, numb
 			let doc = {};
 			if (keywordRegex != null) {
 				doc['title'] = keywordRegex;
+			}
+			if (tags != null || tags.length !=0) {
+				doc['tag'] = {'$in': tags};
 			}
 
 			let dateRange = {};
