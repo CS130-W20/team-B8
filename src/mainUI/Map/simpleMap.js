@@ -1,13 +1,18 @@
 import React, { Component } from 'react';
 import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
-import { markerTypes } from './../markerPrefab/mapMarker';
+import { getMarkerType, markerTypes } from './../markerPrefab/mapMarker';
 import Dimensions from 'react-dimensions';
 import Dialog from '@material-ui/core/Dialog';
+import { DialogContent } from '@material-ui/core';
 import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Geocode from "react-geocode";
+
+const
+    io = require("socket.io-client"),
+    socket = io.connect("http://localhost:8000");
 
 /**
 * SimpleMap is a ReactJS Component that displays events on a google map
@@ -36,6 +41,7 @@ class SimpleMap extends Component {
       this.state = {
           markers: [],
           open: false,
+          currEvent: {},
     }
     
     this.addMarker = this.addMarker.bind(this);
@@ -60,17 +66,35 @@ class SimpleMap extends Component {
 
 /**
  * Sets the state of the component when it mounts. Default function that is available for all reactJS components
- * In this case, for testing purposes, we have defined a set of markers based on markerTypes
- * @see markerTypes from './../markerPrefab/mapMarker'
+ * In particular, we will get all events and then push them onto a buffer before updating our state
+ * this.state.markers will then be rendered on the DOM
  */
   componentDidMount() {
-    this.setState({
-      markers: [
-        {"name" : "Test 1", "lat": 34.06, "lng": -118.45, "type": markerTypes.gaming},
-        {"name" : "Test 2", "lat": 34.07, "lng": -118.44, "type": markerTypes.food},
-        {"name" : "Test 3", "lat": 34.06, "lng": -118.44, "type": markerTypes.dj},
-        {"name" : "Test 4", "lat": 34.06, "lng": -118.46, "type": markerTypes.dance},
-      ],
+    var markerList = []
+    socket.emit('getAllEvents');
+
+    socket.on('serverReply', (response) => {
+      console.log("serverReply: ", response);
+      response.map(event => {
+        if (event.location) {
+          markerList.push({
+            name: event.title,
+            lat: event.location.lat,
+            lng: event.location.lng,
+            type: event.tag[0],
+            dateTime: event.dateTime,
+            description: 'new event!',
+            locationName: event.LocationName,
+            host: event.host
+          })
+        }
+      });
+
+      this.setState({
+        markers: markerList
+      });
+
+      markerList = [];
     })
   }
 
@@ -96,10 +120,11 @@ class SimpleMap extends Component {
   /**
    * Event function that will be used for detecting button click and display event details
    */
-  handleClickOpen() {
+  handleClickOpen(event) {
     this.setState({
       open: true,
-    })
+      currEvent: event
+    });
   };
 
   /**
@@ -138,6 +163,8 @@ class SimpleMap extends Component {
       return null;
     }
 
+    const events = this.props.events;
+
     return (
       <div>
         <Map
@@ -150,30 +177,16 @@ class SimpleMap extends Component {
           center={ userLocation }>
           <Marker
           position={userLocation}/>
-          {this.state.markers.map((marker, i) =>{
-                //console.log(i);
-                //this.renderMarker(marker, i);
-                return(
-                  <Marker
-                    onClick={this.handleClickOpen}
-                    position={{ lat: marker.lat, lng: marker.lng}}
-                    name={marker.name}
-                    key={i}
-                    icon={{url: marker.type, scaleSize: (.5, .5)}}/>
-                )
-          })}
+          {events.map((event, i) => event.createEventMarker(() => { this.handleClickOpen(event) }, i))} 
         </Map>
-        <Dialog open={this.state.open} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Event Name</DialogTitle>
+        <Dialog data-testid="map-dialog" open={this.state.open} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">{this.state.currEvent.title}</DialogTitle>
                 <DialogContent>
                 <Typography gutterBottom>
-                    Event Details
+                  Details: {this.state.currEvent.description}
                 </Typography>
                 <Typography gutterBottom>
-                    Event Host
-                </Typography>
-                <Typography gutterBottom>
-                    Event Description
+                  Hosted by: {this.state.currEvent.host}
                 </Typography>
                 </DialogContent>
                 <DialogActions>

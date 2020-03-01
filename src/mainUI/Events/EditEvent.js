@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { Component } from 'react';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Select from '@material-ui/core/Select';
@@ -19,21 +19,36 @@ import MenuItem from '@material-ui/core/MenuItem';
 import EditIcon from '@material-ui/icons/Edit';
 import { IconButton } from '@material-ui/core';
 import LocationSearchInput from './LocationSearcher';
+import Geocode from "react-geocode";
+import { markerTypes } from './../markerPrefab/mapMarker';
+ 
+const
+    io = require("socket.io-client"),
+    socket = io.connect("http://localhost:8000");
 
 /**
- * @var useStyle Function object that generates a style off of default MaterialsUI Theme
+ * @function useStyle Function object that generates a style off of default MaterialsUI Theme
  * @see https://github.com/mui-org/material-ui/tree/master/docs/src/pages/getting-started/templates/dashboard
  * @see https://material-ui.com/styles/basics/
  */
-const useStyles = makeStyles(theme => ({
+const styles = theme => ({
     formControl: {
       margin: theme.spacing(1),
       minWidth: 120,
     },
-  }));
+  });
+
+// set Google Maps Geocoding API for purposes of quota management. Its optional but recommended.
+Geocode.setApiKey("AIzaSyD2EzcDG507GgPgPHVEoVpgFngvsMGIElg");
+ 
+// set response language. Defaults to english.
+Geocode.setLanguage("en");
+ 
+// Enable or disable logs. Its optional.
+Geocode.enableDebug();
 
 /**
- * Function component that uses Google Material UI Dialog Boxes
+ * React component that uses Google Material UI Dialog Boxes
  * Uses IconButton to toggle display, and allows users update/Edit Events.
  * Currently incomplete, as we still need to display event information.
  * @see https://material-ui.com/components/dialogs/
@@ -42,86 +57,171 @@ const useStyles = makeStyles(theme => ({
  * @author Phipson Lee
  * @since 2020-02-15
  */
-export default function EventEdit() {
-  /**
-   * @var classes Calls Material-UI useStyles to generate/inherit material UI styles generated from a default theme
-   */
-    const classes = useStyles();
+class EventEdit extends Component{
+/**
+ * Default constructor for component, as with all ReactJS Components
+ * this.state is used to keep track of any changes in the FormInput and also (by default)
+ * store the existing information of the event (in case the user wants to cancel)
+ * 
+ * Constructor also uses Google Maps API to fetch user's current location.
+ * @param props This is a key-value object that is maintained to pass arguments
+ * on construction; we are passing 1. the Event object and 2. a function object to update the EventList
+ * @see google-maps-react For more information on navigator.geolocation
+ * @see markerTypes
+ */
+  constructor(props) {
+    super(props);
+    this.state = {
+      date: '',
+      location: '',
+      title: '',
+      dialogopen: false,
+      open: false,
+      type: '',
+      event: props.event,
+    }
+    this.handleClickOpen = this.handleClickOpen.bind(this);
+    this.handleClickClose = this.handleClickClose.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+    this.handleOpen = this.handleOpen.bind(this);
+    this.updateEvent = this.updateEvent.bind(this);
+    this.handleLocChange = this.handleLocChange.bind(this);
+    this.handleTextChange = this.handleTextChange.bind(this);
+  }
 
   /**
-   * @var dialogopen Hook set to false to indicate state of dashboard
-   * @var setDOpen Function that changes the state variable open
+   * Function is called when component is loaded onto DOM. In particular, we use this to 
+   * Pass the arguments from the event (given in props) to the state
    */
-    const [dialogopen, setDOpen] = React.useState(false);
+  componentDidMount() {
+    console.log(this.props.event);
+    console.log(this.state.event);
+    this.setState({
+      date: this.props.date,
+      location: this.props.location,
+      title: this.props.title,
+      type: this.props.tag && this.props.tag[0],
+    })
+  }
+
+  updateEvent() {
+    Geocode.fromAddress(this.state.location).then(
+      response => {
+        const { lat, lng } = response.results[0].geometry.location;
+
+        var newEvent = {
+          eventId: 1,
+          title: this.state.title,
+          tag: [this.state.type],
+          location: {lat: lat, lng: lng},
+          locationName: this.state.location,
+        }
+
+        socket.emit('updateEvent', newEvent.eventId, newEvent.title, newEvent.tag,
+        newEvent.location, newEvent.locationName);
+
+        socket.on('serverReply', (event) => {
+          console.log("serverReply: ", event);
+          this.props.updateFunction();
+        })
+
+      },
+      error => {
+        console.error(error);
+      }
+    );
+    this.handleClickClose();
+  }
+
 
   /**
-   * @var handleClickOpen Function that sets the dialog box to close
+   * @function handleClickOpen Function that sets the dialog box to close
    */
-    const handleClickOpen = () => {
-        setDOpen(true);
+    handleClickOpen = () => {
+      this.setState({
+        dialogopen: true
+      })    
     };
 
   /**
-   * @var handleClickClose Function that sets the dialog box to close
+   * @function handleClickClose Function that sets the dialog box to close
    */
-    const handleClickClose = () => {
-        setDOpen(false);
+    handleClickClose = () => {
+      this.setState({
+        dialogopen: false
+      })    
     };
 
   /**
-   * @var selectedDate Hook set to default date. Changes date of event
-   * @var setSelectedDate Function that changes the state variable selectedDate
-   * @see https://material-ui.com/components/pickers/
+   * @function handleDateChange Function that takes in a date and updates the selected date for event
+   * @param {String} date Date of the anticipated event passed as a string
    */
-    const [selectedDate, setSelectedDate] = React.useState(new Date('2014-08-18T21:11:54'));
-
-  /**
-   * @var handleDateChange Function that takes in a date and updates the selected date for event
-   * @param {*} date 
-   */
-    const handleDateChange = date => {
-        setSelectedDate(date);
+    handleDateChange = date => {
+      this.setState({
+        date: date
+      })    
     };
 
   /**
-   * @var type Hook set to none by default. Configures the type of event user wants.
-   * @var setType Function that changes the state variable type
+   * @function handleChange Function that changes the state variable type based on selected event type
+   * @param {String} event Type of event based on onClick event listener
    */
-    const [type, setType] = React.useState('');
   
-    const handleChange = event => {
-      setType(event.target.value);
+    handleChange = event => {
+      this.setState({
+        type: event.target.value
+      })    
     };
 
   /**
-   * @var open Hook set to false to indicate state of select menu
-   * @var setOpen Function that changes the state variable open
+   * @function handleClose Function that sets the select menu to close
    */
-    const [open, setOpen] = React.useState(false);
-
-  /**
-   * @var handleClose Function that sets the select menu to close
-   */
-    const handleClose = () => {
-        setOpen(false);
+    handleClose = () => {
+      this.setState({
+        open: false,
+      })    
     };
 
   /**
-   * @var handleClose Function that sets the select box to open
+   * @function handleClose Function that sets the select box to open
    */
-    const handleOpen = () => {
-        setOpen(true);
+    handleOpen = () => {
+      this.setState({
+        open: true
+      })    
     };
+
+  /**
+   * @function handleLocChange Function that sets the select box to open
+   */
+    handleLocChange = address => {
+      this.setState({
+        location: address
+      })
+    }
+
+  /**
+   * @function handleTextChange Function that sets the select box to open
+   */
+    handleTextChange = text => {
+      this.setState({
+        title: text.target.value
+      })
+    }
 
   /**
    * Renders event form based on button click and state changes. Creates event upon submission of form.
    */
+  render() {
+    const {classes} = this.props;
     return (
       <div>
-        <IconButton onClick={handleClickOpen}>
+        <IconButton onClick={this.handleClickOpen}>
           <EditIcon />
         </IconButton>
-        <Dialog open={dialogopen} onClose={handleClickClose} aria-labelledby="form-dialog-title">
+        <Dialog open={this.state.dialogopen} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
           <DialogTitle id="form-dialog-title">Update Your Event</DialogTitle>
           <DialogContent>
               <TextField
@@ -129,26 +229,28 @@ export default function EventEdit() {
               margin="dense"
               id="name"
               label="Name of Event"
+              value={this.state.title}
+              onChange={this.handleTextChange}
               type="email"
               fullWidth/>
-              <LocationSearchInput/>
+              <LocationSearchInput
+              default={this.state.location}
+              updateFunction={this.handleLocChange}/>
               <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <KeyboardDatePicker
               margin="normal"
               id="date-picker-dialog"
-              label="Date picker dialog"
               format="MM/dd/yyyy"
-              value={selectedDate}
-              onChange={handleDateChange}
+              value={this.state.date}
+              onChange={this.handleDateChange}
               KeyboardButtonProps={{
               'aria-label': 'change date',
               }}/>
               <KeyboardTimePicker
               margin="normal"
               id="time-picker"
-              label="Time picker"
-              value={selectedDate}
-              onChange={handleDateChange}
+              value={this.state.date}
+              onChange={this.handleDateChange}
               KeyboardButtonProps={{
               'aria-label': 'change time',
               }}/>
@@ -158,31 +260,34 @@ export default function EventEdit() {
               <Select
               labelId="demo-controlled-open-select-label"
               id="demo-controlled-open-select"
-              open={open}
-              onClose={handleClose}
-              onOpen={handleOpen}
-              value={type}
-              onChange={handleChange}>
+              open={this.state.open}
+              onClose={this.handleClose}
+              onOpen={this.handleOpen}
+              value={this.state.type}
+              onChange={this.handleChange}>
               <MenuItem value="">
                   <em>None</em>
               </MenuItem>
-              <MenuItem value={10}>Bar Hopping</MenuItem>
-              <MenuItem value={20}>Rave</MenuItem>
-              <MenuItem value={30}>House Party</MenuItem>
-              <MenuItem value={40}>Music Concert/Festival</MenuItem>
+              <MenuItem value={markerTypes.food}>Bar Hopping</MenuItem>
+              <MenuItem value={markerTypes.dance}>Rave</MenuItem>
+              <MenuItem value={markerTypes.hats}>House Party</MenuItem>
+              <MenuItem value={markerTypes.dj}>Music Concert/Festival</MenuItem>
               </Select>
               </FormControl>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClickClose} color="primary">
+            <Button onClick={this.handleClickClose} color="primary">
               Cancel
             </Button>
-            <Button onClick={handleClickClose} color="primary">
+            <Button onClick={this.updateEvent} color="primary">
               {/* TODO: ADD TO DB AND UPDATE */}
               Update
             </Button>
           </DialogActions>
         </Dialog>
       </div>
-    );
+    )
+  };
 }
+
+export default withStyles(styles, {withTheme: true})(EventEdit);

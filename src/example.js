@@ -42,8 +42,7 @@ const newEvent = {
 }
 
 // TEST EVENT CREATION
-socket.emit('addEvent', newEvent.eventId, newEvent.title, newEvent.tag,
-  newEvent.location, newEvent.locationName, newEvent.host);
+socket.emit('addEvent', newEvent.eventId, newEvent.title, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.host);
 
 // TEST EVENT GET
 socket.on('getEventReply', (event) => {

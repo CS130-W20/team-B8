@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {Component} from 'react';
 import PlacesAutocomplete, {
   geocodeByAddress,
   getLatLng,
 } from 'react-places-autocomplete';
 import TextField from '@material-ui/core/TextField';
+import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
 
 
 /**
@@ -13,38 +14,47 @@ import TextField from '@material-ui/core/TextField';
  * Used to fetch location based on search query to give users a list of potential auto-complete locations
  * Integrated with Material-UI
  */ 
-export default class LocationSearchInput extends React.Component {
+class LocationSearchInput extends Component {
   constructor(props) {
     super(props);
-    this.state = { address: '' };
+    this.state = { address: this.props.default };
     this.handleChange = this.handleChange.bind(this);
     this.handleSelect = this.handleSelect.bind(this);
   }
  
-  handleChange = address => {
-    this.setState({ address });
+  handleChange = newAddress => {
+    this.setState({ address: newAddress });
+    //this.props.updateFunction(newAddress);
   };
  
-  handleSelect = address => {
-    geocodeByAddress(address)
-      .then(results => getLatLng(results[0]))
-      .then(latLng => console.log('Success', latLng))
-      .catch(error => console.error('Error', error));
+  handleSelect = newAddress => {
+    this.setState({ address: newAddress });
+    geocodeByAddress(newAddress)
+    this.props.updateFunction(newAddress);
   };
  
   render() {
+    const {
+      locationNameId,
+      setLocation,
+      setWaitingForLocation
+    } = this.props;
+
     return (
       <PlacesAutocomplete
         value={this.state.address}
         onChange={this.handleChange}
-        onSelect={this.handleSelect}
-      >
+        onSelect={this.handleSelect}>
         {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
           <div style={{paddingTop: "2.5%", paddingBottom: "2.5%"}}>
               <TextField
                 autoFocus
                 margin="dense"
-                id="name"
+                inputProps={{
+                  "data-testid":"event-location"
+                }}
+                id="event-location"
+                value={this.state.address}
                 type="email"
                 fullWidth
                 {...getInputProps({
@@ -67,6 +77,7 @@ export default class LocationSearchInput extends React.Component {
                       className,
                       style,
                     })}
+                    onClick={() => {this.handleSelect(suggestion.description)}}
                   >
                     <span>{suggestion.description}</span>
                   </div>
@@ -79,3 +90,7 @@ export default class LocationSearchInput extends React.Component {
     );
   }
 }
+
+export default (GoogleApiWrapper({
+  apiKey: "AIzaSyD2EzcDG507GgPgPHVEoVpgFngvsMGIElg"
+})(LocationSearchInput));

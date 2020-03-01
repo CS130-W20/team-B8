@@ -9,6 +9,13 @@ import foodImg from './BruinMeet/food.png'
 import gameImg from './BruinMeet/gaming.png'
 import hatImg from './BruinMeet/hats.png'
 
+export const eventTypes = {
+  barHopping: 'bar',
+  rave: 'rave',
+  houseParty: 'house',
+  music: 'concert',
+}
+
 // TODO: Modify depending on marker types
 export const markerTypes = {
     dj: djImg,
@@ -17,6 +24,21 @@ export const markerTypes = {
     gaming: gameImg,
     hats: hatImg,
 };
+
+export const getMarkerType = (eventType) => {
+  switch(eventType){
+    case "bar":
+      return markerTypes.food;
+    case "house":
+      return markerTypes.gaming;
+    case "rave":
+      return markerTypes.dj;
+    case "concert":
+      return markerTypes.dance;
+    default:
+      return markerTypes.hats;
+  }
+}
 
 class CustomMarker extends Marker {
   constructor(props) {

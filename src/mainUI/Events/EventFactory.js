@@ -1,24 +1,22 @@
-import {BMeetEvent} from './EventInterface';
+import React from 'react';
+import BMeetEvent from './EventInterface';
 
-export class BMeetEventFactory {
+export default class BMeetEventFactory {
     
-    createEvent(type, props) {
+    static createEvent(type, props) {
         switch (type) {
-            case "beer":
-                return BMeetEvent(props);
-                break;
+            case "bar":
+                return new BMeetEvent(props);
             
-            case "music":
-                return BMeetEvent(props);
-                break;
-
-            case "club":
-                return BMeetEvent(props);
-                break;
-
             case "rave":
-                return BMeetEvent(props);
-                break;
+                return new BMeetEvent(props);
+
+
+            case "house":
+                return new BMeetEvent(props);
+
+            case "concert":
+                return new BMeetEvent(props);
 
             default:
                 break;

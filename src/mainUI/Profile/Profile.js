@@ -52,7 +52,7 @@ export default function Profile() {
    * Renders User profile onto screen
    */
     return (
-      <Container component="main" maxWidth="xs">
+      <Container data-testid="Profile" component="main" maxWidth="xs">
         <Grid item xs={12}>
             <Paper className={classes.paper} style={{padding: '10% 0'}}>
         <CssBaseline />

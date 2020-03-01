@@ -2,15 +2,15 @@
 // Uses notify to 
 export class BMeetUser {
     constructor(props) {
-        this.m_name = props.name;
-        this.m_email = props.email;
-        this.m_password = props.password;
-        this.m_interests = props.interests;
-        this.m_sessionToken = props.sessionToken;
-        this.m_phone = props.phone;
-        this.m_eventsAttending = props.events;
-        this.m_eventsHosting = props.host;
-        this.m_rating = props.rating;
+        this.name = props.name;
+        this.email = props.email;
+        this.password = props.password;
+        this.interests = props.interests;
+        this.sessionToken = props.sessionToken;
+        this.phone = props.phone;
+        this.eventsAttending = props.events;
+        this.eventsHosting = props.host;
+        this.rating = props.rating;
     }
 
     // TODO: Use Twilio to send SMS/Updates about an event
