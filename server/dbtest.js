@@ -53,33 +53,34 @@ setTimeout(function(){
     	});
 
     	let event = {
-		'eventID': 1,
 		'title': 'foo',
 		'timeDate' : new Date(),
 		'tag': ['tag'],
 		'location': 'loc',
 		'locationName': 'locNAme',
+		'type': 'tag',
 		'host': 'h',
 		'attendees': [],
 		'reviews':[]
    	 };
     	let newEvent = {
-		'eventID': 1,
 		'title': 'bar',
 		'timeDate' : new Date(),
 		'tag': ['tag'],
 		'location': 'loc',
 		'locationName': 'locName',
+		'type' : 'tag',
 		'host': 'h',
 		'attendees': ['a'],
 		'reviews':[{'user': 'a','score': 2,'review': 'c'}]
     	};
 
-    	let e1 = dbInterface.addEvent(event.eventID,event.title, event.timeDate, event.tag, event.location,event.locationName, event.host);
+    	let e1 = dbInterface.addEvent(event.title, event.timeDate, event.tag, event.location,event.locationName, event.type, event.host);
     	let e2 = e1.then( f => dbInterface.getAllEvents())
 		.then( r =>{
 			let res = r[0];
-			assert.equal(res.eventID, event.eventID);
+			event.eventID = res._id;
+			newEvent.eventID = res._id;
 			assert.equal(res.title, event.title);
 			assert.equal(res.timeDate.getTime(), event.timeDate.getTime());
 			assert.equal(res.tag[0], event.tag[0]);
@@ -93,7 +94,6 @@ setTimeout(function(){
     	let e3 = e2.then( f => dbInterface.queryEvents())
 		.then(r => {
 			let res = r[0];
-			assert.equal(res.eventID, event.eventID);
 			assert.equal(res.title, event.title);
 			assert.equal(res.timeDate.getTime(), event.timeDate.getTime());
 			assert.equal(res.tag[0], event.tag[0]);
@@ -106,7 +106,6 @@ setTimeout(function(){
     	let e4 = e3.then( f => dbInterface.getEvent(event.eventID))
 		.then(r => {
 			let res = r;
-			assert.equal(res.eventID, event.eventID);
 			assert.equal(res.title, event.title);
 			assert.equal(res.timeDate.getTime(), event.timeDate.getTime());
 			assert.equal(res.tag[0], event.tag[0]);
@@ -117,7 +116,7 @@ setTimeout(function(){
 			assert.equal(res.reviews.length, 0);
     	});
 
-    	let e5 = e4.then(f => dbInterface.updateEvent(newEvent.eventID , newEvent.title, newEvent.timeDate, newEvent.tag, newEvent.location, newEvent.locationName))
+    	let e5 = e4.then(f => dbInterface.updateEvent(newEvent.eventID , newEvent.title, newEvent.timeDate, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.type))
 		.then(r => dbInterface.addEventAttendee(newEvent.eventID, newEvent.attendees[0]))
 		.then(r => dbInterface.addEventReview(newEvent.eventID, newEvent.reviews[0].user, newEvent.reviews[0].score,newEvent.reviews[0].review))
 		.then(r => dbInterface.getEvent(newEvent.eventID))

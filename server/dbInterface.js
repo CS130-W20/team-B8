@@ -226,6 +226,7 @@ module.exports.removeUserHostingEvent = function(name, eventID){
 	tag:[String/int/enum],
 	location: TBD
 	locationName: String
+	type: String
 	host: String (username)
 	attendees: [String]
 	reviews:[{user: String, score:Int, review:String}]
@@ -262,7 +263,7 @@ module.exports.queryEvents = function(keywordRegex, tags, upperBound, lowerBound
 			if (keywordRegex != null) {
 				doc['title'] = keywordRegex;
 			}
-			if (tags != null || tags.length !=0) {
+			if (tags != null && tags.length !=0) {
 				doc['tag'] = {'$in': tags};
 			}
 
@@ -301,12 +302,12 @@ module.exports.getEvent = function(eventID){
 			const collection = db.collection('Events');
 			// Find some documents
 			
-			let query = {'eventID': eventID} ;
+			let query = {'_id': eventID} ;
 			console.log(query);
 
 		 	collection.findOne(query, function(err, doc) {
 			if(err == null){
-				console.log("getEvent() query Success");
+				console.log("getEvent() query Success" + doc);
 				resolve(doc);
 			} else{
 				console.log("getEvent() query Failed");
@@ -362,7 +363,7 @@ module.exports.addEvent = function(title, timeDate, tag, location, locationName,
 	});
 };
 
-module.exports.updateEvent = function(eventID, title, timeDate, tag, location, locationName){
+module.exports.updateEvent = function(eventID, title, timeDate, tag, location, locationName, type){
 	return new Promise(	
 		function (resolve, reject) {
 			const collection = db.collection('Events');
@@ -370,6 +371,7 @@ module.exports.updateEvent = function(eventID, title, timeDate, tag, location, l
 				'title': title,
 				'timeDate': timeDate,
 				'tag': tag,
+				'type': type,
 				'location': location,
 				'locationName': locationName
 			};
