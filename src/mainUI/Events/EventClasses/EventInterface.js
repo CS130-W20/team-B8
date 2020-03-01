@@ -1,7 +1,8 @@
 import React from 'react';
-import EventListRow from './EventListRow';
+import EventListRow from '../EventListRow';
+import EventHistoryRow from '../EventHistoryRow';
 import { Marker } from 'google-maps-react';
-import { getMarkerType, markerTypes } from './../markerPrefab/mapMarker';
+import { getMarkerType, markerTypes } from '../../markerPrefab/mapMarker';
 import { DialogContent } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 
@@ -20,6 +21,7 @@ export default class BMeetEvent{
         this.attendees = [];
         this.ratings = [];
         this.type = props.type;
+        this.questions = [{id: 'name', label: "What was your experience like?"}]
     }
 
    /**
@@ -41,15 +43,26 @@ export default class BMeetEvent{
         )
     }
 
-    /**
-   * this method is used to generate an event list row used by EventHistory
+   /**
+   * this method is used to generate an event history row used by EventHistory
    * @param none
    * @return EventHistoryRow component corresponding to this Event
    */
     createEventHistoryRow(){
-        /* TO DO: return row component based on event data*/
+        console.log("creating event history row");
+        return (
+            <EventHistoryRow
+                key={this._id} 
+                _id={this._id}
+                title={this.title}
+                timeDate={this.timeDate}
+                locationName={this.locationName}
+                attendees={this.attendees}
+                tag={this.tags}     
+                questions={this.questions}
+            />
+        )
     }
-
     /**
    * this method is used to generate an event list row used by EventHistory
    * @param handleClickOpen callback to open modal relating to this marker
