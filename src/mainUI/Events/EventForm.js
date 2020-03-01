@@ -97,12 +97,10 @@ class EventForm extends Component {
 
         socket.emit('addEvent', newEvent.title, newEvent.date, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.type, newEvent.host);
 
-
         socket.on('serverReply', (event) => {
           console.log("serverReply: ", event);
           this.props.updateFunction();
         })
-
       },
       error => {
         console.error(error);

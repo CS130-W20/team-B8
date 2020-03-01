@@ -4,6 +4,8 @@ const express = require('express');
 const app = express();
 const server= require('http').Server(app);
 const io = require('socket.io')(server);
+const twilio = require('twilio');
+const ProxySMSMessage = require('./ProxySMSMessage');
 
 // TODO: add rooms so not ever user will see everyone's events
 
@@ -249,4 +251,15 @@ io.on("connection", (socket) => {
     })
   })
 
+  socket.on('messageUsers', (req, event) => {
+    let smsMsg = new ProxySMSMessage(req, event);
+    try {
+      smsMsg.send();
+      console.log("serverReply", "Successfully sent to all recipients!")
+      socket.emit("serverReply", "Successfully sent to all recipients!")
+    } catch (error) {
+      console.log("ERROR:", error);
+      socket.emit("serverError", error);
+    }
+  });
 });
