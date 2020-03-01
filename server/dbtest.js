@@ -55,6 +55,7 @@ setTimeout(function(){
     	let event = {
 		'eventID': 1,
 		'title': 'foo',
+		'timeDate' : new Date(),
 		'tag': ['tag'],
 		'location': 'loc',
 		'locationName': 'locNAme',
@@ -65,6 +66,7 @@ setTimeout(function(){
     	let newEvent = {
 		'eventID': 1,
 		'title': 'bar',
+		'timeDate' : new Date(),
 		'tag': ['tag'],
 		'location': 'loc',
 		'locationName': 'locName',
@@ -73,12 +75,13 @@ setTimeout(function(){
 		'reviews':[{'user': 'a','score': 2,'review': 'c'}]
     	};
 
-    	let e1 = dbInterface.addEvent(event.eventID, event.title, event.tag, event.location,event.locationName, event.host);
+    	let e1 = dbInterface.addEvent(event.eventID,event.title, event.timeDate, event.tag, event.location,event.locationName, event.host);
     	let e2 = e1.then( f => dbInterface.getAllEvents())
 		.then( r =>{
 			let res = r[0];
 			assert.equal(res.eventID, event.eventID);
 			assert.equal(res.title, event.title);
+			assert.equal(res.timeDate.getTime(), event.timeDate.getTime());
 			assert.equal(res.tag[0], event.tag[0]);
 			assert.equal(res.location, event.location);
 			assert.equal(res.locationName, event.locationName);
@@ -92,6 +95,7 @@ setTimeout(function(){
 			let res = r[0];
 			assert.equal(res.eventID, event.eventID);
 			assert.equal(res.title, event.title);
+			assert.equal(res.timeDate.getTime(), event.timeDate.getTime());
 			assert.equal(res.tag[0], event.tag[0]);
 			assert.equal(res.location, event.location);
 			assert.equal(res.locationName, event.locationName);
@@ -99,11 +103,12 @@ setTimeout(function(){
 			assert.equal(res.attendees.length, 0);
 			assert.equal(res.reviews.length, 0);
     	});
-    	let e4 = e3.then( f => dbInterface.getEvent(1))
+    	let e4 = e3.then( f => dbInterface.getEvent(event.eventID))
 		.then(r => {
 			let res = r;
 			assert.equal(res.eventID, event.eventID);
 			assert.equal(res.title, event.title);
+			assert.equal(res.timeDate.getTime(), event.timeDate.getTime());
 			assert.equal(res.tag[0], event.tag[0]);
 			assert.equal(res.location, event.location);
 			assert.equal(res.locationName, event.locationName);
@@ -112,13 +117,13 @@ setTimeout(function(){
 			assert.equal(res.reviews.length, 0);
     	});
 
-    	let e5 = e4.then(f => dbInterface.updateEvent(newEvent.eventID , newEvent.title, newEvent.tag, newEvent.location, newEvent.locationName))
+    	let e5 = e4.then(f => dbInterface.updateEvent(newEvent.eventID , newEvent.title, newEvent.timeDate, newEvent.tag, newEvent.location, newEvent.locationName))
 		.then(r => dbInterface.addEventAttendee(newEvent.eventID, newEvent.attendees[0]))
 		.then(r => dbInterface.addEventReview(newEvent.eventID, newEvent.reviews[0].user, newEvent.reviews[0].score,newEvent.reviews[0].review))
 		.then(r => dbInterface.getEvent(newEvent.eventID))
 		.then(r => {
-			console.log(r);
 			assert.equal(r.title, newEvent.title);
+			assert.equal(r.timeDate.getTime(), newEvent.timeDate.getTime());
 			assert.equal(r.tag[0], newEvent.tag[0]);
 			assert.equal(r.location, newEvent.location);
 			assert.equal(r.locationName, newEvent.locationName);
@@ -128,7 +133,6 @@ setTimeout(function(){
 	let e6 = e5.then(r => dbInterface.removeEventAttendee(newEvent.eventID, newEvent.attendees[0]))
 		.then(r => dbInterface.getEvent(newEvent.eventID))
 		.then(r => {
-			console.log(r);
 			assert.equal(r.attendees.length, 0);
 	});
    	console.log('endCalls');
