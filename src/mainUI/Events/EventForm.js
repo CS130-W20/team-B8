@@ -77,7 +77,7 @@ class EventForm extends Component {
   createEvent() {
     if (this.state == null)
       this.handleClickClose();
-    //console.log(this.state.location);
+
     Geocode.fromAddress(this.state.location).then(
       response => {
         const { lat, lng } = response.results[0].geometry.location;
@@ -93,12 +93,9 @@ class EventForm extends Component {
           host: 'Sean Derman'
         }
 
-        console.log(newEvent);
-
         socket.emit('addEvent', newEvent.title, newEvent.date, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.type, newEvent.host);
 
         socket.on('serverReply', (event) => {
-          console.log("serverReply: ", event);
           this.props.updateFunction();
         })
       },

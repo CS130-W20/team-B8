@@ -163,7 +163,7 @@ class SimpleMap extends Component {
       return null;
     }
 
-    const events = this.props.events;;
+    const events = this.props.events;
 
     return (
       <div>

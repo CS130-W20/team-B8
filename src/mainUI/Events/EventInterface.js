@@ -9,16 +9,17 @@ import Typography from '@material-ui/core/Typography';
 // Uses an observer pattern to notify and update attendees of event changes
 export default class BMeetEvent{
     constructor(props) {
-        this.m_eventID = props._id;
-        this.m_title =  props.title;
-        this.m_timeDate = props.timeDate;
-        this.m_tags = props.tags;
-        this.m_location = props.location;
-        this.m_locationName = props.locationName;
-        this.m_host =  props.host;
-        this.m_attendees = [];
-        this.m_ratings = [];
-        this.m_type = props.type;
+        this._id = props._id;
+        this.title =  props.title;
+        this.description = props.description;
+        this.timeDate = props.timeDate;
+        this.tags = props.tags;
+        this.location = props.location;
+        this.locationName = props.locationName;
+        this.host =  props.host;
+        this.attendees = [];
+        this.ratings = [];
+        this.type = props.type;
     }
 
    /**
@@ -29,13 +30,13 @@ export default class BMeetEvent{
     createEventListRow() {
         return (
             <EventListRow
-                key={this.m_eventId} 
-                _id={this.m_eventID}
-                title={this.m_title}
-                timeDate={this.m_timeDate}
-                locationName={this.m_locationName}
-                attendees={this.m_attendees}
-                tag={this.m_tags}
+                key={this._id} 
+                _id={this._id}
+                title={this.title}
+                timeDate={this.timeDate}
+                locationName={this.locationName}
+                attendees={this.attendees}
+                tag={this.tags}
             />
         )
     }
@@ -59,10 +60,10 @@ export default class BMeetEvent{
         return(
           <Marker
             onClick={handleClickOpen}
-            position={{ lat: this.m_location.lat, lng: this.m_location.lng}}
-            name={this.m_title}
+            position={{ lat: this.location.lat, lng: this.location.lng}}
+            name={this.title}
             key={key}
-            icon={{url: getMarkerType(this.m_type), scaleSize: (.5, .5)}}/>
+            icon={{url: getMarkerType(this.type), scaleSize: (.5, .5)}}/>
         )
     }
 
@@ -93,7 +94,7 @@ export default class BMeetEvent{
    * 
    */
     registerUser(user) {
-        this.m_attendees.push(user);
+        this.attendees.push(user);
     }
 
     /**
@@ -102,9 +103,9 @@ export default class BMeetEvent{
    * 
    */
     removeUser(id) {
-        var oldList = this.m_attendees;
-        var removeIndex = oldList.map(function(item) { return item.state.m_ID; }).indexOf(id);
-        this.m_attendees.splice(removeIndex, 1);
+        var oldList = this.attendees;
+        var removeIndex = oldList.map(function(item) { return item.state._id; }).indexOf(id);
+        this.attendees.splice(removeIndex, 1);
     }
 
     /**
@@ -112,7 +113,7 @@ export default class BMeetEvent{
    * 
    */
     notifyUsers() {
-        this.m_attendees.forEach(element => {
+        this.attendees.forEach(element => {
             console.log(element);
             element.update();
         })

@@ -181,7 +181,6 @@ export default function Dashboard(props) {
 
     const refreshEvents = () => {
       socket.emit('getAllEvents');
-      //socket.emit('getEvents', 'me');
     }
 
   /**

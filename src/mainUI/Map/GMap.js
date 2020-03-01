@@ -38,13 +38,13 @@ class GMap extends Component {
     }
 
     render() {
-        const {classes} = this.props;
+        const {classes, events} = this.props;
         return(
             <Grid data-testid="Map" container spacing={3} style={{height: "80vh"}}>
                 {/* Map */}
                 <Grid item xs={12} md={8} lg={9} style={{height: "100%"}}>
                     <Paper className={classes.paperElement}>
-                        <SimpleMap mapFilters={this.state.filters}/>
+                        <SimpleMap mapFilters={this.state.filters} events={events}/>
                     </Paper>
                 </Grid>
                 {/* Map Settings? */}
