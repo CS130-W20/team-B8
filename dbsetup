@@ -2,5 +2,4 @@ db = db.getSiblingDB("ServiceDb");
 db.createCollection("Users");
 db.createCollection("Events");
 db.Users.createIndex( { "name": 1, "email": 1 }, { unique: true } )
-db.Events.createIndex( { "eventID": 1 }, { unique: true } )
 

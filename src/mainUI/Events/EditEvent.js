@@ -99,10 +99,10 @@ class EventEdit extends Component{
     console.log(this.props.event);
     console.log(this.state.event);
     this.setState({
-      date: this.state.event.date,
-      location: this.state.event.location,
-      title: this.state.event.name,
-      type: this.state.event.tag[0],
+      date: this.props.date,
+      location: this.props.location,
+      title: this.props.title,
+      type: this.props.tag && this.props.tag[0],
     })
   }
 

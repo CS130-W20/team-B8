@@ -10,9 +10,8 @@ import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import EventForm from './EventForm';
-import EventEdit from './EditEvent';
-import EventDelete from './DeleteEvent';
-import EventMessage from './MessageEvent';
+
+import BMeetEventFactory from './EventFactory';
 
 const
     io = require("socket.io-client"),
@@ -78,18 +77,11 @@ class EventList extends Component {
         socket.emit('getAllEvents');
 
         socket.on('serverReply', (response) => {
-            console.log(eventList);
+            console.log("eventList: ", eventList);
             response.map((event) => {
                 if (event.location) {
-                    eventList.push({
-                        id: event.eventID,
-                        name: event.title, 
-                        date: event.timeDate,
-                        location: event.locationName,
-                        attendees: 1,
-                        host: event.host,
-                        tag: event.tag,
-                    })
+                    var newEvent = BMeetEventFactory.createEvent(event.type, event);
+                    eventList.push(newEvent);
                 }
             });
             this.setState({
@@ -97,7 +89,7 @@ class EventList extends Component {
             });
             
             eventList = []; // MUST CLEAR eventList before getting more events         
-            console.log(this.state.hostEvents)
+            console.log("hostEvents:" + this.state.hostEvents)
         });
     }
 
@@ -120,20 +112,7 @@ class EventList extends Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {this.state.hostEvents.map(row => (
-                        <TableRow data-testid="event-rows" key={row.id}>
-                            <TableCell>{row.date}</TableCell>
-                            <TableCell>{row.name}</TableCell>
-                            <TableCell>{row.location}</TableCell>
-                            <TableCell>{row.date}</TableCell>
-                            <TableCell>{row.attendees}</TableCell>
-                            <TableCell align="right" style={{display: 'grid', gridTemplateRows: '1fr', gridTemplateColumns: '1fr 1fr 1fr'}}>
-                                <EventEdit event={row} updateFunction={this.resetList}/>
-                                <EventMessage event={row}/>
-                                <EventDelete event={row}/>
-                            </TableCell>
-                        </TableRow>
-                        ))}
+                        {this.state.hostEvents.map(event => event.createEventListRow())}
                     </TableBody>
                     </Table>
                     <div className={classes.seeMore}>

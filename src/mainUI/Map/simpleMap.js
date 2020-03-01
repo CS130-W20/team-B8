@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
-import { markerTypes } from './../markerPrefab/mapMarker';
+import { getMarkerType, markerTypes } from './../markerPrefab/mapMarker';
 import Dimensions from 'react-dimensions';
 import Dialog from '@material-ui/core/Dialog';
+import { DialogContent } from '@material-ui/core';
 import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
 import Geocode from "react-geocode";
 
 const
@@ -120,10 +120,10 @@ class SimpleMap extends Component {
   /**
    * Event function that will be used for detecting button click and display event details
    */
-  handleClickOpen(marker) {
+  handleClickOpen(event) {
     this.setState({
       open: true,
-      currEvent: marker
+      currEvent: event
     });
   };
 
@@ -163,6 +163,8 @@ class SimpleMap extends Component {
       return null;
     }
 
+    const events = this.props.events;;
+
     return (
       <div>
         <Map
@@ -175,21 +177,10 @@ class SimpleMap extends Component {
           center={ userLocation }>
           <Marker
           position={userLocation}/>
-          {this.state.markers.map((marker, i) =>{
-                //console.log(i);
-                //this.renderMarker(marker, i);
-                return(
-                  <Marker
-                    onClick={() => this.handleClickOpen(marker)}
-                    position={{ lat: marker.lat, lng: marker.lng}}
-                    name={marker.name}
-                    key={i}
-                    icon={{url: marker.type, scaleSize: (.5, .5)}}/>
-                )
-          })}
+          {events.map((event, i) => event.createEventMarker(() => { this.handleClickOpen(event) }, i))} 
         </Map>
         <Dialog data-testid="map-dialog" open={this.state.open} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">{this.state.currEvent.name}</DialogTitle>
+        <DialogTitle id="form-dialog-title">{this.state.currEvent.title}</DialogTitle>
                 <DialogContent>
                 <Typography gutterBottom>
                   Details: {this.state.currEvent.description}

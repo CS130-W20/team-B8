@@ -30,13 +30,16 @@ class LocationSearchInput extends Component {
   handleSelect = newAddress => {
     this.setState({ address: newAddress });
     geocodeByAddress(newAddress)
-      .then(results => getLatLng(results[0]))
-      .then(latLng => console.log('Success', latLng))
-      .catch(error => console.error('Error', error));
     this.props.updateFunction(newAddress);
   };
  
   render() {
+    const {
+      locationNameId,
+      setLocation,
+      setWaitingForLocation
+    } = this.props;
+
     return (
       <PlacesAutocomplete
         value={this.state.address}

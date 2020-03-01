@@ -18,7 +18,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import LocationSearchInput from './LocationSearcher';
 import Geocode from "react-geocode";
-import { markerTypes } from './../markerPrefab/mapMarker';
+import { eventTypes, markerTypes } from './../markerPrefab/mapMarker';
  
 const
     io = require("socket.io-client"),
@@ -46,14 +46,14 @@ const styles = theme => ({
  * @see https://material-ui.com/components/dialogs/
  * @see https://material-ui.com/components/pickers/
  * 
- * @author Phipson Lee
+ * @author Phipson Lee, Lawrence Lee
  * @since 2020-02-15
  */
 class EventForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      date: '',
+      date: new Date(),
       location: '',
       title: '',
       dialogopen: false,
@@ -85,15 +85,17 @@ class EventForm extends Component {
         var newEvent = {
           eventId: 1,
           title: this.state.title,
+          date: this.state.date,
           tag: [this.state.type],
           location: {lat: lat, lng: lng},
           locationName: this.state.location,
+          type: this.state.type,
           host: 'Sean Derman'
         }
 
         console.log(newEvent);
 
-        socket.emit('addEvent', newEvent.eventId, newEvent.title, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.host);
+        socket.emit('addEvent', newEvent.title, newEvent.date, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.type, newEvent.host);
 
 
         socket.on('serverReply', (event) => {
@@ -255,10 +257,10 @@ class EventForm extends Component {
               <MenuItem value="">
                   <em>None</em>
               </MenuItem>
-              <MenuItem value={markerTypes.food}>Bar Hopping</MenuItem>
-              <MenuItem value={markerTypes.dance}>Rave</MenuItem>
-              <MenuItem value={markerTypes.hats}>House Party</MenuItem>
-              <MenuItem value={markerTypes.dj}>Music Concert/Festival</MenuItem>
+              <MenuItem value={eventTypes.barHopping}>Bar Hopping</MenuItem>
+              <MenuItem value={eventTypes.rave}>Rave</MenuItem>
+              <MenuItem value={eventTypes.houseParty}>House Party</MenuItem>
+              <MenuItem value={eventTypes.music}>Music Concert/Festival</MenuItem>
               </Select>
               </FormControl>
           </DialogContent>

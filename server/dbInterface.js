@@ -314,17 +314,36 @@ module.exports.getEvent = function(eventID){
 	});
 };
 
-module.exports.addEvent = function(eventID, title, tag, location, locationName, host){
+module.exports.getEventByHost = function(host){
+	return new Promise(
+		function (resolve, reject) {
+			const collection = db.collection('Events');
+			let query = {'host': host};
+			collection.find(query, function(err, doc) {
+				if(err == null){
+					console.log("getEventByHost() query Success");
+					var docs = doc.toArray();
+					resolve(docs);
+				} else{
+					console.log("getEventByHost() query Failed");
+					reject(err);
+				}
+			})
+		}
+	)
+}
+
+module.exports.addEvent = function(title, date, tag, location, locationName, type, host){
 	return new Promise(	
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
-				'eventID': eventID,
 				'title': title,
-				'timeDate': new Date(),
+				'timeDate': date,
 				'tag': tag,
 				'location': location,
 				'locationName': locationName,
+				'type': type,
 				'host': host,
 				'attendees': [],
 				'reviews':[]
@@ -352,7 +371,7 @@ module.exports.updateEvent = function(eventID, title, tag, location, locationNam
 				'location': location,
 				'locationName': locationName
 			};
-		 	collection.updateOne({'eventID': eventID},{ '$set': doc},
+		 	collection.updateOne({'_id': eventID},{ '$set': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("updateEvent() Success: " + eventID);
@@ -372,7 +391,7 @@ module.exports.addEventAttendee = function(eventID, attendee){
 			let doc = {
 				'attendees': attendee
 			};
-		 	collection.updateOne({'eventID': eventID},{ '$push': doc},
+		 	collection.updateOne({'_id': eventID},{ '$push': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("addEventAttendee() Success: " + eventID);
@@ -392,7 +411,7 @@ module.exports.removeEventAttendee = function(eventID, attendee){
 			let doc = {
 				'attendees': attendee
 			};
-		 	collection.updateOne({'eventID': eventID},{ '$pull': doc},
+		 	collection.updateOne({'_id': eventID},{ '$pull': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("addEventAttendee() Success: " + eventID);
@@ -416,7 +435,7 @@ module.exports.addEventReview = function(eventID, user, score, review){
 					'review': review
 				}
 			};
-		 	collection.updateOne({'eventID': eventID},{ '$push': doc},
+		 	collection.updateOne({'_id': eventID},{ '$push': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("addEventReview() Success: " + eventID);
