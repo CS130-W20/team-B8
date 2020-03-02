@@ -222,6 +222,7 @@ module.exports.removeUserHostingEvent = function(name, eventID){
 {
 	eventID: int
 	title: String
+	description: String
 	timeDate: Date
 	tag:[String/int/enum],
 	location: TBD
@@ -322,10 +323,9 @@ module.exports.getEventByHost = function(host){
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let query = {'host': host};
-			collection.find(query, function(err, doc) {
+			collection.find(query,{}).toArray(function(err, docs) {
 				if(err == null){
 					console.log("getEventByHost() query Success");
-					var docs = doc.toArray();
 					resolve(docs);
 				} else{
 					console.log("getEventByHost() query Failed");
@@ -336,7 +336,30 @@ module.exports.getEventByHost = function(host){
 	)
 }
 
-module.exports.addEvent = function(title, timeDate, tag, location, locationName, type, host){
+module.exports.getHostAvgRating = function(host){
+	return new Promise(
+		function (resolve, reject) {
+			const collection = db.collection('Events');
+			let query = {'host': host};
+			let mat = {'$match' : query};
+			let unw = {'$unwind' : "$reviews"};
+			let group = {'$group' : {'_id' : '$host', 'result' : {'$avg':'$reviews.score'}}};
+
+			let agg_pipeline = [mat, unw, group];
+			collection.aggregate(agg_pipeline).toArray(function(err, doc) {
+				if(err == null){
+					console.log("getHostAvgRating() query Success:" + doc);
+					resolve(doc[0]['result']);
+				} else{
+					console.log("getHostAvgRating() query Failed");
+					reject(err);
+				}
+			})
+		}
+	)
+}
+
+module.exports.addEvent = function(title, timeDate, tag, location, locationName, type, host,description){
 	return new Promise(	
 		function (resolve, reject) {
 			const collection = db.collection('Events');
@@ -349,7 +372,8 @@ module.exports.addEvent = function(title, timeDate, tag, location, locationName,
 				'type': type,
 				'host': host,
 				'attendees': [],
-				'reviews':[]
+				'reviews':[],
+				'description': description
 			};
 		 	collection.insertOne(doc,{},function(err, result) {
 			if(err == null){
@@ -363,7 +387,7 @@ module.exports.addEvent = function(title, timeDate, tag, location, locationName,
 	});
 };
 
-module.exports.updateEvent = function(eventID, title, timeDate, tag, location, locationName, type){
+module.exports.updateEvent = function(eventID, title, timeDate, tag, location, locationName, type,description){
 	return new Promise(	
 		function (resolve, reject) {
 			const collection = db.collection('Events');
@@ -374,7 +398,7 @@ module.exports.updateEvent = function(eventID, title, timeDate, tag, location, l
 				'type': type,
 				'location': location,
 				'locationName': locationName,
-				'type': type
+				'description' :description
 			};
 		 	collection.updateOne({'_id': eventID},{ '$set': doc},
 		 			{'upsert':false},function(err, result) {
