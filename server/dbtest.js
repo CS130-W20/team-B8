@@ -134,5 +134,7 @@ setTimeout(function(){
 		.then(r => {
 			assert.equal(r.attendees.length, 0);
 	});
+	let e7 = e6.then(r => dbInterface.getHostAvgRating(event.host))
+		.then( r => assert.equal(newEvent.reviews[0].score, r));
    	console.log('endCalls');
 }, 2000);

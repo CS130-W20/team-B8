@@ -62,7 +62,13 @@ io.on("connection", (socket) => {
     let prom = dbInterface.getUser(name);
     prom.then( (docs) => {
       console.log("FOUND USER", docs);
-      socket.emit("getUserReply", docs);
+      let prom2 = dbInterface.getHostAvgRating(docs.name);
+      prom2.then(avg_score => {
+	console.log("FOUND USER", docs);
+	docs['avgScore'] = avg_score;
+	socket.emit("getUserReply", docs);
+      }
+      ).catch( err => reject(err));
     })
     .catch( (error) =>  {
       console.log("ERROR:", error);
