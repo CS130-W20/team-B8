@@ -87,7 +87,7 @@ componentDidUpdate(prevProps) {
       }
 
       for (var i = 0; i < this.props.filters.eventTypes.length; i++) {
-        if (this.props.filters.eventTypes[i] != prevProps.filters.eventTypes[i]) {
+        if (this.props.mapFilters.eventTypes[i] != prevProps.mapFilters.eventTypes[i]) {
           this.resetMap();
         }
       }
