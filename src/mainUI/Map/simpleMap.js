@@ -59,6 +59,8 @@ class SimpleMap extends Component {
           userLocation: { lat: latitude, lng: longitude },
           loading: false,
         });
+
+        this.props.updateLocation(this.state.userLocation);
       },
       () => {
         this.setState({ loading: false });
@@ -168,6 +170,8 @@ resetMap() {
   /**
    * Filters out the markers to be displayed on the maps, based on user query and filtering
    */
+
+  /*
   filterMarkers(eventList, eventDist) {
     var finalList = [];
     if (this.state.userLocation != null) {
@@ -189,7 +193,7 @@ resetMap() {
 
     console.log(finalList);
     return finalList;
-  }
+  }*/
 
   /**
    * Event function that will be used for detecting button click and display event details
@@ -209,22 +213,6 @@ resetMap() {
       open: false,
     })
   };
-
-  /**
-   * Helper function to render marker based on this.state.markers
-   * @param {Object} marker A marker object from this.state.markers
-   * @param {Integer} index Specify a unique key value for component
-   */
-  renderMarker(marker, index) {
-    return(
-      <Marker 
-        position={{ lat: marker.lat, lng: marker.lng}}
-        name={marker.name}
-        id={index}
-        key={index}
-        type={marker.type}/>
-    )
-  }
 
   /**
    * Default function to load and display component on DOM
