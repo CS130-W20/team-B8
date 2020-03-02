@@ -210,9 +210,11 @@ export default function Dashboard(props) {
                 longitude: event.location.lng
               });
             
-            if (dist <= newfilter.eventDistance * 1000) {
-              console.log('You are ', dist, ' meters away from event');
-              finalList.push(event);
+            if (newfilter != null) {
+              if (dist <= newfilter.eventDistance * 1000) {
+                console.log('You are ', dist, ' meters away from event');
+                finalList.push(event);
+              }
             }
         });
         console.log(finalList);

@@ -43,7 +43,6 @@ class SimpleMap extends Component {
           markers: [],
           open: false,
           currEvent: {},
-          filters: this.props.mapFilters,
     }
     
     this.handleClickClose = this.handleClickClose.bind(this);
@@ -227,6 +226,8 @@ resetMap() {
 
     const events = this.props.events;
 
+    console.log(events);
+
     return (
       <div>
         <Map
@@ -239,7 +240,7 @@ resetMap() {
           center={ userLocation }>
           <Marker
           position={userLocation}/>
-          {events.map((event, i) => event.createEventMarker(() => { this.handleClickOpen(event) }, i))} 
+          {events.forEach((event, i) => {event.createEventMarker(() => { this.handleClickOpen(event) }, i)})} 
         </Map>
         <Dialog data-testid="map-dialog" open={this.state.open} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">{this.state.currEvent.title}</DialogTitle>

@@ -14,8 +14,6 @@ const io = require("socket.io-client"),
 socket = io.connect("http://localhost:8000");
 socket.emit('getAllEvents');
 
-
-
 export default class App extends React.Component{
 
   login = (userID) => {

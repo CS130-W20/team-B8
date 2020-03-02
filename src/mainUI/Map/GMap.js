@@ -31,7 +31,7 @@ class GMap extends Component {
                 {/* Map */}
                 <Grid item xs={12} md={8} lg={9} style={{height: "100%"}}>
                     <Paper className={classes.paperElement}>
-                        <SimpleMap mapFilters={this.state.filters} events={events}/>
+                        <SimpleMap updateLocation={this.props.updateLocation} events={events}/>
                     </Paper>
                 </Grid>
                 {/* Map Settings? */}
