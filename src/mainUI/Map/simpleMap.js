@@ -41,15 +41,14 @@ class SimpleMap extends Component {
       super(props);
       this.current = React.createRef();
       this.state = {
-          markers: [],
+          eventMarkers: props.events,
           open: false,
           currEvent: {},
     }
     
     this.handleClickClose = this.handleClickClose.bind(this);
     this.handleClickOpen = this.handleClickOpen.bind(this);
-    //this.resetMap = this.resetMap.bind(this);
-    //this.filterMarkers = this.filterMarkers.bind(this);
+    this.updateMarkers = this.updateMarkers.bind(this);
 
     navigator.geolocation.getCurrentPosition(
       position => {
@@ -68,132 +67,46 @@ class SimpleMap extends Component {
     );
   }
 
+  componentWillReceiveProps(newProps) {
+    console.log('GMap PrevProps: ', newProps);
+    console.log('GMap this.Props: ', this.props);
+    if (this.props.events.length != newProps.events.length){
+        console.log('Found difference!')
+        this.updateMarkers(newProps);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    console.log('Markers PrevState: ', prevState);
+    console.log('Markers PrevProps: ', prevProps);
+    console.log('Marker this.Props: ', this.props);
+    console.log('Marker this.state: ', this.state);
+  }
+
+  updateMarkers(prevProps) {
+    if (prevProps == null)
+        prevProps = this.props;
+    
+    var eventList = [];
+    prevProps.events.forEach(event => {
+        eventList.push(event);
+    });
+
+    this.setState({
+        eventMarkers: eventList
+    })
+
+    console.log(this.state);
+
+    eventList = [];
+  }
+
 /**
  * Sets the state of the component when it mounts. Default function that is available for all reactJS components
  * In particular, we will get all events and then push them onto a buffer before updating our state
  * this.state.markers will then be rendered on the DOM
  */
-componentDidMount() {
-  //this.resetMap();
-}
-
 /*
-componentDidUpdate(prevProps) {
-  //console.log(prevProps);
-  //console.log(this.props);
-  var newObj = {
-    eventTypes: prevProps.mapFilters.eventTypes,
-    eventDistance: prevProps.mapFilters.eventDistance
-  }
-  if (this.props.mapFilters != null) {
-    if (this.props.mapFilters.eventDistance == prevProps.mapFilters.eventDistance) {
-      if (this.props.mapFilters.eventTypes.length != prevProps.mapFilters.eventTypes.length) {
-        console.log('Changed tags');
-        var newObj = {
-          eventTypes: this.props.mapFilters.eventTypes,
-          eventDistance: this.props.mapFilters.eventDistance
-        }
-        this.setState({
-          filters: newObj
-        });
-        console.log(this.state.filters);
-
-        this.resetMap();
-      }
-
-      for (var i = 0; i < this.props.mapFilters.eventTypes.length; i++) {
-        if (this.props.mapFilters.eventTypes[i] != prevProps.mapFilters.eventTypes[i]) {
-          console.log('Changed tags');
-          this.setState({
-            filters: newObj
-          });
-          console.log(this.state.filters);
-
-          this.resetMap();
-        }
-      }
-    } else {
-      console.log('Changed distance');
-      this.setState({
-        filters: newObj
-      });
-      console.log(this.state.filters);
-      this.resetMap();
-    }
-  }
-}
-
-resetMap() {
-  console.log(this.state.filters);
-  var markerList = []
-
-  if (this.state.filters == null)
-    return;
-
-  var eventDist = this.state.filters.eventDistance;
-
-  if (this.state.filters.eventTypes.length > 0) {
-    socket.emit('queryEvents', null, this.state.filters, null, null, null);
-  } else {
-    socket.emit('getAllEvents'); // TODO: Query by tags
-  }
-
-  socket.on('serverReply', (response) => {
-    console.log("serverReply: ", response);
-    response.map(event => {
-      if (event.location) {
-        markerList.push({
-          name: event.title,
-          lat: event.location.lat,
-          lng: event.location.lng,
-          type: event.tag[0],
-          dateTime: event.dateTime,
-          description: 'new event!',
-          locationName: event.LocationName,
-          host: event.host
-        })
-      }
-    });
-
-    var filteredEvents = this.filterMarkers(markerList, eventDist);
-
-    console.log(filteredEvents);
-
-    this.setState({
-      markers: filteredEvents
-    });
-
-    markerList = [];
-  });
-  }*/
-
-  /**
-   * Filters out the markers to be displayed on the maps, based on user query and filtering
-   */
-
-  /*
-  filterMarkers(eventList, eventDist) {
-    var finalList = [];
-    if (this.state.userLocation != null) {
-      eventList.map(event => {
-          var currposition = {latitude: this.state.userLocation.lat,
-                              longitude: this.state.userLocation.lng};
-          var dist = getDistance(currposition, 
-            {
-              latitude: event.lat,
-              longitude: event.lng
-            });
-          
-          if (dist <= eventDist * 1000) {
-            console.log('You are ', dist, ' meters away from event');
-            finalList.push(event);
-          }
-      });
-    }
-
-    console.log(finalList);
-    return finalList;
-  }*/
 
   /**
    * Event function that will be used for detecting button click and display event details
@@ -225,9 +138,7 @@ resetMap() {
       return null;
     }
 
-    const events = this.props.events;
-
-    console.log(events);
+    console.log('eventMarkers: ', this.state.eventMarkers);
 
     return (
       <div>
@@ -241,7 +152,7 @@ resetMap() {
           center={ userLocation }>
           <Marker
           position={userLocation}/>
-          {events.forEach((event, i) => {event.createEventMarker(() => { this.handleClickOpen(event) }, i)})} 
+          {this.state.eventMarkers.map((event, i) => {event.createEventMarker(() => { this.handleClickOpen(event) }, i)})}
         </Map>
         <Dialog data-testid="map-dialog" open={this.state.open} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
           <EventPage currEvent={this.state.currEvent}></EventPage>

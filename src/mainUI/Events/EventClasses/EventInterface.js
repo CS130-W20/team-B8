@@ -41,8 +41,19 @@ export default class BMeetEvent{
                 tag={this.tags}
                 type={this.type}
                 updateFunction={updateFunction}
+                updateObject={this}
             />
         )
+    }
+
+    updateEventListData(updatedEvent) {
+        this.title =  updatedEvent.title;
+        this.description = updatedEvent.description;
+        this.timeDate = updatedEvent.timeDate;
+        this.tags = updatedEvent.tags;
+        this.location = updatedEvent.location;
+        this.locationName = updatedEvent.locationName;
+        this.type = updatedEvent.type;
     }
 
    /**
@@ -72,6 +83,8 @@ export default class BMeetEvent{
    * @return Marker component corresponding to this Event
    */
     createEventMarker(handleClickOpen, key){
+        console.log(this.type);
+        console.log(this.location);
         return(
           <Marker
             onClick={handleClickOpen}

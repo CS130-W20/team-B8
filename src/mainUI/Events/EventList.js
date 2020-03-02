@@ -56,46 +56,21 @@ class EventList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            hostEvents: [],
+            hostEvents: props.events,
         }
-        this.resetList = this.resetList.bind(this);
     };
 
     /**
      * called when the component is added to the DOM; we call resetList() to ensure that the component is updated
      */
     componentDidMount() {
-        //this.resetList();
-    }
-
-    /**
-     * @function resetList Resets the view of the list of events based on whether an event has been edited or created
-     */
-    resetList() {
-        console.log("Updating Table");
-        let eventList = [];
-        socket.emit('getAllEvents');
-
-        socket.on('serverReply', (response) => {
-            console.log("eventList: ", response);
-            response.map((event) => {
-                console.log(event);
-                if (event.location) {
-                    var newEvent = BMeetEventFactory.createEvent(event.type, event);
-                    eventList.push(newEvent);
-                }
-            });
-            this.setState({
-                hostEvents: eventList
-            });
-            
-            eventList = []; // MUST CLEAR eventList before getting more events         
-            console.log("hostEvents:" + this.state.hostEvents)
+        this.setState({
+            hostEvents: this.props.events,
         });
     }
 
     render() {
-    const { classes } = this.props;
+    const { classes, events, refreshEvents } = this.props;
     return (
             <Grid data-testid="Events" item xs={12}>
               <Paper className={classes.paper}>
@@ -113,7 +88,7 @@ class EventList extends Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {this.props.events.map(event => event.createEventListRow(this.props.refreshEvents))}
+                        {this.state.hostEvents.map(event => event.createEventListRow(refreshEvents))}
                     </TableBody>
                     </Table>
                     <div className={classes.seeMore}>
