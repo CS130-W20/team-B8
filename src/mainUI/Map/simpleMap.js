@@ -9,6 +9,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Geocode from "react-geocode";
+import { getDistance } from 'geolib';
 
 const
     io = require("socket.io-client"),
@@ -42,12 +43,15 @@ class SimpleMap extends Component {
           markers: [],
           open: false,
           currEvent: {},
+          filters: this.props.mapFilters,
     }
     
     this.addMarker = this.addMarker.bind(this);
     this.filterMarkers = this.filterMarkers.bind(this);
     this.handleClickClose = this.handleClickClose.bind(this);
     this.handleClickOpen = this.handleClickOpen.bind(this);
+    this.resetMap = this.resetMap.bind(this);
+    this.filterMarkers = this.filterMarkers.bind(this);
 
     navigator.geolocation.getCurrentPosition(
       position => {
@@ -55,7 +59,7 @@ class SimpleMap extends Component {
 
         this.setState({
           userLocation: { lat: latitude, lng: longitude },
-          loading: false
+          loading: false,
         });
       },
       () => {
@@ -69,9 +73,31 @@ class SimpleMap extends Component {
  * In particular, we will get all events and then push them onto a buffer before updating our state
  * this.state.markers will then be rendered on the DOM
  */
-  componentDidMount() {
-    var markerList = []
-    socket.emit('getAllEvents');
+componentDidMount() {
+  this.resetMap();
+}
+
+componentDidUpdate(prevProps) {
+  console.log(prevProps);
+  console.log(this.props);
+  if (this.props.mapFilters != null) {
+    if (this.props.mapFilters.eventDistance != prevProps.mapFilters.eventDistance) {
+      if (this.props.mapFilters.eventTypes.length != prevProps.mapFilters.eventTypes.length) {
+        this.resetMap();
+      }
+
+      for (var i = 0; i < this.props.mapFilters.eventTypes.length; i++) {
+        if (this.props.mapFilters.eventTypes[i] != prevProps.mapFilters.eventTypes[i]) {
+          this.resetMap();
+        }
+      }
+    }
+  }
+}
+
+resetMap() {
+  var markerList = []
+    socket.emit('getAllEvents'); // TODO: Query by tags
 
     socket.on('serverReply', (response) => {
       console.log("serverReply: ", response);
@@ -90,12 +116,14 @@ class SimpleMap extends Component {
         }
       });
 
+      var filteredEvents = this.filterMarkers(markerList);
+
       this.setState({
-        markers: markerList
+        markers: filteredEvents
       });
 
       markerList = [];
-    })
+    });
   }
 
 /**
@@ -110,11 +138,28 @@ class SimpleMap extends Component {
 
   /**
    * Filters out the markers to be displayed on the maps, based on user query and filtering
-   * @param {String} query 
    */
-  // TODO: Change rendered markers based on filters
-  filterMarkers(query) {
-    
+  filterMarkers(eventList) {
+    var finalList = [];
+    if (this.state.userLocation != null) {
+      eventList.map(event => {
+          var currposition = {latitude: this.state.userLocation.lat,
+                              longitude: this.state.userLocation.lng};
+          var dist = getDistance(currposition, 
+            {
+              latitude: event.lat,
+              longitude: event.lng
+            });
+          
+          if (dist <= this.state.filters.eventDistance * 1000) {
+            console.log('You are ', dist, ' meters away from event');
+            finalList.push(event);
+          }
+      });
+    }
+
+    console.log(finalList);
+    return finalList;
   }
 
   /**

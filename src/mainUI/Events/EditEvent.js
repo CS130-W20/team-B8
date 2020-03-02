@@ -20,7 +20,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import { IconButton } from '@material-ui/core';
 import LocationSearchInput from './LocationSearcher';
 import Geocode from "react-geocode";
-import { markerTypes } from './../markerPrefab/mapMarker';
+import { eventTypes, markerTypes } from './../markerPrefab/mapMarker';
  
 const
     io = require("socket.io-client"),
@@ -72,13 +72,13 @@ class EventEdit extends Component{
   constructor(props) {
     super(props);
     this.state = {
+      id: 0,
       date: '',
       location: '',
       title: '',
       dialogopen: false,
       open: false,
       type: '',
-      event: props.event,
     }
     this.handleClickOpen = this.handleClickOpen.bind(this);
     this.handleClickClose = this.handleClickClose.bind(this);
@@ -96,13 +96,15 @@ class EventEdit extends Component{
    * Pass the arguments from the event (given in props) to the state
    */
   componentDidMount() {
-    console.log(this.props.event);
+    //console.log(this.props.event);
     console.log(this.state.event);
+    console.log(this.props.type);
     this.setState({
+      id: this.props._id,
       date: this.props.date,
       location: this.props.location,
       title: this.props.title,
-      type: this.props.tag && this.props.tag[0],
+      type: this.props.type,
     })
   }
 
@@ -112,15 +114,18 @@ class EventEdit extends Component{
         const { lat, lng } = response.results[0].geometry.location;
 
         var newEvent = {
-          eventId: 1,
+          eventId: this.state.id,
           title: this.state.title,
           tag: [this.state.type],
+          date: this.state.date,
           location: {lat: lat, lng: lng},
           locationName: this.state.location,
+          type: this.state.type,
         }
 
-        socket.emit('updateEvent', newEvent.eventId, newEvent.title, newEvent.tag,
-        newEvent.location, newEvent.locationName);
+        console.log(newEvent);
+
+        socket.emit('updateEvent', newEvent.eventId, newEvent.title, newEvent.date, newEvent.type, newEvent.location, newEvent.locationName);
 
         socket.on('serverReply', (event) => {
           console.log("serverReply: ", event);
@@ -170,6 +175,7 @@ class EventEdit extends Component{
    */
   
     handleChange = event => {
+      console.log(event.target.value)
       this.setState({
         type: event.target.value
       })    
@@ -268,10 +274,10 @@ class EventEdit extends Component{
               <MenuItem value="">
                   <em>None</em>
               </MenuItem>
-              <MenuItem value={markerTypes.food}>Bar Hopping</MenuItem>
-              <MenuItem value={markerTypes.dance}>Rave</MenuItem>
-              <MenuItem value={markerTypes.hats}>House Party</MenuItem>
-              <MenuItem value={markerTypes.dj}>Music Concert/Festival</MenuItem>
+              <MenuItem value={eventTypes.barHopping}>Bar Hopping</MenuItem>
+              <MenuItem value={eventTypes.rave}>Rave</MenuItem>
+              <MenuItem value={eventTypes.houseParty}>House Party</MenuItem>
+              <MenuItem value={eventTypes.music}>Music Concert/Festival</MenuItem>
               </Select>
               </FormControl>
           </DialogContent>
