@@ -59,7 +59,7 @@ class SimpleMap extends Component {
 
         this.setState({
           userLocation: { lat: latitude, lng: longitude },
-          loading: false
+          loading: false,
         });
       },
       () => {
@@ -80,14 +80,14 @@ componentDidMount() {
 componentDidUpdate(prevProps) {
   console.log(prevProps);
   console.log(this.props);
-  if (this.props.userLocation != null && this.props.mapFilters != null) {
+  if (this.props.mapFilters != null) {
     if (this.props.mapFilters.eventDistance != prevProps.mapFilters.eventDistance) {
       if (this.props.mapFilters.eventTypes.length != prevProps.mapFilters.eventTypes.length) {
         this.resetMap();
       }
 
-      for (var i = 0; i < this.props.filters.eventTypes.length; i++) {
-        if (this.props.filters.eventTypes[i] != prevProps.filters.eventTypes[i]) {
+      for (var i = 0; i < this.props.mapFilters.eventTypes.length; i++) {
+        if (this.props.mapFilters.eventTypes[i] != prevProps.mapFilters.eventTypes[i]) {
           this.resetMap();
         }
       }
@@ -141,20 +141,22 @@ resetMap() {
    */
   filterMarkers(eventList) {
     var finalList = [];
-    eventList.map(event => {
-        var currposition = {latitude: this.state.userLocation.lat,
-                            longitude: this.state.userLocation.lng};
-        var dist = getDistance(currposition, 
-          {
-            latitude: event.lat,
-            longitude: event.lng
-          });
-        
-        if (dist <= this.state.filters.eventDistance * 1000) {
-          console.log('You are ', dist, ' meters away from event');
-          finalList.push(event);
-        }
-    });
+    if (this.state.userLocation != null) {
+      eventList.map(event => {
+          var currposition = {latitude: this.state.userLocation.lat,
+                              longitude: this.state.userLocation.lng};
+          var dist = getDistance(currposition, 
+            {
+              latitude: event.lat,
+              longitude: event.lng
+            });
+          
+          if (dist <= this.state.filters.eventDistance * 1000) {
+            console.log('You are ', dist, ' meters away from event');
+            finalList.push(event);
+          }
+      });
+    }
 
     console.log(finalList);
     return finalList;

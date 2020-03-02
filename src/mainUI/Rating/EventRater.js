@@ -34,12 +34,14 @@ const StyledRating = withStyles({
  * @author Phipson Lee
  * @since 2020-02-15
  */
-export default function EventRater() {
+export default function EventRater(props) {
   /**
    * @var dialogopen Hook set to false to indicate state of dashboard
    * @var setDOpen Function that changes the state variable open
    */
   const [dialogopen, setDOpen] = React.useState(false);
+
+  const { questions } = props;
 
   /**
    * @var handleClickOpen Function that sets the dialog box to close
@@ -66,20 +68,22 @@ export default function EventRater() {
       <Dialog open={dialogopen} onClose={handleClickClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">Review and Rate [Host Name]'s Event!</DialogTitle>
         <DialogContent>
+          <StyledRating
+              name="customized-color"
+              defaultValue={2}
+              getLabelText={value => `${value} Heart${value !== 1 ? 's' : ''}`}
+              precision={0.5}
+              icon={<FavoriteIcon fontSize="inherit" />}
+              />
+          {questions.map(question => (
             <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="What was your experience like?"
-            fullWidth/>
+              autoFocus
+              margin="dense"
+              id={question.id}
+              label={question.label}
+              fullWidth/>
+          ))}
 
-            <StyledRating
-            name="customized-color"
-            defaultValue={2}
-            getLabelText={value => `${value} Heart${value !== 1 ? 's' : ''}`}
-            precision={0.5}
-            icon={<FavoriteIcon fontSize="inherit" />}
-            />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClickClose} color="primary">

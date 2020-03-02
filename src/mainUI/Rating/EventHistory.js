@@ -1,5 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import { withStyles } from "@material-ui/core/styles";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -16,7 +17,7 @@ import EventRater from './EventRater';
  * @var useStyle Function object that generates a style off of default MaterialsUI Theme
  * @see https://material-ui.com/styles/basics/
  */
-const useStyles = makeStyles(theme => ({
+const styles = theme => ({
     root: {
         display: 'flex',
     },
@@ -33,11 +34,11 @@ const useStyles = makeStyles(theme => ({
         paddingTop: theme.spacing(2),
         paddingBottom: theme.spacing(2)
     },
-}));
+});
 
 function preventDefault(event) {
     event.preventDefault();
-  }
+}
 
 /**
  * Helper function to display data of each event based on entry
@@ -74,12 +75,13 @@ const rows = [
  * @author Phipson Lee
  * @since 2020-02-15
  */
-export default function EventHistory() {
+class EventHistory extends React.Component{
     /**
      * @var classes Calls useStyles to generate CSS style inherited from Materials UI Theme
      */
-    const classes = useStyles();
-
+    render = () => {
+        const { classes, events } = this.props;
+        console.log("events: ", events)
     /**
      * Renders a table showing the events that the user has attended (currently using test data)
      */
@@ -99,7 +101,8 @@ export default function EventHistory() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows.map(row => (
+                        {events.map(event => event.createEventHistoryRow())}
+                        {/* {rows.map(row => (
                         <TableRow key={row.id}>
                             <TableCell>{row.date}</TableCell>
                             <TableCell>{row.name}</TableCell>
@@ -110,16 +113,19 @@ export default function EventHistory() {
                                 <EventRater />
                             </TableCell>
                         </TableRow>
-                        ))}
+                        ))} */}
                     </TableBody>
                     </Table>
                     <div className={classes.seeMore}>
-                    <Link color="primary" href="#" onClick={preventDefault}>
+                    {/* <Link color="primary" href="#" onClick={preventDefault}>
                         See more Events
-                    </Link>
+                    </Link> */}
                     </div>
                 </React.Fragment>
               </Paper>
             </Grid>     
     );
+    }
 };
+
+export default withStyles(styles, {withTheme: true})(EventHistory);

@@ -7,12 +7,9 @@
  * @see https://www.twilio.com/docs/chat/tutorials/chat-application-node-express
  */
 
-const TWILIO_AUTH = 'cb93ae1bbfca766b1f00410a257e06da';
 const TWILIO_SID = 'AC513454963ff517f3e07b90baf8f5d8e1';
-
-const accountSid = TWILIO_SID;
-const authToken = TWILIO_AUTH;
-const client = require('twilio')(accountSid, authToken);
+const TWILIO_AUTH = 'cb93ae1bbfca766b1f00410a257e06da';
+const client = require('twilio')(TWILIO_SID, TWILIO_AUTH);
 
 // Base class that is used to send messages
 // Creates a message object based on twilio API but does not verify number or format message

@@ -42,7 +42,7 @@ const getAppComponent = (page, socket, events, refreshEvents) => {
     case "Events":
       return <EventList events={events} refreshEvents={refreshEvents} socket={socket}/>
     case "Rate":
-      return <EventHistory/>
+      return <EventHistory events={events}/>
   }
 };
 
