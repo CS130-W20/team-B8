@@ -42,7 +42,38 @@ io.on("connection", (socket) => {
   Add a new user to the "Users" collection in the DB.
   Other event listeners are similar to this.
   */
+  socket.on('authenticate', (name, password) => {
+    let prom = dbInterface.getUser(name);
+    prom.then( (docs) => {
+      console.log("FOUND USER", docs);
+      if (docs == null) {
+        //no user with that username
+        socket.emit("authReply", "FAIL", docs["name"]);
+      }
+      else {
+        // found a user
+        console.log("USER FOUND: ", docs);
+        console.log("Entered password: ", password);
+        if (docs["password"] == password) {
+          // correct password
+          socket.emit("authReply", "SUCCESS", docs["name"]);
+        }
+        else {
+          //incorrect pass
+          socket.emit("authReply", "FAIL", docs["name"]);
+        }
+      }
+
+    })
+    .catch( (error) =>  {
+      console.log("ERROR:", error);
+      socket.emit("authReply", "FAIL")
+    })
+  })
+
+
   socket.on('addUser', (name, email, password, phone) => {
+    console.log("on add user", name, email, password, phone);
     //on the "addUser" socket event, recieve the tuple and request the promise:
     let prom = dbInterface.addUser(name, email, password, phone);
     //Promise flow

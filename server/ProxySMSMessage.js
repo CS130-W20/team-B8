@@ -1,7 +1,7 @@
 /**
  * @author Phipson Lee
  * @date 02-26-2020
- * 
+ *
  * Class object to pass messages using Twilio via a Proxy Design Pattern
  * @see https://www.twilio.com/docs/sms/send-messages
  * @see https://www.twilio.com/docs/chat/tutorials/chat-application-node-express
@@ -16,7 +16,7 @@ const client = require('twilio')(TWILIO_SID, TWILIO_AUTH);
 class SMSMessage {
     /**
      * Constructor that is used to generate SMSMessages
-     * @param {Object} request Holds twilioSid and twilioToken used for authentication; also contains sender phone no. 
+     * @param {Object} request Holds twilioSid and twilioToken used for authentication; also contains sender phone no.
      * and recipient phone no. as well as message
      */
     constructor(request) {
@@ -98,7 +98,7 @@ class ProxySMSMessage extends SMSMessage {
                             this.recipients.splice(i, 1);
                             console.log(this.recipients[i] + " is invalid. Removing...");
                             i--;
-                          } 
+                          }
                         });
         }
       } catch (error) {

@@ -24,6 +24,7 @@
     "react-geocode": "^0.2.1",
     "react-native-testing-library": "^1.12.0",
     "react-places-autocomplete": "^7.2.1",
+    "react-router-dom": "^5.1.2",
     "react-scripts": "3.3.0",
     "riteway-jest": "^2.0.2",
     "socket.io": "^2.3.0",
