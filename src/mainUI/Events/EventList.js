@@ -65,7 +65,7 @@ class EventList extends Component {
      * called when the component is added to the DOM; we call resetList() to ensure that the component is updated
      */
     componentDidMount() {
-        this.resetList();
+        //this.resetList();
     }
 
     /**
@@ -113,7 +113,7 @@ class EventList extends Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {this.props.events.map(event => event.createEventListRow(this.resetList))}
+                        {this.props.events.map(event => event.createEventListRow(this.props.refreshEvents))}
                     </TableBody>
                     </Table>
                     <div className={classes.seeMore}>

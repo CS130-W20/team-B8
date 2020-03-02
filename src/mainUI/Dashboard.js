@@ -165,7 +165,7 @@ export default function Dashboard(props) {
 
     const setDashboardPage = (page) => {
       if(page == "Events" || page =="Map"){
-        refreshEvents();
+        refreshEvents(null);
       }
       setPage(page);
     }
@@ -174,6 +174,7 @@ export default function Dashboard(props) {
 
     const setUserLoc = (loc) => {
       setLoc(loc);
+      refreshEvents(null);
     }
 
   /**
@@ -190,9 +191,9 @@ export default function Dashboard(props) {
       setOpen(false);
     };
 
-  const refreshEvents = (EventFilter) => {
-    if (EventFilter != null && EventFilter.length > 0) {
-      socket.emit('queryEvents', null, EventFilters.eventTypes, null, null, null);
+  const refreshEvents = (newfilter) => {
+    if (newfilter != null && newfilter.length > 0) {
+      socket.emit('queryEvents', null, newfilter.eventTypes, null, null, null);
     } else {
       socket.emit('getAllEvents');
     }
@@ -200,7 +201,7 @@ export default function Dashboard(props) {
     socket.on('serverReply', (events) => {
       var finalList = [];
       if (userLocation != null && userLocation.lat != null && userLocation.lng != null) {
-        eventList.map(event => {
+        events.map(event => {
             var currposition = {latitude: userLocation.lat,
                                 longitude: userLocation.lng};
             var dist = getDistance(currposition, 
@@ -209,7 +210,7 @@ export default function Dashboard(props) {
                 longitude: event.location.lng
               });
             
-            if (dist <= EventFilter.eventDistance * 1000) {
+            if (dist <= newfilter.eventDistance * 1000) {
               console.log('You are ', dist, ' meters away from event');
               finalList.push(event);
             }
@@ -234,7 +235,7 @@ export default function Dashboard(props) {
   const getAppComponent = (page, socket, events, refreshEvents) => {
   switch(page){
     case "Map":
-      return <GMap events={events} refreshFunction={refreshEvents}/>
+      return <GMap events={events} refreshFunction={refreshEvents} updateLocation={setUserLoc}/>
     case "Profile":
       return <Profile />
     case "Events":

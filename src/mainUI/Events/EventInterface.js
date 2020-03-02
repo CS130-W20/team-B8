@@ -21,13 +21,12 @@ export default class BMeetEvent{
         this.ratings = [];
         this.type = props.type;
     }
- 
    /**
    * this method is used to generate an event list row used by EventList
    * @param none
    * @return EventListRow component corresponding to this Event
    */
-    createEventListRow() {
+    createEventListRow(refreshFunction) {
         return (
             <EventListRow
                 key={this._id} 
@@ -37,6 +36,7 @@ export default class BMeetEvent{
                 locationName={this.locationName}
                 attendees={this.attendees}
                 tag={this.tags}
+                updateFunction={refreshFunction}
             />
         )
     }
