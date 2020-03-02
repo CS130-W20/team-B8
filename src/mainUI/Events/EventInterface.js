@@ -20,6 +20,8 @@ export default class BMeetEvent{
         this.attendees = [];
         this.ratings = [];
         this.type = props.type;
+
+        console.log(props);
     }
 
    /**
@@ -27,7 +29,7 @@ export default class BMeetEvent{
    * @param none
    * @return EventListRow component corresponding to this Event
    */
-    createEventListRow() {
+    createEventListRow(updateFunction) {
         return (
             <EventListRow
                 key={this._id} 
@@ -37,6 +39,8 @@ export default class BMeetEvent{
                 locationName={this.locationName}
                 attendees={this.attendees}
                 tag={this.tags}
+                type={this.type}
+                updateFunction={updateFunction}
             />
         )
     }

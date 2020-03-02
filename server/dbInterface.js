@@ -359,16 +359,17 @@ module.exports.addEvent = function(title, timeDate, tag, location, locationName,
 	});
 };
 
-module.exports.updateEvent = function(eventID, title, timeDate, tag, location, locationName){
+module.exports.updateEvent = function(eventID, title, timeDate, type, location, locationName){
 	return new Promise(	
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
 				'title': title,
 				'timeDate': timeDate,
-				'tag': tag,
+				'tag': [type],
 				'location': location,
-				'locationName': locationName
+				'locationName': locationName,
+				'type': type
 			};
 		 	collection.updateOne({'_id': eventID},{ '$set': doc},
 		 			{'upsert':false},function(err, result) {

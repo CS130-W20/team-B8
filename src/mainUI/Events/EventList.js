@@ -112,7 +112,7 @@ class EventList extends Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {this.state.hostEvents.map(event => event.createEventListRow())}
+                        {this.state.hostEvents.map(event => event.createEventListRow(this.resetList))}
                     </TableBody>
                     </Table>
                     <div className={classes.seeMore}>

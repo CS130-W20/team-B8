@@ -4,6 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import { eventTypes } from './../markerPrefab/mapMarker';
 
 const styles = theme => ({
     root: {
@@ -65,7 +66,7 @@ class GMapFilter extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            eventTypes: ['Food'],
+            eventTypes: [eventTypes.music],
             eventDistance: 1,
         }
         this.handleType = this.handleType.bind(this);
@@ -114,19 +115,19 @@ class GMapFilter extends Component {
             <ToggleButtonGroup
                 value={this.state.eventTypes} 
                 onChange={this.handleType}
-                aria-label="text alignment"
+                aria-label="eventFilters"
                 style={{width: "100%", justifyContent: "center"}}
             >
-                <ToggleButton value="left" aria-label="left aligned">
-                <Typography className={classes.typography}>Food</Typography>
+                <ToggleButton value={eventTypes.barHopping} aria-label="left aligned">
+                <Typography className={classes.typography}>Bars</Typography>
                 </ToggleButton>
-                <ToggleButton value="center" aria-label="centered">
+                <ToggleButton value={eventTypes.rave} aria-label="centered">
                     <Typography className={classes.typography}>Raves</Typography>
                 </ToggleButton>
-                <ToggleButton value="right" aria-label="right aligned">
-                    <Typography className={classes.typography}>Drinks</Typography>
+                <ToggleButton value={eventTypes.houseParty} aria-label="right aligned">
+                    <Typography className={classes.typography}>Party</Typography>
                 </ToggleButton>
-                <ToggleButton value="justify" aria-label="justified">
+                <ToggleButton value={eventTypes.music} aria-label="justified">
                     <Typography className={classes.typography}>Music</Typography>
                 </ToggleButton>
             </ToggleButtonGroup>

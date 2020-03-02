@@ -18,6 +18,7 @@ export default class EventListRow extends React.Component{
             locationName,
             attendees,
             tag,
+            type,
         } = this.props;
 
         let dateObj = new Date(timeDate);
@@ -34,7 +35,7 @@ export default class EventListRow extends React.Component{
             <TableCell>{time}</TableCell>
             <TableCell>{numAttendees}</TableCell>
             <TableCell align="right" style={{display: 'grid', gridTemplateRows: '1fr', gridTemplateColumns: '1fr 1fr 1fr'}}>
-                <EventEdit title={title} date={timeDate} location={location} tag={tag}/>
+                <EventEdit _id={_id} title={title} date={timeDate} location={location} tag={tag} type={type} updateFunction={this.props.updateFunction}/>
                 <EventMessage/>
                 <EventDelete />
             </TableCell>
