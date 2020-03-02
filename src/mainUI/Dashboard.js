@@ -27,24 +27,7 @@ import EventList from './Events/EventList';
 import Profile from './Profile/Profile';
 import EventHistory from './Rating/EventHistory';
 import BMeetEventFactory from './Events/EventFactory';
-
-/**
- * @var AppComponents Dictionary that maps specific state of dashboard to a component
- * Toggles what is visible on DOM when a button is pressed
- * Used in Dashboard component
- */
-const getAppComponent = (page, socket, events, refreshEvents) => {
-  switch(page){
-    case "Map":
-      return <GMap events={events}/>
-    case "Profile":
-      return <Profile />
-    case "Events":
-      return <EventList events={events} refreshEvents={refreshEvents} socket={socket}/>
-    case "Rate":
-      return <EventHistory events={events}/>
-  }
-};
+import { getDistance } from 'geolib';
 
 /**
  * @var drawerWidth CSS Style for setting width of dashboard drawer
@@ -174,15 +157,6 @@ export default function Dashboard(props) {
    */
     const [events, handleEventsIn] = React.useState([]);
 
-    socket.on('serverReply', (events) => {
-        let BMeetEvents = events.map(event => BMeetEventFactory.createEvent(event.type, event))
-        handleEventsIn(BMeetEvents);
-    });
-
-    const refreshEvents = () => {
-      socket.emit('getAllEvents');
-    }
-
   /**
    * @var dashboardPage Hook to display specific component based on button click
    * @var setPage Function that changes the state variable dashboardPage
@@ -194,6 +168,12 @@ export default function Dashboard(props) {
         refreshEvents();
       }
       setPage(page);
+    }
+
+    const [userLocation, setLoc] = React.useState({});
+
+    const setUserLoc = (loc) => {
+      setLoc(loc);
     }
 
   /**
@@ -209,6 +189,60 @@ export default function Dashboard(props) {
     const handleDrawerClose = () => {
       setOpen(false);
     };
+
+  const refreshEvents = (EventFilter) => {
+    if (EventFilter != null && EventFilter.length > 0) {
+      socket.emit('queryEvents', null, EventFilters.eventTypes, null, null, null);
+    } else {
+      socket.emit('getAllEvents');
+    }
+
+    socket.on('serverReply', (events) => {
+      var finalList = [];
+      if (userLocation != null && userLocation.lat != null && userLocation.lng != null) {
+        eventList.map(event => {
+            var currposition = {latitude: userLocation.lat,
+                                longitude: userLocation.lng};
+            var dist = getDistance(currposition, 
+              {
+                latitude: event.location.lat,
+                longitude: event.location.lng
+              });
+            
+            if (dist <= EventFilter.eventDistance * 1000) {
+              console.log('You are ', dist, ' meters away from event');
+              finalList.push(event);
+            }
+        });
+        console.log(finalList);
+        let BMeetEvents = finalList.map(event => BMeetEventFactory.createEvent(event.type, event));
+        handleEventsIn(BMeetEvents);
+        finalList = [];
+      } else {
+        let BMeetEvents = events.map(event => BMeetEventFactory.createEvent(event.type, event));
+        handleEventsIn(BMeetEvents);
+      }
+    });
+
+  }
+
+  /**
+   * @var AppComponents Dictionary that maps specific state of dashboard to a component
+   * Toggles what is visible on DOM when a button is pressed
+   * Used in Dashboard component
+   */
+  const getAppComponent = (page, socket, events, refreshEvents) => {
+  switch(page){
+    case "Map":
+      return <GMap events={events} refreshFunction={refreshEvents}/>
+    case "Profile":
+      return <Profile />
+    case "Events":
+      return <EventList events={events} refreshEvents={refreshEvents} socket={socket}/>
+    case "Rate":
+      return <EventHistory events={events}/>
+  }
+  };
 
   /**
    * Default return function that renders dashboard onto browser

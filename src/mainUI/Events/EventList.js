@@ -77,8 +77,9 @@ class EventList extends Component {
         socket.emit('getAllEvents');
 
         socket.on('serverReply', (response) => {
-            console.log("eventList: ", eventList);
+            console.log("eventList: ", response);
             response.map((event) => {
+                console.log(event);
                 if (event.location) {
                     var newEvent = BMeetEventFactory.createEvent(event.type, event);
                     eventList.push(newEvent);
@@ -112,7 +113,7 @@ class EventList extends Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {this.state.hostEvents.map(event => event.createEventListRow(this.resetList))}
+                        {this.props.events.map(event => event.createEventListRow(this.resetList))}
                     </TableBody>
                     </Table>
                     <div className={classes.seeMore}>

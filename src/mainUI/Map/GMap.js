@@ -22,19 +22,6 @@ const styles = theme => ({
 class GMap extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            filters: {
-                eventTypes: ["Food"],
-                eventDistance: 1,
-            }
-        }
-        this.updateFilter = this.updateFilter.bind(this);
-    }
-
-    updateFilter = newFilters => {
-        this.setState({
-            filters: newFilters
-        });
     }
 
     render() {
@@ -50,7 +37,7 @@ class GMap extends Component {
                 {/* Map Settings? */}
                 <Grid item xs={12} md={4} lg={3}>
                     <Paper className={classes.paperElement}>
-                        <GMapFilter updateFilter={this.updateFilter}/>
+                        <GMapFilter updateFilter={(filter) => {this.props.refreshFunction(filter)}}/>
                     </Paper>
                 </Grid>
             </Grid>

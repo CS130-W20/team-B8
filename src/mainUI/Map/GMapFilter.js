@@ -86,6 +86,7 @@ class GMapFilter extends Component {
         this.setState({
             eventDistance: newVal,
         })
+        console.log(this.state);
         this.props.updateFilter(this.state);
     }
 

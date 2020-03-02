@@ -46,12 +46,10 @@ class SimpleMap extends Component {
           filters: this.props.mapFilters,
     }
     
-    this.addMarker = this.addMarker.bind(this);
-    this.filterMarkers = this.filterMarkers.bind(this);
     this.handleClickClose = this.handleClickClose.bind(this);
     this.handleClickOpen = this.handleClickOpen.bind(this);
-    this.resetMap = this.resetMap.bind(this);
-    this.filterMarkers = this.filterMarkers.bind(this);
+    //this.resetMap = this.resetMap.bind(this);
+    //this.filterMarkers = this.filterMarkers.bind(this);
 
     navigator.geolocation.getCurrentPosition(
       position => {
@@ -74,72 +72,103 @@ class SimpleMap extends Component {
  * this.state.markers will then be rendered on the DOM
  */
 componentDidMount() {
-  this.resetMap();
+  //this.resetMap();
 }
 
+/*
 componentDidUpdate(prevProps) {
-  console.log(prevProps);
-  console.log(this.props);
+  //console.log(prevProps);
+  //console.log(this.props);
+  var newObj = {
+    eventTypes: prevProps.mapFilters.eventTypes,
+    eventDistance: prevProps.mapFilters.eventDistance
+  }
   if (this.props.mapFilters != null) {
-    if (this.props.mapFilters.eventDistance != prevProps.mapFilters.eventDistance) {
+    if (this.props.mapFilters.eventDistance == prevProps.mapFilters.eventDistance) {
       if (this.props.mapFilters.eventTypes.length != prevProps.mapFilters.eventTypes.length) {
+        console.log('Changed tags');
+        var newObj = {
+          eventTypes: this.props.mapFilters.eventTypes,
+          eventDistance: this.props.mapFilters.eventDistance
+        }
+        this.setState({
+          filters: newObj
+        });
+        console.log(this.state.filters);
+
         this.resetMap();
       }
 
       for (var i = 0; i < this.props.mapFilters.eventTypes.length; i++) {
         if (this.props.mapFilters.eventTypes[i] != prevProps.mapFilters.eventTypes[i]) {
+          console.log('Changed tags');
+          this.setState({
+            filters: newObj
+          });
+          console.log(this.state.filters);
+
           this.resetMap();
         }
       }
+    } else {
+      console.log('Changed distance');
+      this.setState({
+        filters: newObj
+      });
+      console.log(this.state.filters);
+      this.resetMap();
     }
   }
 }
 
 resetMap() {
+  console.log(this.state.filters);
   var markerList = []
+
+  if (this.state.filters == null)
+    return;
+
+  var eventDist = this.state.filters.eventDistance;
+
+  if (this.state.filters.eventTypes.length > 0) {
+    socket.emit('queryEvents', null, this.state.filters, null, null, null);
+  } else {
     socket.emit('getAllEvents'); // TODO: Query by tags
-
-    socket.on('serverReply', (response) => {
-      console.log("serverReply: ", response);
-      response.map(event => {
-        if (event.location) {
-          markerList.push({
-            name: event.title,
-            lat: event.location.lat,
-            lng: event.location.lng,
-            type: event.tag[0],
-            dateTime: event.dateTime,
-            description: 'new event!',
-            locationName: event.LocationName,
-            host: event.host
-          })
-        }
-      });
-
-      var filteredEvents = this.filterMarkers(markerList);
-
-      this.setState({
-        markers: filteredEvents
-      });
-
-      markerList = [];
-    });
   }
 
-/**
- * Adds a marker to this.state.markers list. To be displayed on the maps on render.
- * @param {Object} value  Dictionary object that holds name, position, and type of marker to be placed.
- */
-  addMarker(value) {
+  socket.on('serverReply', (response) => {
+    console.log("serverReply: ", response);
+    response.map(event => {
+      if (event.location) {
+        markerList.push({
+          name: event.title,
+          lat: event.location.lat,
+          lng: event.location.lng,
+          type: event.tag[0],
+          dateTime: event.dateTime,
+          description: 'new event!',
+          locationName: event.LocationName,
+          host: event.host
+        })
+      }
+    });
+
+    var filteredEvents = this.filterMarkers(markerList, eventDist);
+
+    console.log(filteredEvents);
+
     this.setState({
-      markers: this.markers.push(value)
+      markers: filteredEvents
     });
-  }
+
+    markerList = [];
+  });
+  }*/
 
   /**
    * Filters out the markers to be displayed on the maps, based on user query and filtering
    */
-  filterMarkers(eventList) {
+  filterMarkers(eventList, eventDist) {
     var finalList = [];
     if (this.state.userLocation != null) {
       eventList.map(event => {
@@ -151,7 +180,7 @@ resetMap() {
               longitude: event.lng
             });
           
-          if (dist <= this.state.filters.eventDistance * 1000) {
+          if (dist <= eventDist * 1000) {
             console.log('You are ', dist, ' meters away from event');
             finalList.push(event);
           }

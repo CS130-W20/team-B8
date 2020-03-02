@@ -1,6 +1,7 @@
 //http://mongodb.github.io/node-mongodb-native/3.0/quick-start/quick-start/
 
 const MongoClient = require('mongodb').MongoClient;
+const {ObjectId} = require('mongodb'); // or ObjectID 
 const assert = require('assert');
 
 // Connection URL
@@ -376,7 +377,7 @@ module.exports.updateEvent = function(eventID, title, timeDate, tag, location, l
 				'locationName': locationName,
 				'type': type
 			};
-		 	collection.updateOne({'_id': eventID},{ '$set': doc},
+		 	collection.updateOne({'_id': ObjectId(eventID)},{ '$set': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("updateEvent() Success: " + eventID);
