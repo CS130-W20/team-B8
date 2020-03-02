@@ -3,13 +3,14 @@ import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
 import { getMarkerType, markerTypes } from './../markerPrefab/mapMarker';
 import Dimensions from 'react-dimensions';
 import Dialog from '@material-ui/core/Dialog';
-import { DialogContent } from '@material-ui/core';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Geocode from "react-geocode";
 import { getDistance } from 'geolib';
+import EventPage from '../Events/EventPage';
+
 
 const
     io = require("socket.io-client"),
@@ -243,28 +244,20 @@ resetMap() {
           {events.forEach((event, i) => {event.createEventMarker(() => { this.handleClickOpen(event) }, i)})} 
         </Map>
         <Dialog data-testid="map-dialog" open={this.state.open} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">{this.state.currEvent.title}</DialogTitle>
-                <DialogContent>
-                <Typography gutterBottom>
-                  Details: {this.state.currEvent.description}
-                </Typography>
-                <Typography gutterBottom>
-                  Hosted by: {this.state.currEvent.host}
-                </Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={this.handleClickClose} color="primary">
-                        Cancel
-                    </Button>
-                    <Button onClick={this.handleClickClose} color="primary">
-                        {/* TODO: ADD TO DB AND UPDATE */}
-                        Attend
-                    </Button>
-                    <Button onClick={this.handleClickClose} color="primary">
-                        {/* TODO: ADD TO DB AND UPDATE */}
-                        Message Host
-                    </Button>
-                </DialogActions>
+          <EventPage currEvent={this.state.currEvent}></EventPage>
+          <DialogActions>
+              <Button onClick={this.handleClickClose} color="primary">
+                  Cancel
+              </Button>
+              <Button onClick={this.handleClickClose} color="primary">
+                  {/* TODO: ADD TO DB AND UPDATE */}
+                  Attend
+              </Button>
+              <Button onClick={this.handleClickClose} color="primary">
+                  {/* TODO: ADD TO DB AND UPDATE */}
+                  Message Host
+              </Button>
+          </DialogActions>
           </Dialog>
       </div>
     );

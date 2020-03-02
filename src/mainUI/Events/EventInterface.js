@@ -21,7 +21,6 @@ export default class BMeetEvent{
         this.ratings = [];
         this.type = props.type;
     }
-
    /**
    * this method is used to generate an event list row used by EventList
    * @param none
