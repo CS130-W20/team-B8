@@ -126,7 +126,7 @@ export default class BMeetEvent{
 
     /**
    * this method calls update() on all observers
-   *
+   * @param msg: msg to be sent to everyone
    */
     notifyUsers(msg) {
         let recipients = []
