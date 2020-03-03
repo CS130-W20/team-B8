@@ -107,7 +107,7 @@ class SimpleMap extends Component {
           center={ userLocation }>
           <Marker
             position={userLocation}/>
-          {events.forEach((event, i) => {event.createEventMarker(()=> {this.handleClickOpen(event)}, i)})}
+          {events.map((event, i) => {event.createEventMarker(()=> {this.handleClickOpen(event)}, i)})}
         </Map>
         <Dialog data-testid="map-dialog" open={this.state.open} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
           <EventPage currEvent={this.state.currEvent}></EventPage>
