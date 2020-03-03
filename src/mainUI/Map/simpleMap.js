@@ -5,6 +5,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import EventPage from '../Events/EventPage';
+import { markerTypes } from './../markerPrefab/mapMarker';
 
 /**
 * SimpleMap is a ReactJS Component that displays events on a google map
@@ -31,13 +32,13 @@ class SimpleMap extends Component {
       super(props);
       this.current = React.createRef();
       this.state = {
-          eventMarkers: this.props.events,
           open: false,
           currEvent: {},
       }
     
       this.handleClickClose = this.handleClickClose.bind(this);
       this.handleClickOpen = this.handleClickOpen.bind(this);
+      this.getMarkerType = this.getMarkerType.bind(this);
 
       navigator.geolocation.getCurrentPosition(
         position => {
@@ -60,6 +61,20 @@ class SimpleMap extends Component {
    * In particular, we will get all events and then push them onto a buffer before updating our state
    * this.state.markers will then be rendered on the DOM
    */
+  getMarkerType = (eventType) => {
+    switch(eventType){
+      case "bar":
+        return markerTypes.food;
+      case "house":
+        return markerTypes.gaming;
+      case "rave":
+        return markerTypes.dj;
+      case "concert":
+        return markerTypes.dance;
+      default:
+        return markerTypes.hats;
+    }
+  }
 
 
   /**
@@ -107,7 +122,18 @@ class SimpleMap extends Component {
           center={ userLocation }>
           <Marker
             position={userLocation}/>
-          {events.forEach((event, i) => {event.createEventMarker(()=> {this.handleClickOpen(event)}, i)})}
+          {events.map((marker, i) =>{
+                console.log(marker);
+                //this.renderMarker(marker, i);
+                return(
+                  <Marker
+                    onClick={() => this.handleClickOpen(marker)}
+                    position={{ lat: marker.location.lat, lng: marker.location.lng}}
+                    name={marker.title}
+                    key={i}
+                    icon={{url: this.getMarkerType(marker.type), scaleSize: (.5, .5)}}/>
+                )
+          })}
         </Map>
         <Dialog data-testid="map-dialog" open={this.state.open} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
           <EventPage currEvent={this.state.currEvent}></EventPage>

@@ -40,8 +40,7 @@ export default class BMeetEvent{
                 attendees={this.attendees}
                 tag={this.tags}
                 type={this.type}
-                updateFunction={updateFunction}
-            />
+                updateFunction={updateFunction}/>
         )
     }
 
