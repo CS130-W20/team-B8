@@ -13,10 +13,6 @@ import EventForm from './EventForm';
 
 import BMeetEventFactory from './EventFactory';
 
-const
-    io = require("socket.io-client"),
-    socket = io.connect("http://localhost:8000");
-
 /**
  * @var useStyle Function object that generates a style off of default MaterialsUI Theme
  * @see https://material-ui.com/styles/basics/
@@ -75,7 +71,7 @@ class EventList extends Component {
             <Grid data-testid="Events" item xs={12}>
               <Paper className={classes.paper}>
               <React.Fragment>
-              <EventForm updateFunction={this.resetList}/>
+              <EventForm updateFunction={refreshEvents}/>
                     <Table size="small">
                     <TableHead>
                         <TableRow>
@@ -88,7 +84,7 @@ class EventList extends Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {this.state.hostEvents.map(event => event.createEventListRow(refreshEvents))}
+                        {events.map(event => event.createEventListRow(refreshEvents))}
                     </TableBody>
                     </Table>
                     <div className={classes.seeMore}>

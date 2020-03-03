@@ -141,7 +141,6 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      socket: props.socket,
       open: false,
       events: [],
       filters: {},
@@ -156,17 +155,24 @@ class Dashboard extends Component {
     this.handleEventsIn = this.handleEventsIn.bind(this);
     this.setPage = this.setPage.bind(this);
     this.renderDashboard = this.renderDashboard.bind(this);
+    this.setNewFilter = this.setNewFilter.bind(this);
   }
 
+  /**
+   * @function renderDashboard
+   * Helper function to render the dashboard based on the events that are created using factory pattern
+   * Will be passed to elements of dashboard depending on what is rendered
+   * @return Rendered element for dashboard that is selected on click
+   */
   renderDashboard() {
     console.log('Updated Dashboard: ', this.state.events);
     switch(this.state.dashboardPage){
       case "Map":
-        return <GMap events={this.state.events} refreshFunction={this.refreshEvents} updateLocation={this.setUserLoc}/>
+        return <GMap events={this.state.events} updateLocation={this.setUserLoc} updateFilter={this.setNewFilter}/>
       case "Profile":
         return <Profile />
       case "Events":
-        return <EventList events={this.state.events} refreshEvents={this.refreshEvents} socket={this.state.socket}/>
+        return <EventList events={this.state.events} refreshEvents={this.refreshEvents}/>
       case "Rate":
         return <EventHistory events={this.state.events}/>
     }
@@ -182,16 +188,30 @@ class Dashboard extends Component {
     if (newPage == "Events" || newPage == "Map") {
       this.refreshEvents();
     }
+
     this.setState({
       dashboardPage: newPage
     });
   }
 
   setUserLoc (newLocation) {
+    console.log('Dashboard newUserLocation: ', newLocation);
+    if (newLocation.lat != this.state.userLocation.lat || newLocation.lng != this.state.userLocation.lng) {
+      this.setState({
+        userLocation: newLocation
+      }, () => {this.refreshEvents();
+      });
+    }
+  }
+
+  setNewFilter (newFilter) {
+    //console.log('Dashboard setNewFilter: ', newFilter);
     this.setState({
-      userLocation: newLocation
-    })
-    this.refreshEvents();
+      filters: newFilter
+    }, () => {
+      console.log('Dashboard setNewFilter: ', this.state.filters);
+      this.refreshEvents();
+    });
   }
 
   /**
@@ -212,46 +232,70 @@ class Dashboard extends Component {
       })
     };
 
-  refreshEvents (newfilter=null) {
-    if (newfilter != null && newfilter.length > 0) {
+  /**
+   * Event handler that fetches events from server
+   * Returns and updates this.state.events with the events that are to be sent over
+   */
+  refreshEvents () {
+    /**
+     * Fetch all events depending on the filter that is available
+     */
+    var newfilter = this.state.filters;
+    if (Object.keys(newfilter).length !== 0 && newfilter.eventTypes.length > 0) {
       console.log('filterEvents: ', newfilter)
-      this.state.socket.emit('queryEvents', null, newfilter.eventTypes, null, null, null);
+      this.props.socket.emit('queryEvents', null, newfilter.eventTypes, null, null, null);
     } else {
       console.log('getting all events');
-      this.state.socket.emit('getAllEvents');
+      this.props.socket.emit('getAllEvents');
     }
 
-    this.state.socket.on('serverReply', (events) => {
-      console.log('serverReply: ', events);
-      var finalList = [];
-      if (newfilter != null && this.state.userLocation != null && this.state.userLocation.lat != null && this.state.userLocation.lng != null) {
-        this.state.events.map(event => {
-            var currposition = {latitude: this.state.userLocation.lat,
-                                longitude: this.state.userLocation.lng};
-            var dist = getDistance(currposition, 
-              {
-                latitude: event.location.lat,
-                longitude: event.location.lng
-              });
-            
-            if (newfilter != null) {
-              if (dist <= newfilter.eventDistance * 1000) {
-                console.log('You are ', dist, ' meters away from event');
-                finalList.push(event);
+    /**
+     * Handles events based on reply
+     */
+    this.props.socket.on('serverReply', (response) => {
+      console.log('serverReply: ', response);
+      var tempList = []; // Temporarily hold events if we need to filter through them
+      var finalList = [] // Actual list of events
+      response.map(event => {
+        finalList.push(event);
+      });
+
+      /**
+       * If the filter exists, we filter by distance; otherwise, we just return
+       */
+      if (Object.keys(newfilter).length !== 0 && this.state.userLocation != null && 
+          this.state.userLocation.lat != null && 
+          this.state.userLocation.lng != null) 
+          {
+            finalList.map(event => {
+              
+              var currposition = {latitude: this.state.userLocation.lat,
+                longitude: this.state.userLocation.lng};
+
+              var dist = getDistance(currposition, {latitude: event.location.lat, longitude: event.location.lng});
+
+              if (newfilter != null) {
+                if (dist <= newfilter.eventDistance * 1000) {
+                  console.log('You are ', dist, ' meters away from event');
+                  tempList.push(event);
+                }
               }
-            }
-        });
-        //console.log(finalList);
-        let BMeetEvents = finalList.map(event => BMeetEventFactory.createEvent(event.type, event));
-        console.log('BMeetEvents withfilter: ',BMeetEvents);
-        this.handleEventsIn(BMeetEvents);
-        finalList = [];
-      } else {
-        let BMeetEvents = events.map(event => BMeetEventFactory.createEvent(event.type, event));
-        console.log('BMeetEvents nofilter: ', BMeetEvents);
-        this.handleEventsIn(BMeetEvents);
-        finalList = []
-      }
+            });
+
+            let BMeetEvents = tempList.map(event => BMeetEventFactory.createEvent(event.type, event));
+            console.log('BMeetEvents withfilter: ',BMeetEvents);
+            this.handleEventsIn(BMeetEvents);
+            finalList = [];
+            tempList = [];
+        } 
+        else 
+        {
+            let BMeetEvents = finalList.map(event => BMeetEventFactory.createEvent(event.type, event));
+            console.log('BMeetEvents nofilter: ', BMeetEvents);
+            this.handleEventsIn(BMeetEvents);
+            finalList = [];
+            tempList = [];
+        }
     });
   }
 

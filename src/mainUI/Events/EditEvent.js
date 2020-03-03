@@ -128,8 +128,6 @@ class EventEdit extends Component{
 
         socket.emit('updateEvent', newEvent.eventId, newEvent.title, newEvent.date, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.type, newEvent.description);
 
-        console.log(this.props.updateObject);
-
         socket.on('serverReply', (event) => {
           console.log("updateEventReply: ", event);
           this.props.updateFunction();

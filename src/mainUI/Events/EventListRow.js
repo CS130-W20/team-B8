@@ -35,7 +35,14 @@ export default class EventListRow extends React.Component{
             <TableCell>{time}</TableCell>
             <TableCell>{numAttendees}</TableCell>
             <TableCell align="right" style={{display: 'grid', gridTemplateRows: '1fr', gridTemplateColumns: '1fr 1fr 1fr'}}>
-                <EventEdit _id={_id} title={title} date={timeDate} location={location} tag={tag} type={type} updateFunction={this.props.updateFunction}/>
+                <EventEdit 
+                    _id={_id} 
+                    title={title} 
+                    date={timeDate} 
+                    location={location} 
+                    tag={tag} 
+                    type={type} 
+                    updateFunction={this.props.updateFunction}/>
                 <EventMessage/>
                 <EventDelete />
             </TableCell>

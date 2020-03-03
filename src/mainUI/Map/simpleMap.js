@@ -1,20 +1,10 @@
 import React, { Component } from 'react';
 import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
-import { getMarkerType, markerTypes } from './../markerPrefab/mapMarker';
 import Dimensions from 'react-dimensions';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import Geocode from "react-geocode";
-import { getDistance } from 'geolib';
 import EventPage from '../Events/EventPage';
-
-
-const
-    io = require("socket.io-client"),
-    socket = io.connect("http://localhost:8000");
 
 /**
 * SimpleMap is a ReactJS Component that displays events on a google map
@@ -41,72 +31,36 @@ class SimpleMap extends Component {
       super(props);
       this.current = React.createRef();
       this.state = {
-          eventMarkers: props.events,
+          eventMarkers: this.props.events,
           open: false,
           currEvent: {},
-    }
-    
-    this.handleClickClose = this.handleClickClose.bind(this);
-    this.handleClickOpen = this.handleClickOpen.bind(this);
-    this.updateMarkers = this.updateMarkers.bind(this);
-
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        const { latitude, longitude } = position.coords;
-
-        this.setState({
-          userLocation: { lat: latitude, lng: longitude },
-          loading: false,
-        });
-
-        this.props.updateLocation(this.state.userLocation);
-      },
-      () => {
-        this.setState({ loading: false });
       }
-    );
-  }
-
-  componentWillReceiveProps(newProps) {
-    console.log('GMap PrevProps: ', newProps);
-    console.log('GMap this.Props: ', this.props);
-    if (this.props.events.length != newProps.events.length){
-        console.log('Found difference!')
-        this.updateMarkers(newProps);
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    console.log('Markers PrevState: ', prevState);
-    console.log('Markers PrevProps: ', prevProps);
-    console.log('Marker this.Props: ', this.props);
-    console.log('Marker this.state: ', this.state);
-  }
-
-  updateMarkers(prevProps) {
-    if (prevProps == null)
-        prevProps = this.props;
     
-    var eventList = [];
-    prevProps.events.forEach(event => {
-        eventList.push(event);
-    });
+      this.handleClickClose = this.handleClickClose.bind(this);
+      this.handleClickOpen = this.handleClickOpen.bind(this);
 
-    this.setState({
-        eventMarkers: eventList
-    })
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const { latitude, longitude } = position.coords;
 
-    console.log(this.state);
+          this.setState({
+            userLocation: { lat: latitude, lng: longitude },
+            loading: false,
+          }, () => {this.props.updateLocation(this.state.userLocation)}
+          );
+        },
+        () => {
+          this.setState({ loading: false });
+        }
+      );
+    }
 
-    eventList = [];
-  }
+  /**
+   * Sets the state of the component when it mounts. Default function that is available for all reactJS components
+   * In particular, we will get all events and then push them onto a buffer before updating our state
+   * this.state.markers will then be rendered on the DOM
+   */
 
-/**
- * Sets the state of the component when it mounts. Default function that is available for all reactJS components
- * In particular, we will get all events and then push them onto a buffer before updating our state
- * this.state.markers will then be rendered on the DOM
- */
-/*
 
   /**
    * Event function that will be used for detecting button click and display event details
@@ -138,7 +92,8 @@ class SimpleMap extends Component {
       return null;
     }
 
-    console.log('eventMarkers: ', this.state.eventMarkers);
+    const {events} = this.props;
+    console.log('simpleMap events: ', events);
 
     return (
       <div>
@@ -151,8 +106,8 @@ class SimpleMap extends Component {
           }}
           center={ userLocation }>
           <Marker
-          position={userLocation}/>
-          {this.state.eventMarkers.map((event, i) => {event.createEventMarker(() => { this.handleClickOpen(event) }, i)})}
+            position={userLocation}/>
+          {events.forEach((event, i) => {event.createEventMarker(()=> {this.handleClickOpen(event)}, i)})}
         </Map>
         <Dialog data-testid="map-dialog" open={this.state.open} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
           <EventPage currEvent={this.state.currEvent}></EventPage>
