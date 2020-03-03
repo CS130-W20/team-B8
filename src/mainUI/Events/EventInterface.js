@@ -99,9 +99,11 @@ export default class BMeetEvent{
         console.log("Adding ", user, " to event ", this.state.title);
         this.attendees.push(user);
         // add user to event object
-        io.emit("addEventAttendee", this.state._id, user);
+        _id = (typeof this.state._id == "string") ? ObjectId(this.state._id) :
+            this.state._id;
+        socket.emit("addEventAttendee", _id, user);
         // add event to user object
-        io.emit("addUserAttendingEvent", user, this.state._id);
+        socket.emit("addUserAttendingEvent", user, this.state._id);
     }
 
     /**
@@ -110,16 +112,16 @@ export default class BMeetEvent{
    *
    */
     removeUser(user) {
-        let userId = user["_id"]
+        let userId = user["name"]
         var oldList = this.attendees;
         var removeIndex = oldList.map(function(item) { return item.state._id; }).indexOf(userId);
         //remove 1 element at removeIndex
 
         this.attendees.splice(removeIndex, 1);
         // remove user from event object
-        io.emit("removeUserAttendingEvent", user, this.state._id);
+        socket.emit("removeUserAttendingEvent", userId, this.state._id);
         // remove event from user object
-        io.emit("removeEventAttendee", this.state._id, user);
+        socket.emit("removeEventAttendee", this.state._id, user);
     }
 
     /**
@@ -143,6 +145,6 @@ export default class BMeetEvent{
           "title": this.state.title,
           "locationName": this.state.locationName
         }
-        io.emit("messageUsers", req, event);
+        socket.emit("messageUsers", req, event);
     }
 }
