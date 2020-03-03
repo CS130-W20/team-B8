@@ -12,11 +12,29 @@ import Registration from './mainUI/LoginReg/Registration';
 const io = require("socket.io-client"),
 
 socket = io.connect("http://localhost:8000");
-socket.emit('getAllEvents');
-
-
+//socket.emit('getAllEvents');
 
 export default class App extends React.Component{
+
+  constructor(props){
+    super(props);
+    this.state = {
+      loggedIn: false,
+      register: false,
+      socket:  null,
+      user: ""
+    };
+    this.login= this.login.bind(this);
+  }
+
+  componentDidMount() {
+    this.setState({
+      loggedIn: false,
+      register: false,
+      socket:  socket,
+      user: ""
+    });
+  }
 
   login = (userID) => {
     console.log("loggin in...");
@@ -24,20 +42,8 @@ export default class App extends React.Component{
       this.setState({user: userID});
   }
 
-  constructor(props){
-  super(props);
-  this.state = {
-    loggedIn: false,
-    register: false,
-    socket:  socket,
-    user: ""
-  };
-  this.login=this.login.bind(this);
-}
-
   render() {
     return (
-
       this.state.loggedIn?
       <Router>
         <div>
@@ -48,7 +54,7 @@ export default class App extends React.Component{
       this.state.register?
       <Router>
         <div>
-        <Registration socket={socket}/>
+        <Registration socket={this.state.socket}/>
           <Switch>
             <Route exact path="/register" component={Registration} />
             <Route exact path="/login" component={Login} />

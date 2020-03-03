@@ -5,6 +5,7 @@ import Slider from '@material-ui/core/Slider';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import { eventTypes } from './../markerPrefab/mapMarker';
+import update from 'react-addons-update'; // ES6
 
 const styles = theme => ({
     root: {
@@ -75,19 +76,25 @@ class GMapFilter extends Component {
 
     handleType = (event, newTypes) => {
         if (newTypes.length) {
+            console.log('GMapFilter newTypes: ', newTypes);
             this.setState({
                 eventTypes: newTypes,
+            }, () => {
+                console.log('GMapFilter updatedTypes:', this.state.eventTypes);
+                this.props.updateFilter(this.state);
             });
-            this.props.updateFilter(this.state);
         }
     }
 
     handleDistance = (event, newVal) => {
-        this.setState({
-            eventDistance: newVal,
-        })
-        console.log(this.state);
-        this.props.updateFilter(this.state);
+        if (newVal != this.state.eventDistance) {
+            this.setState({
+                eventDistance: newVal,
+            }, () => {
+                this.props.updateFilter(this.state);
+            }
+            );
+        }
     }
 
   
@@ -119,16 +126,16 @@ class GMapFilter extends Component {
                 aria-label="eventFilters"
                 style={{width: "100%", justifyContent: "center"}}
             >
-                <ToggleButton value={eventTypes.barHopping} aria-label="left aligned">
+                <ToggleButton value={eventTypes.barHopping} aria-label={eventTypes.barHopping}>
                 <Typography className={classes.typography}>Bars</Typography>
                 </ToggleButton>
-                <ToggleButton value={eventTypes.rave} aria-label="centered">
+                <ToggleButton value={eventTypes.rave} aria-label={eventTypes.rave}>
                     <Typography className={classes.typography}>Raves</Typography>
                 </ToggleButton>
-                <ToggleButton value={eventTypes.houseParty} aria-label="right aligned">
+                <ToggleButton value={eventTypes.houseParty} aria-label={eventTypes.houseParty}>
                     <Typography className={classes.typography}>Party</Typography>
                 </ToggleButton>
-                <ToggleButton value={eventTypes.music} aria-label="justified">
+                <ToggleButton value={eventTypes.music} aria-label={eventTypes.music}>
                     <Typography className={classes.typography}>Music</Typography>
                 </ToggleButton>
             </ToggleButtonGroup>

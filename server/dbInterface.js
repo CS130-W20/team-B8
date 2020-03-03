@@ -388,7 +388,7 @@ module.exports.addEvent = function(title, timeDate, tag, location, locationName,
 	});
 };
 
-module.exports.updateEvent = function(eventID, title, timeDate, tag, location, locationName, type,description){
+module.exports.updateEvent = function(eventID, title, timeDate, tag, location, locationName, type, description){
 	return new Promise(	
 		function (resolve, reject) {
 			const collection = db.collection('Events');

@@ -72,6 +72,9 @@ export default class BMeetEvent{
    * @return Marker component corresponding to this Event
    */
     createEventMarker(handleClickOpen, key){
+        console.log(this.type);
+        console.log(this.location);
+        console.log('URL for Marker: ', getMarkerType(this.type));
         return(
           <Marker
             onClick={handleClickOpen}

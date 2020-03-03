@@ -239,8 +239,8 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('updateEvent', (eventID, title, timeDate, tag, location, locationName) => {
-    let prom = dbInterface.updateEvent(eventID, title, timeDate, tag, location, locationName);
+  socket.on('updateEvent', (eventID, title, timeDate, tag, location, locationName, type, description) => {
+    let prom = dbInterface.updateEvent(eventID, title, timeDate, tag, location, locationName, type, description);
     prom.then( (docs) => {
       console.log("EVENT UPDATED", docs);
       socket.emit("serverReply", docs);
