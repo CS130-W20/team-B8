@@ -6,7 +6,6 @@ const server= require('http').Server(app);
 const io = require('socket.io')(server);
 const twilio = require('twilio');
 const ProxySMSMessage = require('./ProxySMSMessage');
-const {ObjectId} = require('mongodb');
 // TODO: add rooms so not ever user will see everyone's events
 
 /**
@@ -132,7 +131,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on('addUserAttendingEvent', (name, eventId) => {
-    let prom = dbInterface.addUserAttendingEvent(name, ObjectId(eventId));
+    let prom = dbInterface.addUserAttendingEvent(name, eventId);
     prom.then( (docs) => {
       console.log("USER ATTENDING NEW EVENT", docs);
       socket.emit("serverReply", docs);
@@ -144,7 +143,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on('removeUserAttendingEvent', (name, eventId) => {
-    let prom = dbInterface.removeUserAttendingEvent(name, ObjectId(eventId));
+    let prom = dbInterface.removeUserAttendingEvent(name, eventId);
     prom.then( (docs) => {
       console.log("USER NO LONGER ATTENDING", docs);
       socket.emit("serverReply", docs);
@@ -156,7 +155,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on('addUserHostingEvent', (name, eventId) => {
-    let prom = dbInterface.addUserHostingEvent(name, ObjectId(eventId));
+    let prom = dbInterface.addUserHostingEvent(name, eventId);
     prom.then( (docs) => {
       console.log("ADDED HOST EVENT", docs);
       socket.emit("serverReply", docs);
@@ -168,7 +167,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on('removeUserHostingEvent', (name, eventId) => {
-    let prom = dbInterface.removeUserHostingEvent(name, ObjectId(eventId));
+    let prom = dbInterface.removeUserHostingEvent(name, eventId);
     prom.then( (docs) => {
       console.log("HOST REMOVED", docs);
       socket.emit("serverReply", docs);
@@ -204,7 +203,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on('getEvent', (eventId) => {
-    let prom = dbInterface.getEvent(ObjectId(eventId));
+    let prom = dbInterface.getEvent(eventId);
     prom.then( (docs) => {
       console.log("EVENT", docs);
       socket.emit("getEventReply", docs);
@@ -240,7 +239,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on('updateEvent', (eventID, title, timeDate, tag, location, locationName, type, description) => {
-    let prom = dbInterface.updateEvent(ObjectId(eventID), title, timeDate, tag, location, locationName, type, description);
+    let prom = dbInterface.updateEvent(eventId, title, timeDate, tag, location, locationName, type, description);
     prom.then( (docs) => {
       console.log("EVENT UPDATED", docs);
       socket.emit("serverReply", docs);
@@ -252,8 +251,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on('addEventAttendee', (eventID, attendee) => {
-    //TODO: does the db call overwrite with one attendee or append?
-    let prom = dbInterface.addEventAttendee(ObjectId(eventID), attendee);
+    let prom = dbInterface.addEventAttendee(eventId, attendee);
     prom.then( (docs) => {
       console.log("NEW ATTENDEE", docs);
       socket.emit("serverReply", docs);
@@ -265,7 +263,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on('removeEventAttendee', (eventID, attendee) => {
-    let prom = dbInterface.removeEventAttendee(ObjectId(eventID), attendee);
+    let prom = dbInterface.removeEventAttendee(eventID, attendee);
     prom.then( (docs) => {
       console.log("REMOVED ATTENDEE", docs);
       socket.emit("serverReply", docs);
@@ -277,9 +275,31 @@ io.on("connection", (socket) => {
   })
 
   socket.on('addEventReview', (eventID, user, score, review) => {
-    let prom = dbInterface.removeEventAttendee(ObjectId(eventID), attendee);
+    let prom = dbInterface.removeEventAttendee(eventID, attendee);
     prom.then( (docs) => {
       console.log("REVIEW ADDED", docs);
+      socket.emit("serverReply", docs);
+    })
+    .catch( (error) =>  {
+      console.log("ERROR:", error);
+      socket.emit("serverError", error)
+    })
+  })
+  socket.on('addImage', (eventID, imageArrayBuffer) => {
+    let prom = dbInterface.addImage(eventID, imageArrayBuffer);
+    prom.then( (docs) => {
+      console.log("IMAGE ADDED", docs);
+      socket.emit("serverReply", docs);
+    })
+    .catch( (error) =>  {
+      console.log("ERROR:", error);
+      socket.emit("serverError", error)
+    })
+  })
+  socket.on('removeImage', (eventID) => {
+    let prom = dbInterface.addImage(eventID);
+    prom.then( (docs) => {
+      console.log("IMAGE REMOVED", docs);
       socket.emit("serverReply", docs);
     })
     .catch( (error) =>  {

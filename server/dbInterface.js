@@ -305,7 +305,7 @@ module.exports.getEvent = function(eventID){
 			const collection = db.collection('Events');
 			// Find some documents
 
-			let query = {'_id': eventID} ;
+			let query = {'_id': ObjectId(eventID)} ;
 			console.log(query);
 
 		 	collection.findOne(query, function(err, doc) {
@@ -422,7 +422,7 @@ module.exports.addEventAttendee = function(eventID, attendee){
 			let doc = {
 				'attendees': attendee
 			};
-		 	collection.updateOne({'_id': eventID},{ '$push': doc},
+		 	collection.updateOne({'_id': ObjectId(eventID)},{ '$push': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("addEventAttendee() Success: " + result);
@@ -442,7 +442,7 @@ module.exports.removeEventAttendee = function(eventID, attendee){
 			let doc = {
 				'attendees': attendee
 			};
-		 	collection.updateOne({'_id': eventID},{ '$pull': doc},
+		 	collection.updateOne({'_id': ObjectId(eventID)},{ '$pull': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("addEventAttendee() Success: " + eventID);
@@ -466,7 +466,7 @@ module.exports.addEventReview = function(eventID, user, score, review){
 					'review': review
 				}
 			};
-		 	collection.updateOne({'_id': eventID},{ '$push': doc},
+		 	collection.updateOne({'_id': ObjectId(eventID)},{ '$push': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("addEventReview() Success: " + eventID);
@@ -486,7 +486,7 @@ module.exports.addImage = function(eventID, imageArrayBuffer){
 			let doc = {
 				'image': Binary(Buffer.from(imageArrayBuffer))
 			};
-		 	collection.updateOne({'_id': eventID}, doc,
+		 	collection.updateOne({'_id': ObjectId(eventID)}, doc,
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("addImage() Success: " + eventID);
@@ -506,13 +506,13 @@ module.exports.removeImage = function(eventID){
 			let doc = {
 				'image': null
 			};
-		 	collection.updateOne({'_id': eventID}, doc,
+		 	collection.updateOne({'_id': ObjectId(eventID)}, doc,
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("removeImage() Success: " + eventID);
 				resolve(result);
 			} else{
-				console.log("removeImage() Failed: " + eventID);
+				console.log("Image() Failed: " + eventID);
 				reject(err);
 			}
 		});
