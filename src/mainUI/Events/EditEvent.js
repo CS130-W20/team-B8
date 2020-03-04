@@ -96,9 +96,6 @@ class EventEdit extends Component{
    * Pass the arguments from the event (given in props) to the state
    */
   componentDidMount() {
-    //console.log(this.props.event);
-    //console.log(this.state.event);
-    //console.log(this.props.type);
     this.setState({
       id: this.props._id,
       date: this.props.date,
