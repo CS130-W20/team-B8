@@ -22,7 +22,7 @@ export default class BMeetEvent{
         this.locationName = props.locationName;
         this.host =  props.host;
         this.attendees = [];
-        this.ratings = [];
+        this.reviews = props.reviews;
         this.type = props.type;
         this.questions = [{id: 'name', label: "What was your experience like?"}]
     }
@@ -52,7 +52,12 @@ export default class BMeetEvent{
    * @param none
    * @return EventHistoryRow component corresponding to this Event
    */
-    createEventHistoryRow(user){
+    createEventHistoryRow(user, refreshEvents){
+        console.log(this.reviews)
+        let userReview = this.reviews.reduce((userReview, reviewObj) => {
+            return (reviewObj.user === user) ? reviewObj : userReview
+        }, null);
+        console.log("user review: ",userReview)
         return (
             <EventHistoryRow
                 key={this._id} 
@@ -64,7 +69,8 @@ export default class BMeetEvent{
                 tag={this.tags}     
                 host={this.host}
                 questions={this.questions}
-                submitReview={(rating, review) => { this.submitReview(user,rating,review) }}
+                userReview={userReview}
+                submitReview={(rating, review) => { this.submitReview(user,rating,review, refreshEvents) }}
             />
         )
     }
@@ -129,8 +135,9 @@ export default class BMeetEvent{
         this.attendees.splice(removeIndex, 1);
     }
 
-    submitReview(user, rating, review){
+    submitReview(user, rating, review, refreshEvents){
         socket.emit('addEventReview', this._id, user, rating, review);
+        refreshEvents();
     }
 
     /**

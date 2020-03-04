@@ -1,6 +1,7 @@
 import React from 'react';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
+import EventReview from '../Rating/EventReview';
 import EventRater from '../Rating/EventRater';
 
 
@@ -17,6 +18,7 @@ export default class EventHistoryRow extends React.Component{
             attendees,
             host,
             questions,
+            userReview,
             submitReview,
             tag,
         } = this.props;
@@ -35,7 +37,11 @@ export default class EventHistoryRow extends React.Component{
             <TableCell>{time}</TableCell>
             <TableCell>{numAttendees}</TableCell>
             <TableCell align="right">
-                <EventRater questions={questions} host={host} submitReview={submitReview}/>
+                {userReview ? 
+                    <EventReview rating={userReview.score} review={JSON.parse(userReview.review)} user={userReview.user} key={_id}/>
+                    :
+                    <EventRater questions={questions} host={host} submitReview={submitReview}/>
+                }
             </TableCell>
         </TableRow>
         )
