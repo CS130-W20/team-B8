@@ -141,8 +141,11 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      useFilter: false,
       open: false,
       events: [],
+      hostEvents: [],
+      eventHistory: [],
       filters: {},
       dashboardPage: 'Map',
       userLocation: {}
@@ -172,7 +175,7 @@ class Dashboard extends Component {
       case "Profile":
         return <Profile />
       case "Events":
-        return <EventList events={this.state.events} refreshEvents={this.refreshEvents}/>
+        return <EventList events={this.state.hostEvents} userID={this.props.userID} refreshEvents={this.refreshEvents}/>
       case "Rate":
         return <EventHistory events={this.state.events}/>
     }
@@ -250,7 +253,27 @@ class Dashboard extends Component {
     }
 
     /**
-     * Handles events based on reply
+     * Fetch all events that the current user is hosting
+     */
+    this.props.socket.emit('getEvents', this.props.userID);
+
+    /**
+     * Fetch all events that the current user is attending/has attended
+     */
+
+    /**
+     * Handle EventList Events based on ones that the user is hosting
+     */
+    this.props.socket.on('getEventsReply', (response) => {
+      console.log('getEventsReply: ', response);
+      this.setState({
+        hostEvents: response
+      });
+    });
+
+
+    /**
+     * Handle Google Map Event Markers based on Reply
      */
     this.props.socket.on('serverReply', (response) => {
       console.log('serverReply: ', response);

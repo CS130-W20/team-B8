@@ -13,7 +13,7 @@ export default class BMeetEvent{
         this.title =  props.title;
         this.description = props.description;
         this.timeDate = props.timeDate;
-        this.tags = props.tags;
+        this.tags = props.tag;
         this.location = props.location;
         this.locationName = props.locationName;
         this.host =  props.host;
