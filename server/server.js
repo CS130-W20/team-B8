@@ -191,8 +191,8 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('queryEvents', (keywordRegex, tags, upperBound, lowerBound, numberBound) => {
-    let prom = dbInterface.queryEvents(keywordRegex, tags, upperBound, lowerBound, numberBound);
+  socket.on('queryEvents', (keywordRegex, tags, upperBound, lowerBound, numberBound, eventIDs) => {
+    let prom = dbInterface.queryEvents(keywordRegex, tags, upperBound, lowerBound, numberBound, eventIDs);
     prom.then( (docs) => {
       console.log("EVENTS", docs);
       socket.emit("serverReply", docs);

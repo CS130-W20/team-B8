@@ -256,7 +256,7 @@ module.exports.getAllEvents = function(){
 	});
 };
 
-module.exports.queryEvents = function(keywordRegex, tags, upperBound, lowerBound, numberBound){
+module.exports.queryEvents = function(keywordRegex, tags, upperBound, lowerBound, numberBound, eventIDs){
 	// keywordRegex is a RegExp Obj corresponding to the keywords
 	return new Promise(
 		function (resolve, reject) {
@@ -278,6 +278,9 @@ module.exports.queryEvents = function(keywordRegex, tags, upperBound, lowerBound
 			}
 			if (Object.keys(dateRange).length != 0) {
 				doc['timeDate'] = dateRange;
+			}
+			if (eventIDs != null && eventIDs.length != 0) {
+				doc['tag'] = {'$in': eventIDs };
 			}
 		 	let dbRes = collection.find(doc,{
 				'attendees': 0,
@@ -379,7 +382,7 @@ module.exports.addEvent = function(title, timeDate, tag, location, locationName,
 		 	collection.insertOne(doc,{},function(err, result) {
 			if(err == null){
 				console.log("addEvent() query Success: " + title);
-				resolve(result);
+				resolve(doc._id);
 			} else{
 				console.log("addEvent() query failed: " + title);
 				reject(err);
