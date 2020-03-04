@@ -75,6 +75,17 @@ class SimpleMap extends Component {
         return markerTypes.hats;
     }
   }
+  
+  /**
+   * @function registerUserToEvent Calls the observer method in Event Interface to allow users to register user
+   * to an event and receive SMS notifications about the event
+   * Also closes the dialog box so users can keep searching through event
+   */
+  registerUserToEvent() {
+    this.state.currEvent.registerUser(this.props.user);
+    this.handleClickClose();
+    this.props.refreshMap();
+  }
 
 
   /**

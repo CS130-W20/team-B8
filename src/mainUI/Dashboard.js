@@ -146,6 +146,7 @@ class Dashboard extends Component {
       events: [],
       hostEvents: [],
       eventHistory: [],
+      eventUpcoming: [],
       filters: {},
       dashboardPage: 'Map',
       userLocation: {}
@@ -158,7 +159,18 @@ class Dashboard extends Component {
     this.handleEventsIn = this.handleEventsIn.bind(this);
     this.setPage = this.setPage.bind(this);
     this.renderDashboard = this.renderDashboard.bind(this);
+    this.handleDashboardMap = this.handleDashboardMap.bind(this);
+    this.handleEventList = this.handleEventList.bind(this);
+    this.handleEventHistory = this.handleEventHistory.bind(this);
     this.setNewFilter = this.setNewFilter.bind(this);
+  }
+
+  /**
+   * We call all the functions to ensure that behavior is updated
+   */
+  componentDidMount() {
+    this.handleEventList();
+    this.handleDashboardMap();
   }
 
   /**
@@ -171,11 +183,14 @@ class Dashboard extends Component {
     console.log('Updated Dashboard: ', this.state.events);
     switch(this.state.dashboardPage){
       case "Map":
-        return <GMap events={this.state.events} updateLocation={this.setUserLoc} updateFilter={this.setNewFilter}/>
+        return <GMap events={this.state.events} 
+                     updateLocation={this.setUserLoc} 
+                     updateFilter={this.setNewFilter}
+                     refreshMap={this.refreshEvents}/>
       case "Profile":
         return <Profile />
       case "Events":
-        return <EventList events={this.state.hostEvents} userID={this.props.userID} refreshEvents={this.refreshEvents}/>
+        return <EventList events={this.state.hostEvents} user={this.props.user} refreshEvents={this.refreshEvents}/>
       case "Rate":
         return <EventHistory events={this.state.events}/>
     }
@@ -240,37 +255,73 @@ class Dashboard extends Component {
    * Returns and updates this.state.events with the events that are to be sent over
    */
   refreshEvents () {
-    /**
-     * Fetch all events depending on the filter that is available
-     */
-    var newfilter = this.state.filters;
-    if (Object.keys(newfilter).length !== 0 && newfilter.eventTypes.length > 0) {
-      console.log('filterEvents: ', newfilter)
-      this.props.socket.emit('queryEvents', null, newfilter.eventTypes, null, null, null);
-    } else {
-      console.log('getting all events');
-      this.props.socket.emit('getAllEvents');
+    switch(this.state.dashboardPage) {
+      case "Map":
+        this.handleDashboardMap();
+        break;
+      case "Events":
+        this.handleEventList();
+        break;
+      case "Rate":
+        this.handleEventHistory();
+        break;
+      default:
+        break;
     }
+  }
+
+  /**
+   * 
+   */
+  handleEventHistory() {
+    let date = new Date();
+    console.log('At handleEventHistory; current Date: ', date.toISOString());
+
+    this.props.socket.emit('', ); // TODO
+
+  }
+
+  /**
+   * 
+   */
+  handleEventList() {
+    let date = new Date();
+    console.log('At handleEventList; current Date: ', date.toISOString());
 
     /**
      * Fetch all events that the current user is hosting
      */
-    this.props.socket.emit('getEvents', this.props.userID);
-
-    /**
-     * Fetch all events that the current user is attending/has attended
-     */
+    this.props.socket.emit('getEvents', this.props.user["name"], date.toISOString());
 
     /**
      * Handle EventList Events based on ones that the user is hosting
      */
     this.props.socket.on('getEventsReply', (response) => {
       console.log('getEventsReply: ', response);
+      let BMeetEvents = response.map(event => BMeetEventFactory.createEvent(event.type, event));
       this.setState({
-        hostEvents: response
+        hostEvents: BMeetEvents
       });
     });
+  }
 
+  /**
+   * 
+   */
+  handleDashboardMap() {
+    /**
+     * Fetch all events depending on the filter that is available
+     */
+    var newfilter = this.state.filters;
+    let date = new Date();
+    console.log('At handleDashboardMap; current Date: ', date.toISOString());
+    if (Object.keys(newfilter).length !== 0 && newfilter.eventTypes.length > 0) {
+      console.log('filterEvents: ', newfilter)
+      this.props.socket.emit('queryEvents', null, newfilter.eventTypes, null, date.toISOString(), null);
+    } else {
+      console.log('no filter');
+      this.props.socket.emit('queryEvents', null, null, null, date.toISOString(), null);
+    }
 
     /**
      * Handle Google Map Event Markers based on Reply
@@ -280,7 +331,14 @@ class Dashboard extends Component {
       var tempList = []; // Temporarily hold events if we need to filter through them
       var finalList = [] // Actual list of events
       response.map(event => {
-        finalList.push(event);
+          var isHost = false;
+          this.state.hostEvents.forEach(hostEvent => {
+            if (event._id == hostEvent._id)
+              isHost = true; 
+          });
+
+          if (!isHost)
+            finalList.push(event);
       });
 
       /**
@@ -327,7 +385,8 @@ class Dashboard extends Component {
    * Uses open and dashboardPage variables to change the state of the dashboardUI
    */
     render() {
-          const { classes } = this.props;
+          const { classes, user } = this.props;
+          console.log('Logged in user: ', user);
           return (
             <div className={classes.root}>
               <CssBaseline />

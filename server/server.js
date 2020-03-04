@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
         console.log("Entered password: ", password);
         if (docs["password"] == password) {
           // correct password
-          socket.emit("authReply", "SUCCESS", docs["name"]);
+          socket.emit("authReply", "SUCCESS", docs);
         }
         else {
           //incorrect pass

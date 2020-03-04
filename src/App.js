@@ -38,8 +38,7 @@ export default class App extends React.Component{
 
   login = (userID) => {
     console.log("loggin in...");
-      this.setState({loggedIn:true});
-      this.setState({user: userID});
+      this.setState({loggedIn:true, user: userID});
   }
 
   render() {
@@ -47,7 +46,7 @@ export default class App extends React.Component{
       this.state.loggedIn?
       <Router>
         <div>
-          <Dashboard socket={this.state.socket} userID={this.state.user}/>
+          <Dashboard socket={this.state.socket} user={this.state.user}/>
         </div>
       </Router>
       :
