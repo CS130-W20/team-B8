@@ -56,16 +56,6 @@ export default class EventReview extends React.Component{
     handleClickClose = () => {
         this.setState({dialogopen: false});
     };
-
-    handleClickSubmit = () => {
-      let reviewString = JSON.stringify(this.state.review)
-      // Object.keys(this.state.review)
-      //                 .map(question => question + this.state.review[question])
-      //                 .join('&');
-      this.props.submitReview(this.state.rating, reviewString);
-      this.handleClickClose();
-    }
-
     handleRatingChange = (e, newRating) => {
       this.setState({rating: newRating});
     }
@@ -80,13 +70,13 @@ export default class EventReview extends React.Component{
   /**
    * Renders a form onclick that allows users to offer ratings and review for host based on event
    */
-  const { key, rating, review, user } = this.props;
+  const { id, rating, review, user } = this.props;
 
   return (
       <div>
       <div style={{cursor: 'pointer', textAlign: 'left', float: 'right'}}onClick={this.handleClickOpen}>
       <StyledRating
-        name={'rating-' + key}
+        name={'rating-' + id}
         value={rating}
         getLabelText={value => `${value} Heart${value !== 1 ? 's' : ''}`}
         precision={0.5}

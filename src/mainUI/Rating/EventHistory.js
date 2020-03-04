@@ -6,6 +6,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Typography from '@material-ui/core/Typography';
 
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
@@ -101,7 +102,14 @@ class EventHistory extends React.Component{
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {events.map(event => event.createEventHistoryRow(user, refreshEvents))}
+                        {events.length > 0 ? 
+                            events.map(event => event.createEventHistoryRow(user["name"], refreshEvents)) :
+                            <TableRow>
+                                <TableCell align='center' colSpan='6'>
+                                 <Typography style={{padding: '10px'}}align="center">{"You currently aren't attending any events"}</Typography>
+                                </TableCell>
+                            </TableRow>
+                        }
                         {/* {rows.map(row => (
                         <TableRow key={row.id}>
                             <TableCell>{row.date}</TableCell>

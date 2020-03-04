@@ -28,6 +28,7 @@ import Profile from './Profile/Profile';
 import EventHistory from './Rating/EventHistory';
 import BMeetEventFactory from './Events/EventFactory';
 import { getDistance } from 'geolib';
+import { isThisSecond } from 'date-fns';
 
 /**
  * @var drawerWidth CSS Style for setting width of dashboard drawer
@@ -145,6 +146,7 @@ class Dashboard extends Component {
       open: false,
       events: [],
       hostEvents: [],
+      attendedEvents: [],
       eventHistory: [],
       eventUpcoming: [],
       filters: {},
@@ -171,6 +173,7 @@ class Dashboard extends Component {
   componentDidMount() {
     this.handleEventList();
     this.handleDashboardMap();
+    this.handleEventHistory();
   }
 
   /**
@@ -192,7 +195,7 @@ class Dashboard extends Component {
       case "Events":
         return <EventList events={this.state.hostEvents} user={this.props.user} refreshEvents={this.refreshEvents}/>
       case "Rate":
-        return <EventHistory events={this.state.events} user={this.props.user} refreshEvents={this.refreshEvents}/>
+        return <EventHistory events={this.state.attendedEvents} user={this.props.user} refreshEvents={this.refreshEvents}/>
     }
   }
 
@@ -203,12 +206,10 @@ class Dashboard extends Component {
   }
 
   setPage(newPage) {
-    if (newPage == "Events" || newPage == "Map") {
-      this.refreshEvents();
-    }
-
     this.setState({
       dashboardPage: newPage
+    }, () => {
+      this.refreshEvents();
     });
   }
 
@@ -230,6 +231,10 @@ class Dashboard extends Component {
       console.log('Dashboard setNewFilter: ', this.state.filters);
       this.refreshEvents();
     });
+  }
+
+  resetFilter () {
+    this.setState({filters: []});
   }
 
   /**
@@ -276,9 +281,20 @@ class Dashboard extends Component {
   handleEventHistory() {
     let date = new Date();
     console.log('At handleEventHistory; current Date: ', date.toISOString());
-
-    this.props.socket.emit('', ); // TODO
-
+    /**
+     * Fetch all events that the current user is attending
+     */
+    this.props.socket.emit('getAttendedEvents', this.props.user["name"]);
+    /**
+     * Handle EventList Events based on ones that the user is hosting
+     */
+    this.props.socket.on('getAttendedEventsReply', (response) => {
+      console.log('getAttendedEventsReply: ', response);
+      let BMeetEvents = response.map(event => BMeetEventFactory.createEvent(event.type, event));
+      this.setState({
+        attendedEvents: BMeetEvents
+      });
+    });
   }
 
   /**

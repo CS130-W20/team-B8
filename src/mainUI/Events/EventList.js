@@ -10,6 +10,7 @@ import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import EventForm from './EventForm';
+import Typography from '@material-ui/core/Typography';
 
 import BMeetEventFactory from './EventFactory';
 
@@ -84,14 +85,22 @@ class EventList extends Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {events.map(event => event.createEventListRow(refreshEvents))}
+                        {events.length > 0 ?
+                            events.map(event => event.createEventListRow(refreshEvents))
+                            :
+                            <TableRow>
+                            <TableCell align='center' colSpan='6'>
+                             <Typography style={{padding: '10px'}}align="center">{"You currently aren't hosting any events"}</Typography>
+                            </TableCell>
+                            </TableRow>
+                        }
                     </TableBody>
                     </Table>
-                    <div className={classes.seeMore}>
+                    {events.length > 0 && <div className={classes.seeMore}>
                     <Link color="primary" href="#">
                         See more Events
                     </Link>
-                    </div>
+                    </div>}
                 </React.Fragment>
               </Paper>
             </Grid>     

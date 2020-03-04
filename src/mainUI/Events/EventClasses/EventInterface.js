@@ -70,7 +70,9 @@ export default class BMeetEvent{
                 host={this.host}
                 questions={this.questions}
                 userReview={userReview}
-                submitReview={(rating, review) => { this.submitReview(user,rating,review, refreshEvents) }}
+                user={user}
+                refreshEvents={refreshEvents}
+                submitReview={this.submitReview}
             />
         )
     }

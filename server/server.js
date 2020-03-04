@@ -227,6 +227,19 @@ io.on("connection", (socket) => {
     })
   })
 
+  socket.on('getAttendedEvents', (user) => {
+    let prom = dbInterface.getAllEvents();
+    prom.then( (docs) => {
+      var attended = docs.filter(event => event.attendees.indexOf(user) >= 0);
+      console.log("ATTENDED EVENTS:", attended);
+      socket.emit("getAttendedEventsReply", attended);
+    })
+    .catch( (error) =>  {
+      console.log("ERROR:", error);
+      socket.emit("serverError", error)
+    })
+  })
+
   socket.on('addEvent', (title, date, tag, location, locationName, type, host) => {
     let prom = dbInterface.addEvent(title, date, tag, location, locationName, type, host);
     prom.then( (docs) => {
