@@ -243,7 +243,8 @@ module.exports.getAllEvents = function(){
 			// Find some documents
 		 	let dbRes = collection.find({},{
 				'attendees': 0,
-				'reviews': 0
+				'reviews': 0,
+				'image': 0
 			}).sort('timeDate',-1);
 			dbRes.toArray(function(err, docs) {
 			if(err == null){
@@ -282,7 +283,8 @@ module.exports.queryEvents = function(keywordRegex, tags, upperBound, lowerBound
 			}
 		 	let dbRes = collection.find(doc,{
 				'attendees': 0,
-				'reviews': 0
+				'reviews': 0,
+				'image': 0
 			}).sort('timeDate',1);
 			if (numberBound != null) {
 				dbRes = dbRes.limit(numberBound);
@@ -325,7 +327,11 @@ module.exports.getEventByHost = function(host){
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let query = {'host': host};
-			collection.find(query,{}).toArray(function(err, docs) {
+			collection.find(query,{
+				'attendees': 0,
+				'reviews': 0,
+				'image': 0
+			}).toArray(function(err, docs) {
 				if(err == null){
 					console.log("getEventByHost() query Success");
 					resolve(docs);
