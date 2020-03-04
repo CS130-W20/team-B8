@@ -16,7 +16,6 @@ export const eventTypes = {
   music: 'concert',
 }
 
-// TODO: Modify depending on marker types
 export const markerTypes = {
     dj: djImg,
     dance: danceImg,

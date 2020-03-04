@@ -20,24 +20,21 @@ const styles = theme => ({
 });
 
 class GMap extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
-        const {classes, events} = this.props;
+        const {classes, events, updateLocation, updateFilter} = this.props;
+        console.log('GMap events: ', events);
         return(
             <Grid data-testid="Map" container spacing={3} style={{height: "80vh"}}>
                 {/* Map */}
                 <Grid item xs={12} md={8} lg={9} style={{height: "100%"}}>
                     <Paper className={classes.paperElement}>
-                        <SimpleMap updateLocation={this.props.updateLocation} events={events}/>
+                        <SimpleMap updateLocation={updateLocation} events={events}/>
                     </Paper>
                 </Grid>
                 {/* Map Settings? */}
                 <Grid item xs={12} md={4} lg={3}>
                     <Paper className={classes.paperElement}>
-                        <GMapFilter updateFilter={(filter) => {this.props.refreshFunction(filter)}}/>
+                        <GMapFilter updateFilter={updateFilter}/>
                     </Paper>
                 </Grid>
             </Grid>

@@ -1,7 +1,7 @@
 //http://mongodb.github.io/node-mongodb-native/3.0/quick-start/quick-start/
 
 const MongoClient = require('mongodb').MongoClient;
-const {ObjectId} = require('mongodb'); // or ObjectID 
+const {ObjectId} = require('mongodb'); // or ObjectID
 const assert = require('assert');
 
 // Connection URL
@@ -37,11 +37,11 @@ MongoClient.connect(url, function(err, client) {
 */
 
 module.exports.getUser = function(username){
-	return new Promise(	
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			// Find some documents
-			
+
 			let query = {'name': username} ;
 			console.log(query);
 
@@ -58,14 +58,14 @@ module.exports.getUser = function(username){
 };
 
 module.exports.addUser = function(name, email, password, phone){
-	return new Promise(	
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			let doc = {
-				'name': name, 
-				'email': email, 
+				'name': name,
+				'email': email,
 				'password': password,
-				'interests': [], 
+				'interests': [],
 				'phone': phone,
 				'eventsAttending': [],
 				'eventsHosting':[]
@@ -84,7 +84,7 @@ module.exports.addUser = function(name, email, password, phone){
 
 
 module.exports.updateUserPassword = function(name, password){
-	return new Promise(	
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			let doc = {};
@@ -103,7 +103,7 @@ module.exports.updateUserPassword = function(name, password){
 };
 
 module.exports.updateUserDetails = function(name, interestList, phone){
-	return new Promise(	
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			let doc = {};
@@ -123,7 +123,7 @@ module.exports.updateUserDetails = function(name, interestList, phone){
 };
 
 module.exports.addUserAttendingEvent = function(name, eventID){
-	return new Promise(	
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			let doc = {
@@ -132,7 +132,7 @@ module.exports.addUserAttendingEvent = function(name, eventID){
 		 	collection.updateOne({'name': name},{ '$push': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
-				console.log("addUserAttendingEvent() Success: " 
+				console.log("addUserAttendingEvent() Success: "
 				+ name
 				+ ":" + eventID);
 				resolve(result);
@@ -147,7 +147,7 @@ module.exports.addUserAttendingEvent = function(name, eventID){
 };
 
 module.exports.removeUserAttendingEvent = function(name, eventID){
-	return new Promise(	
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			let doc = {
@@ -156,7 +156,7 @@ module.exports.removeUserAttendingEvent = function(name, eventID){
 		 	collection.updateOne({'name': name},{ '$pull': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
-				console.log("removeUserAttendingEvent() Success: " 
+				console.log("removeUserAttendingEvent() Success: "
 				+ name
 				+ ":" + eventID);
 				resolve(result);
@@ -171,7 +171,7 @@ module.exports.removeUserAttendingEvent = function(name, eventID){
 };
 
 module.exports.addUserHostingEvent = function(name, eventID){
-	return new Promise(	
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			let doc = {
@@ -180,7 +180,7 @@ module.exports.addUserHostingEvent = function(name, eventID){
 		 	collection.updateOne({'name': name},{ '$push': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
-				console.log("addUserHostingEvent() Success: " 
+				console.log("addUserHostingEvent() Success: "
 				+ name
 				+ ":" + eventID);
 				resolve(result);
@@ -195,7 +195,7 @@ module.exports.addUserHostingEvent = function(name, eventID){
 };
 
 module.exports.removeUserHostingEvent = function(name, eventID){
-	return new Promise(	
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			let doc = {
@@ -204,7 +204,7 @@ module.exports.removeUserHostingEvent = function(name, eventID){
 		 	collection.updateOne({'name': name},{ '$pull': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
-				console.log("removeUserHostingEvent() Success: " 
+				console.log("removeUserHostingEvent() Success: "
 				+ name
 				+ ":" + eventID);
 				resolve(result);
@@ -236,12 +236,12 @@ module.exports.removeUserHostingEvent = function(name, eventID){
 */
 
 module.exports.getAllEvents = function(){
-	return new Promise(	
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			// Find some documents
 		 	let dbRes = collection.find({},{
-				'attendees': 0, 
+				'attendees': 0,
 				'reviews': 0
 			}).sort('timeDate',-1);
 			dbRes.toArray(function(err, docs) {
@@ -257,8 +257,8 @@ module.exports.getAllEvents = function(){
 };
 
 module.exports.queryEvents = function(keywordRegex, tags, upperBound, lowerBound, numberBound){
-	// keywordRegex is a RegExp Obj corresponding to the keywords	
-	return new Promise(	
+	// keywordRegex is a RegExp Obj corresponding to the keywords
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {};
@@ -280,7 +280,7 @@ module.exports.queryEvents = function(keywordRegex, tags, upperBound, lowerBound
 				doc['timeDate'] = dateRange;
 			}
 		 	let dbRes = collection.find(doc,{
-				'attendees': 0, 
+				'attendees': 0,
 				'reviews': 0
 			}).sort('timeDate',1);
 			if (numberBound != null) {
@@ -299,11 +299,11 @@ module.exports.queryEvents = function(keywordRegex, tags, upperBound, lowerBound
 };
 
 module.exports.getEvent = function(eventID){
-	return new Promise(	
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			// Find some documents
-			
+
 			let query = {'_id': eventID} ;
 			console.log(query);
 
@@ -361,7 +361,7 @@ module.exports.getHostAvgRating = function(host){
 }
 
 module.exports.addEvent = function(title, timeDate, tag, location, locationName, type, host,description){
-	return new Promise(	
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
@@ -388,8 +388,8 @@ module.exports.addEvent = function(title, timeDate, tag, location, locationName,
 	});
 };
 
-module.exports.updateEvent = function(eventID, title, timeDate, tag, location, locationName, type,description){
-	return new Promise(	
+module.exports.updateEvent = function(eventID, title, timeDate, tag, location, locationName, type, description){
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
@@ -415,7 +415,7 @@ module.exports.updateEvent = function(eventID, title, timeDate, tag, location, l
 };
 
 module.exports.addEventAttendee = function(eventID, attendee){
-	return new Promise(	
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
@@ -424,7 +424,7 @@ module.exports.addEventAttendee = function(eventID, attendee){
 		 	collection.updateOne({'_id': eventID},{ '$push': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
-				console.log("addEventAttendee() Success: " + eventID);
+				console.log("addEventAttendee() Success: " + result);
 				resolve(result);
 			} else{
 				console.log("addEventAttendee() Failed: " + eventID);
@@ -435,7 +435,7 @@ module.exports.addEventAttendee = function(eventID, attendee){
 };
 
 module.exports.removeEventAttendee = function(eventID, attendee){
-	return new Promise(	
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
@@ -455,7 +455,7 @@ module.exports.removeEventAttendee = function(eventID, attendee){
 };
 
 module.exports.addEventReview = function(eventID, user, score, review){
-	return new Promise(	
+	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
@@ -477,6 +477,3 @@ module.exports.addEventReview = function(eventID, user, score, review){
 		});
 	});
 };
-
-
-

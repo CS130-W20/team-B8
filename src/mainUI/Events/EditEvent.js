@@ -97,8 +97,8 @@ class EventEdit extends Component{
    */
   componentDidMount() {
     //console.log(this.props.event);
-    console.log(this.state.event);
-    console.log(this.props.type);
+    //console.log(this.state.event);
+    //console.log(this.props.type);
     this.setState({
       id: this.props._id,
       date: this.props.date,
@@ -121,14 +121,15 @@ class EventEdit extends Component{
           location: {lat: lat, lng: lng},
           locationName: this.state.location,
           type: this.state.type,
+          description: "hi",
         }
 
         console.log(newEvent);
 
-        socket.emit('updateEvent', newEvent.eventId, newEvent.title, newEvent.date, newEvent.type, newEvent.location, newEvent.locationName);
+        socket.emit('updateEvent', newEvent.eventId, newEvent.title, newEvent.date, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.type, newEvent.description);
 
         socket.on('serverReply', (event) => {
-          console.log("serverReply: ", event);
+          console.log("updateEventReply: ", event);
           this.props.updateFunction();
         })
 

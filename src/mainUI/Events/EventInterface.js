@@ -4,6 +4,8 @@ import { Marker } from 'google-maps-react';
 import { getMarkerType, markerTypes } from './../markerPrefab/mapMarker';
 import { DialogContent } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
+const io = require("socket.io-client"),
+socket = io.connect("http://localhost:8000");
 
 // BMeetEvent: A base class type that is used to generate event objects
 // Uses an observer pattern to notify and update attendees of event changes
@@ -16,7 +18,7 @@ export default class BMeetEvent{
         this.tags = props.tags;
         this.location = props.location;
         this.locationName = props.locationName;
-        this.host =  props.host;
+        this.host =  props.host; // FULL USER OBJECT
         this.attendees = [];
         this.ratings = [];
         this.type = props.type;
@@ -29,7 +31,7 @@ export default class BMeetEvent{
     createEventListRow(refreshFunction) {
         return (
             <EventListRow
-                key={this._id} 
+                key={this._id}
                 _id={this._id}
                 title={this.title}
                 timeDate={this.timeDate}
@@ -90,32 +92,59 @@ export default class BMeetEvent{
 
     /**
    * this method is used to register a user an observer of this event
-   * @param user object
-   * 
+   * @param user: user object
+   *
    */
     registerUser(user) {
+        console.log("Adding ", user, " to event ", this.state.title);
         this.attendees.push(user);
+        // add user to event object
+        _id = (typeof this.state._id == "string") ? ObjectId(this.state._id) :
+            this.state._id;
+        socket.emit("addEventAttendee", _id, user);
+        // add event to user object
+        socket.emit("addUserAttendingEvent", user, this.state._id);
     }
 
     /**
    * this method is used to remove a user as an observer of this event
-   * @param user object
-   * 
+   * @param user: user OBJECT
+   *
    */
-    removeUser(id) {
+    removeUser(user) {
+        let userId = user["name"]
         var oldList = this.attendees;
-        var removeIndex = oldList.map(function(item) { return item.state._id; }).indexOf(id);
+        var removeIndex = oldList.map(function(item) { return item.state._id; }).indexOf(userId);
+        //remove 1 element at removeIndex
+
         this.attendees.splice(removeIndex, 1);
+        // remove user from event object
+        socket.emit("removeUserAttendingEvent", userId, this.state._id);
+        // remove event from user object
+        socket.emit("removeEventAttendee", this.state._id, user);
     }
 
     /**
    * this method calls update() on all observers
-   * 
+   * @param msg: msg to be sent to everyone
    */
-    notifyUsers() {
-        this.attendees.forEach(element => {
-            console.log(element);
-            element.update();
+    notifyUsers(msg) {
+        let recipients = []
+        this.attendees.forEach(user => {
+            console.log(user["name"]);
+            recipients.push(user["phone"]);
+            //element.update();
         })
+        let req = {
+          "sender": this.state.host["name"],
+          "recipients": recipients,
+          "message": msg
+        }
+        let event = {
+          "host": this.state.host["name"],
+          "title": this.state.title,
+          "locationName": this.state.locationName
+        }
+        socket.emit("messageUsers", req, event);
     }
 }

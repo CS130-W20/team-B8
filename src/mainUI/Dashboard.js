@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Component} from 'react';
 import clsx from 'clsx';
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -39,7 +39,7 @@ const drawerWidth = 240;
  * @see https://github.com/mui-org/material-ui/tree/master/docs/src/pages/getting-started/templates/dashboard
  * @see https://material-ui.com/styles/basics/
  */
-const useStyles = makeStyles(theme => ({
+const styles = theme => ({
   root: {
     display: 'flex',
   },
@@ -125,7 +125,7 @@ const useStyles = makeStyles(theme => ({
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
 }
-}));
+});
 
 /**
  * Function component that uses Google Material UI Dashboard Template
@@ -136,190 +136,246 @@ const useStyles = makeStyles(theme => ({
  * @author Phipson Lee
  * @since 2020-02-15
  */
-export default function Dashboard(props) {
+class Dashboard extends Component {
 
-  const socket = props.socket; 
-
-  /**
-   * @var classes Calls Material-UI useStyles to generate/inherit material UI styles generated from a default theme
-   */
-    const classes = useStyles();
-
-  /**
-   * @var open Hook set to false to indicate state of dashboard
-   * @var setOpen Function that changes the state variable open
-   */
-    const [open, setOpen] = React.useState(false);
-
-  /**
-   * @var events Hook set to [] to indicate current events
-   * @var handleEventsIn Function that changes the state variable events
-   */
-    const [events, handleEventsIn] = React.useState([]);
-
-  /**
-   * @var dashboardPage Hook to display specific component based on button click
-   * @var setPage Function that changes the state variable dashboardPage
-   */
-    const [dashboardPage, setPage] = React.useState('Map');
-
-    const setDashboardPage = (page) => {
-      if(page == "Events" || page =="Map"){
-        refreshEvents(null);
-      }
-      setPage(page);
+  constructor(props) {
+    super(props);
+    this.state = {
+      open: false,
+      events: [],
+      filters: {},
+      dashboardPage: 'Map',
+      userLocation: {}
     }
 
-    const [userLocation, setLoc] = React.useState({});
-
-    const setUserLoc = (loc) => {
-      setLoc(loc);
-      refreshEvents(null);
-    }
-
-  /**
-   * @var handleDrawerOpen Function that sets the state of open. Passed to onClick events.
-   */
-    const handleDrawerOpen = () => {
-      setOpen(true);
-    };
+    this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
+    this.handleDrawerClose = this.handleDrawerClose.bind(this);
+    this.setUserLoc = this.setUserLoc.bind(this);
+    this.refreshEvents = this.refreshEvents.bind(this);
+    this.handleEventsIn = this.handleEventsIn.bind(this);
+    this.setPage = this.setPage.bind(this);
+    this.renderDashboard = this.renderDashboard.bind(this);
+    this.setNewFilter = this.setNewFilter.bind(this);
+  }
 
   /**
-   * @var handleDrawerOpen Function that sets the state of open. Passed to onClick events.
+   * @function renderDashboard
+   * Helper function to render the dashboard based on the events that are created using factory pattern
+   * Will be passed to elements of dashboard depending on what is rendered
+   * @return Rendered element for dashboard that is selected on click
    */
-    const handleDrawerClose = () => {
-      setOpen(false);
-    };
-
-  const refreshEvents = (newfilter) => {
-    if (newfilter != null && newfilter.length > 0) {
-      socket.emit('queryEvents', null, newfilter.eventTypes, null, null, null);
-    } else {
-      socket.emit('getAllEvents');
+  renderDashboard() {
+    console.log('Updated Dashboard: ', this.state.events);
+    switch(this.state.dashboardPage){
+      case "Map":
+        return <GMap events={this.state.events} updateLocation={this.setUserLoc} updateFilter={this.setNewFilter}/>
+      case "Profile":
+        return <Profile />
+      case "Events":
+        return <EventList events={this.state.events} refreshEvents={this.refreshEvents}/>
+      case "Rate":
+        return <EventHistory events={this.state.events}/>
     }
+  }
 
-    socket.on('serverReply', (events) => {
-      var finalList = [];
-      if (userLocation != null && userLocation.lat != null && userLocation.lng != null) {
-        events.map(event => {
-            var currposition = {latitude: userLocation.lat,
-                                longitude: userLocation.lng};
-            var dist = getDistance(currposition, 
-              {
-                latitude: event.location.lat,
-                longitude: event.location.lng
-              });
-            
-            if (newfilter != null) {
-              if (dist <= newfilter.eventDistance * 1000) {
-                console.log('You are ', dist, ' meters away from event');
-                finalList.push(event);
-              }
-            }
-        });
-        console.log(finalList);
-        let BMeetEvents = finalList.map(event => BMeetEventFactory.createEvent(event.type, event));
-        handleEventsIn(BMeetEvents);
-        finalList = [];
-      } else {
-        let BMeetEvents = events.map(event => BMeetEventFactory.createEvent(event.type, event));
-        handleEventsIn(BMeetEvents);
-      }
+  handleEventsIn(newEvents) {
+    this.setState({
+      events: newEvents
     });
+  }
 
+  setPage(newPage) {
+    if (newPage == "Events" || newPage == "Map") {
+      this.refreshEvents();
+    }
+
+    this.setState({
+      dashboardPage: newPage
+    });
+  }
+
+  setUserLoc (newLocation) {
+    console.log('Dashboard newUserLocation: ', newLocation);
+    if (newLocation.lat != this.state.userLocation.lat || newLocation.lng != this.state.userLocation.lng) {
+      this.setState({
+        userLocation: newLocation
+      }, () => {this.refreshEvents();
+      });
+    }
+  }
+
+  setNewFilter (newFilter) {
+    //console.log('Dashboard setNewFilter: ', newFilter);
+    this.setState({
+      filters: newFilter
+    }, () => {
+      console.log('Dashboard setNewFilter: ', this.state.filters);
+      this.refreshEvents();
+    });
   }
 
   /**
-   * @var AppComponents Dictionary that maps specific state of dashboard to a component
-   * Toggles what is visible on DOM when a button is pressed
-   * Used in Dashboard component
+   * @function handleDrawerOpen Function that sets the state of open. Passed to onClick events.
    */
-  const getAppComponent = (page, socket, events, refreshEvents) => {
-  switch(page){
-    case "Map":
-      return <GMap events={events} refreshFunction={refreshEvents} updateLocation={setUserLoc}/>
-    case "Profile":
-      return <Profile />
-    case "Events":
-      return <EventList events={events} refreshEvents={refreshEvents} socket={socket}/>
-    case "Rate":
-      return <EventHistory events={events}/>
+    handleDrawerOpen = () => {
+      this.setState({
+        open: true,
+      })
+    };
+
+  /**
+   * @function handleDrawerOpen Function that sets the state of open. Passed to onClick events.
+   */
+    handleDrawerClose = () => {
+      this.setState({
+        open: false,
+      })
+    };
+
+  /**
+   * Event handler that fetches events from server
+   * Returns and updates this.state.events with the events that are to be sent over
+   */
+  refreshEvents () {
+    /**
+     * Fetch all events depending on the filter that is available
+     */
+    var newfilter = this.state.filters;
+    if (Object.keys(newfilter).length !== 0 && newfilter.eventTypes.length > 0) {
+      console.log('filterEvents: ', newfilter)
+      this.props.socket.emit('queryEvents', null, newfilter.eventTypes, null, null, null);
+    } else {
+      console.log('getting all events');
+      this.props.socket.emit('getAllEvents');
+    }
+
+    /**
+     * Handles events based on reply
+     */
+    this.props.socket.on('serverReply', (response) => {
+      console.log('serverReply: ', response);
+      var tempList = []; // Temporarily hold events if we need to filter through them
+      var finalList = [] // Actual list of events
+      response.map(event => {
+        finalList.push(event);
+      });
+
+      /**
+       * If the filter exists, we filter by distance; otherwise, we just return
+       */
+      if (Object.keys(newfilter).length !== 0 && this.state.userLocation != null && 
+          this.state.userLocation.lat != null && 
+          this.state.userLocation.lng != null) 
+          {
+            finalList.map(event => {
+              
+              var currposition = {latitude: this.state.userLocation.lat,
+                longitude: this.state.userLocation.lng};
+
+              var dist = getDistance(currposition, {latitude: event.location.lat, longitude: event.location.lng});
+
+              if (newfilter != null) {
+                if (dist <= newfilter.eventDistance * 1000) {
+                  console.log('You are ', dist, ' meters away from event');
+                  tempList.push(event);
+                }
+              }
+            });
+
+            let BMeetEvents = tempList.map(event => BMeetEventFactory.createEvent(event.type, event));
+            console.log('BMeetEvents withfilter: ',BMeetEvents);
+            this.handleEventsIn(BMeetEvents);
+            finalList = [];
+            tempList = [];
+        } 
+        else 
+        {
+            let BMeetEvents = finalList.map(event => BMeetEventFactory.createEvent(event.type, event));
+            console.log('BMeetEvents nofilter: ', BMeetEvents);
+            this.handleEventsIn(BMeetEvents);
+            finalList = [];
+            tempList = [];
+        }
+    });
   }
-  };
 
   /**
    * Default return function that renders dashboard onto browser
    * Uses open and dashboardPage variables to change the state of the dashboardUI
    */
-    return (
-      <div className={classes.root}>
-        <CssBaseline />
-        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
-          <Toolbar className={classes.toolbar}>
-            <IconButton
-              data-testid="hamburger-button"
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              className={clsx(classes.menuButton, open && classes.menuButtonHidden)}>
-            <MenuIcon />
-            </IconButton>
-            <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-              BruinMeet
-            </Typography>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          variant="permanent"
-          classes={{
-            paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
-          }}
-          open={open}>
-          <div className={classes.toolbarIcon}>
-            <IconButton data-testid="left-button" onClick={handleDrawerClose}>
-              <ChevronLeftIcon className={clsx(classes.customDrawerIcons)}/>
-            </IconButton>
-          </div>
-          <Divider className={clsx(classes.customDivider)}/>
-          <List>
-            <ListItem data-testid="profile-button" button onClick={() => setPage("Profile")}>
-                  <ListItemIcon>
-                  <FaceIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Profile" />
-              </ListItem>
-              <ListItem data-testid="map-button" button onClick={() => setPage("Map")}>
-                  <ListItemIcon>
-                  <MapIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Event Map" />
-              </ListItem>
-              <ListItem data-testid="events-button" button onClick={() => setPage("Events")}>
-                  <ListItemIcon>
-                  <DateRangeIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Your Events" />
-              </ListItem>
-              <ListItem data-testid="rating-button" button onClick={() => setPage("Rate")}>
-                  <ListItemIcon>
-                  <RateReviewIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Write Reviews" />
-              </ListItem>
-          </List>
-        </Drawer>
-        <main className={classes.content}>
-          <div className={classes.appBarSpacer} />
-          <Container maxWidth="lg" className={classes.container}>
-            {getAppComponent(dashboardPage, socket, events, refreshEvents)}
-          </Container>
-        </main>
-      </div>
-    );
+    render() {
+          const { classes } = this.props;
+          return (
+            <div className={classes.root}>
+              <CssBaseline />
+              <AppBar position="absolute" className={clsx(classes.appBar, this.state.open && classes.appBarShift)}>
+                <Toolbar className={classes.toolbar}>
+                  <IconButton
+                    data-testid="hamburger-button"
+                    edge="start"
+                    color="inherit"
+                    aria-label="open drawer"
+                    onClick={this.handleDrawerOpen}
+                    className={clsx(classes.menuButton, this.state.open && classes.menuButtonHidden)}>
+                  <MenuIcon />
+                  </IconButton>
+                  <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
+                    BruinMeet
+                  </Typography>
+                  <IconButton color="inherit">
+                    <Badge badgeContent={4} color="secondary">
+                      <NotificationsIcon />
+                    </Badge>
+                  </IconButton>
+                </Toolbar>
+              </AppBar>
+              <Drawer
+                variant="permanent"
+                classes={{
+                  paper: clsx(classes.drawerPaper, !this.state.open && classes.drawerPaperClose),
+                }}
+                open={this.state.open}>
+                <div className={classes.toolbarIcon}>
+                  <IconButton data-testid="left-button" onClick={this.handleDrawerClose}>
+                    <ChevronLeftIcon className={clsx(classes.customDrawerIcons)}/>
+                  </IconButton>
+                </div>
+                <Divider className={clsx(classes.customDivider)}/>
+                <List>
+                  <ListItem data-testid="profile-button" button onClick={() => this.setPage("Profile")}>
+                        <ListItemIcon>
+                        <FaceIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Profile" />
+                    </ListItem>
+                    <ListItem data-testid="map-button" button onClick={() => this.setPage("Map")}>
+                        <ListItemIcon>
+                        <MapIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Event Map" />
+                    </ListItem>
+                    <ListItem data-testid="events-button" button onClick={() => this.setPage("Events")}>
+                        <ListItemIcon>
+                        <DateRangeIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Your Events" />
+                    </ListItem>
+                    <ListItem data-testid="rating-button" button onClick={() => this.setPage("Rate")}>
+                        <ListItemIcon>
+                        <RateReviewIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Write Reviews" />
+                    </ListItem>
+                </List>
+              </Drawer>
+              <main className={classes.content}>
+                <div className={classes.appBarSpacer} />
+                <Container maxWidth="lg" className={classes.container}>
+                  {this.renderDashboard()}
+                </Container>
+              </main>
+            </div>
+          );
+        }
 }
+export default withStyles(styles, {withTheme: true})(Dashboard);
