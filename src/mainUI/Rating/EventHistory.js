@@ -50,7 +50,9 @@ class EventHistory extends React.Component{
      * @var classes Calls useStyles to generate CSS style inherited from Materials UI Theme
      */
     render = () => {
-        const { classes, eventsPast, eventsFuture } = this.props;
+        const { classes, eventsPast, eventsFuture, userID, socket, refreshEvents } = this.props;
+        console.log(eventsPast);
+        console.log(eventsFuture);
     /**
      * Renders a table showing the events that the user has attended (currently using test data)
      */
@@ -73,7 +75,7 @@ class EventHistory extends React.Component{
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {eventsFuture.map(event => event.createEventHistoryRow())}
+                        {eventsFuture.map(event => event.createEventHistoryRow(userID, socket, false, refreshEvents))}
                     </TableBody>
                     </Table>
                 </React.Fragment>
@@ -95,7 +97,7 @@ class EventHistory extends React.Component{
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {eventsPast.map(event => event.createEventHistoryRow())}
+                        {eventsPast.map(event => event.createEventHistoryRow(userID, socket, true, refreshEvents))}
                     </TableBody>
                     </Table>
                 </React.Fragment>

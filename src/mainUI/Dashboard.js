@@ -312,7 +312,10 @@ class Dashboard extends Component {
                           refreshEvents={this.refreshEvents}/>
       case "Rate":
         return <EventHistory eventsPast={this.state.attendedEvents} 
-                             eventsFuture={this.state.upcomingEvents}/>
+                             eventsFuture={this.state.upcomingEvents}
+                             userID={this.state.user}
+                             socket={this.props.socket}
+                             refreshEvents={this.refreshEvents}/>
     }
   }
 

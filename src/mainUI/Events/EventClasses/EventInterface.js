@@ -49,7 +49,7 @@ export default class BMeetEvent{
    * @param none
    * @return EventHistoryRow component corresponding to this Event
    */
-    createEventHistoryRow(){
+    createEventHistoryRow(user, socket, hasPassed, refreshEvents){
         console.log("creating event history row");
         return (
             <EventHistoryRow
@@ -61,6 +61,11 @@ export default class BMeetEvent{
                 attendees={this.attendees}
                 tag={this.tags}     
                 questions={this.questions}
+                review={hasPassed}
+                leaveEvent={() => {
+                    this.removeUser(user, socket);
+                    refreshEvents();
+                }}
             />
         )
     }
@@ -111,23 +116,11 @@ export default class BMeetEvent{
    * 
    */
     registerUser(user, socket) {
-        console.log("Adding ", user, " to event ", this._id);
+        this.attendees.push(user.name);
+        // add user to event object
         socket.emit("addEventAttendee", this._id, user);
         // add event to user object
         socket.emit("addUserAttendingEvent", user.name, this._id);
-    }
-
-    /**
-     * this method is used to register a user an observer of this event
-     * @param user: user object
-     *
-     */
-    registerUser(user, socket) {
-        console.log("Adding ", user, " to event ", this.title);
-
-        socket.emit("addEventAttendee", this._id, user);
-        // add event to user object
-        socket.emit("addUserAttendingEvent", user, this._id);
     }
 
     /**
@@ -137,15 +130,18 @@ export default class BMeetEvent{
     */
     removeUser(user, socket) {
         let userId = user["name"]
-        var oldList = this.attendees;
-        var removeIndex = oldList.map(function(item) { return item.state._id; }).indexOf(userId);
-        //remove 1 element at removeIndex
 
-        this.attendees.splice(removeIndex, 1);
+        //remove 1 element at removeIndex
+        // this.attendees.map((item, i) => {
+        //     if (item == userId) {
+        //         this.attendees.splice(i, 1);
+        //     }
+        // });
+        console.log("Removing user: ", user, "from event: ", this._id);
         // remove user from event object
-        socket.emit("removeUserAttendingEvent", userId, this.state._id);
+        socket.emit("removeUserAttendingEvent", user.name, this._id);
         // remove event from user object
-        socket.emit("removeEventAttendee", this.state._id, user);
+        socket.emit("removeEventAttendee", this._id, user._id);
     }
 
     /**

@@ -2,6 +2,7 @@ import React from 'react';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import EventRater from '../Rating/EventRater';
+import EventCancel from '../Rating/EventCancel';
 
 
 export default class EventHistoryRow extends React.Component{
@@ -17,6 +18,8 @@ export default class EventHistoryRow extends React.Component{
             attendees,
             questions,
             tag,
+            review,
+            leaveEvent
         } = this.props;
 
         let dateObj = new Date(timeDate);
@@ -33,7 +36,10 @@ export default class EventHistoryRow extends React.Component{
             <TableCell>{time}</TableCell>
             <TableCell>{numAttendees}</TableCell>
             <TableCell align="right">
+                {review?
                 <EventRater questions={questions}/>
+                :
+                <EventCancel leaveEvent={leaveEvent}/>}
             </TableCell>
         </TableRow>
         )

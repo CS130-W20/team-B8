@@ -102,10 +102,10 @@ class SimpleMap extends Component {
    * Also closes the dialog box so users can keep searching through event
    */
   handleAttendEvent() {
-    //console.log('simpleMap registering user: ', this.props.userID);
-    //this.props.socket.emit("addEventAttendee", this.state.currEvent._id, this.props.userID);
-    //this.props.socket.emit("addUserAttendingEvent", this.props.userID.name, this.state.currEvent._id);
-    this.state.currEvent.registerUser(this.props.userID, this.props.socket);
+    console.log('simpleMap registering user: ', this.props.userID);
+    this.props.socket.emit("addEventAttendee", this.state.currEvent._id, this.props.userID);
+    this.props.socket.emit("addUserAttendingEvent", this.props.userID.name, this.state.currEvent._id);
+    //this.state.currEvent.registerUser(this.props.userID, this.props.socket);
     this.handleClickClose();
     this.props.refreshMap();
   }

@@ -455,20 +455,20 @@ module.exports.addEventAttendee = function(eventID, attendee){
 	});
 };
 
-module.exports.removeEventAttendee = function(eventID, attendee){
+module.exports.removeEventAttendee = function(eventID, attendeeID){
 	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
-				'attendees': attendee
+				'attendees': {'_id' : attendeeID}
 			};
 		 	collection.updateOne({'_id': ObjectId(eventID)},{ '$pull': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
-				console.log("addEventAttendee() Success: " + eventID);
+				console.log("removeEventAttendee() Success: " + eventID);
 				resolve(result);
 			} else{
-				console.log("addEventAttendee() Failed: " + eventID);
+				console.log("removeEventAttendee() Failed: " + eventID);
 				reject(err);
 			}
 		});
