@@ -46,7 +46,7 @@ export default class App extends React.Component{
       this.state.loggedIn?
       <Router>
         <div>
-          <Dashboard socket={this.state.socket} user={this.state.user}/>
+          <Dashboard socket={this.state.socket} userID={this.state.user}/>
         </div>
       </Router>
       :
