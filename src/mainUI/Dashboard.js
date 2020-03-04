@@ -192,7 +192,7 @@ class Dashboard extends Component {
       case "Events":
         return <EventList events={this.state.hostEvents} user={this.props.user} refreshEvents={this.refreshEvents}/>
       case "Rate":
-        return <EventHistory events={this.state.events}/>
+        return <EventHistory events={this.state.events} user={this.props.user} refreshEvents={this.refreshEvents}/>
     }
   }
 

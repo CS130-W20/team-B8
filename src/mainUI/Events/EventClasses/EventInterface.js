@@ -6,6 +6,9 @@ import { getMarkerType, markerTypes } from '../../markerPrefab/mapMarker';
 import { DialogContent } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 
+const io = require("socket.io-client"),
+socket = io.connect("http://localhost:8000");
+
 // BMeetEvent: A base class type that is used to generate event objects
 // Uses an observer pattern to notify and update attendees of event changes
 export default class BMeetEvent{
@@ -19,7 +22,7 @@ export default class BMeetEvent{
         this.locationName = props.locationName;
         this.host =  props.host;
         this.attendees = [];
-        this.ratings = [];
+        this.reviews = props.reviews;
         this.type = props.type;
         this.questions = [{id: 'name', label: "What was your experience like?"}]
     }
@@ -49,8 +52,12 @@ export default class BMeetEvent{
    * @param none
    * @return EventHistoryRow component corresponding to this Event
    */
-    createEventHistoryRow(){
-        console.log("creating event history row");
+    createEventHistoryRow(user, refreshEvents){
+        console.log(this.reviews)
+        let userReview = this.reviews.reduce((userReview, reviewObj) => {
+            return (reviewObj.user === user) ? reviewObj : userReview
+        }, null);
+        console.log("user review: ",userReview)
         return (
             <EventHistoryRow
                 key={this._id} 
@@ -60,7 +67,10 @@ export default class BMeetEvent{
                 locationName={this.locationName}
                 attendees={this.attendees}
                 tag={this.tags}     
+                host={this.host}
                 questions={this.questions}
+                userReview={userReview}
+                submitReview={(rating, review) => { this.submitReview(user,rating,review, refreshEvents) }}
             />
         )
     }
@@ -123,6 +133,11 @@ export default class BMeetEvent{
         var oldList = this.attendees;
         var removeIndex = oldList.map(function(item) { return item.state._id; }).indexOf(id);
         this.attendees.splice(removeIndex, 1);
+    }
+
+    submitReview(user, rating, review, refreshEvents){
+        socket.emit('addEventReview', this._id, user, rating, review);
+        refreshEvents();
     }
 
     /**

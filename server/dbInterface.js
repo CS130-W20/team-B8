@@ -465,7 +465,7 @@ module.exports.addEventReview = function(eventID, user, score, review){
 					'review': review
 				}
 			};
-		 	collection.updateOne({'_id': eventID},{ '$push': doc},
+		 	collection.updateOne({'_id': ObjectId(eventID)},{ '$push': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("addEventReview() Success: " + eventID);
