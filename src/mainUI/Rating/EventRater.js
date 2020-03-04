@@ -34,39 +34,58 @@ const StyledRating = withStyles({
  * @author Phipson Lee
  * @since 2020-02-15
  */
-export default function EventRater(props) {
-  /**
-   * @var dialogopen Hook set to false to indicate state of dashboard
-   * @var setDOpen Function that changes the state variable open
-   */
-  const [dialogopen, setDOpen] = React.useState(false);
+export default class EventRater extends React.Component{
 
-  const { questions } = props;
+  constructor(props){
+    super(props);
+    let initialReview = {};
+    this.props.questions.map(question => initialReview[question.label] = "")
+    this.state = {
+      dialogopen: false,
+      review: initialReview
+    }
+  }
 
   /**
    * @var handleClickOpen Function that sets the dialog box to close
    */
-    const handleClickOpen = () => {
-        setDOpen(true);
+    handleClickOpen = () => {
+        this.setState({dialogopen: true});
     };
 
   /**
    * @var handleClickClose Function that sets the dialog box to close
    */
-    const handleClickClose = () => {
-        setDOpen(false);
+    handleClickClose = () => {
+        this.setState({dialogopen: false});
     };
 
+    handleClickSubmit = () => {
+      console.log(this.state.review);
+      //this.props.submitReview();
+      this.handleClickClose();
+    }
+
+    handleTextChange = (label, text) => {
+      console.log(text);
+      let currentReview = this.state.review;
+      currentReview[label] = text;
+      this.setState({review: currentReview});
+    }
+
+  render = () => {
   /**
    * Renders a form onclick that allows users to offer ratings and review for host based on event
    */
+  const { questions, host} = this.props;
+
   return (
       <div>
-      <IconButton onClick={handleClickOpen}>
+      <IconButton onClick={this.handleClickOpen}>
         <RateReviewIcon />
       </IconButton>
-      <Dialog open={dialogopen} onClose={handleClickClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Review and Rate [Host Name]'s Event!</DialogTitle>
+      <Dialog open={this.state.dialogopen} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">{"Review and Rate " + host + "'s Event!"}</DialogTitle>
         <DialogContent>
           <StyledRating
               name="customized-color"
@@ -79,17 +98,20 @@ export default function EventRater(props) {
             <TextField
               autoFocus
               margin="dense"
+              key={question.id}
               id={question.id}
               label={question.label}
+              //value={this.state.review[question.label]}
+              onChange={(newText) => { this.handleTextChange(question.label, newText)}}
               fullWidth/>
           ))}
 
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClickClose} color="primary">
+          <Button onClick={this.handleClickClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleClickClose} color="primary">
+          <Button onClick={this.handleClickSubmit} color="primary">
             {/* TODO: ADD TO DB AND UPDATE/REMOVE EVENT FROM HISTORY */}
             Submit
           </Button>
@@ -97,4 +119,6 @@ export default function EventRater(props) {
       </Dialog>
       </div>
   );
+  
+}
 }

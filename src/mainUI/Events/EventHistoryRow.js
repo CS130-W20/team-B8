@@ -15,6 +15,7 @@ export default class EventHistoryRow extends React.Component{
             timeDate,
             locationName,
             attendees,
+            host,
             questions,
             tag,
         } = this.props;
@@ -33,7 +34,7 @@ export default class EventHistoryRow extends React.Component{
             <TableCell>{time}</TableCell>
             <TableCell>{numAttendees}</TableCell>
             <TableCell align="right">
-                <EventRater questions={questions}/>
+                <EventRater questions={questions} host={host}/>
             </TableCell>
         </TableRow>
         )

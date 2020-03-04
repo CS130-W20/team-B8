@@ -6,6 +6,9 @@ import { getMarkerType, markerTypes } from '../../markerPrefab/mapMarker';
 import { DialogContent } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 
+const io = require("socket.io-client"),
+socket = io.connect("http://localhost:8000");
+
 // BMeetEvent: A base class type that is used to generate event objects
 // Uses an observer pattern to notify and update attendees of event changes
 export default class BMeetEvent{
@@ -51,7 +54,6 @@ export default class BMeetEvent{
    * @return EventHistoryRow component corresponding to this Event
    */
     createEventHistoryRow(){
-        console.log("creating event history row");
         return (
             <EventHistoryRow
                 key={this._id} 
@@ -61,7 +63,9 @@ export default class BMeetEvent{
                 locationName={this.locationName}
                 attendees={this.attendees}
                 tag={this.tags}     
+                host={this.host}
                 questions={this.questions}
+                submitReview={this.submitReview}
             />
         )
     }
@@ -121,6 +125,10 @@ export default class BMeetEvent{
         var oldList = this.attendees;
         var removeIndex = oldList.map(function(item) { return item.state._id; }).indexOf(id);
         this.attendees.splice(removeIndex, 1);
+    }
+
+    submitReview(rating, review){
+        socket.emit('addEventReview', this._id, this.host, rating, review);
     }
 
     /**
