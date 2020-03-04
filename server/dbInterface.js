@@ -57,6 +57,27 @@ module.exports.getUser = function(username){
 	});
 };
 
+module.exports.getUserByPhone = function(phone){
+	return new Promise(
+		function (resolve, reject) {
+			const collection = db.collection('Users');
+			// Find some documents
+
+			let query = {'phone': phone} ;
+			console.log(query);
+
+		 	collection.findOne(query, function(err, doc) {
+			if(err == null){
+				console.log("getUserByPhone() query Success");
+				resolve(doc);
+			} else{
+				console.log("getUserByPhone() query Failed");
+				reject(err);
+			}
+		});
+	});
+};
+
 module.exports.addUser = function(name, email, password, phone){
 	return new Promise(
 		function (resolve, reject) {

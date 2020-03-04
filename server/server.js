@@ -106,6 +106,23 @@ io.on("connection", (socket) => {
       socket.emit("serverError", error)
     })
   })
+  socket.on('getUserByPhone', (phone) => {
+    let prom = dbInterface.getUserByPhone(phone);
+    prom.then( (docs) => {
+      console.log("FOUND USER", docs);
+      let prom2 = dbInterface.getHostAvgRating(docs.name);
+      prom2.then(avg_score => {
+	console.log("FOUND USER", docs);
+	docs['avgScore'] = avg_score;
+	socket.emit("getUserReply", docs);
+      }
+      ).catch( err => reject(err));
+    })
+    .catch( (error) =>  {
+      console.log("ERROR:", error);
+      socket.emit("serverError", error)
+    })
+  })
 
   socket.on('updateUserPassword', (name, newpass) => {
     let prom = dbInterface.updateUserPassword(name, newpass);
