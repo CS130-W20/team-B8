@@ -52,7 +52,7 @@ export default class BMeetEvent{
    * @param none
    * @return EventHistoryRow component corresponding to this Event
    */
-    createEventHistoryRow(){
+    createEventHistoryRow(user){
         return (
             <EventHistoryRow
                 key={this._id} 
@@ -64,7 +64,7 @@ export default class BMeetEvent{
                 tag={this.tags}     
                 host={this.host}
                 questions={this.questions}
-                submitReview={this.submitReview}
+                submitReview={(rating, review) => { this.submitReview(user,rating,review) }}
             />
         )
     }
@@ -129,8 +129,8 @@ export default class BMeetEvent{
         this.attendees.splice(removeIndex, 1);
     }
 
-    submitReview(rating, review){
-        socket.emit('addEventReview', this._id, this.host, rating, review);
+    submitReview(user, rating, review){
+        socket.emit('addEventReview', this._id, user, rating, review);
     }
 
     /**

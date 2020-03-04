@@ -42,7 +42,8 @@ export default class EventRater extends React.Component{
     this.props.questions.map(question => initialReview[question.label] = "")
     this.state = {
       dialogopen: false,
-      review: initialReview
+      review: initialReview,
+      rating: 2,
     }
   }
 
@@ -61,15 +62,21 @@ export default class EventRater extends React.Component{
     };
 
     handleClickSubmit = () => {
-      console.log(this.state.review);
-      //this.props.submitReview();
+      let reviewString = JSON.stringify(this.state.review)
+      // Object.keys(this.state.review)
+      //                 .map(question => question + this.state.review[question])
+      //                 .join('&');
+      this.props.submitReview(this.state.rating, reviewString);
       this.handleClickClose();
     }
 
-    handleTextChange = (label, text) => {
-      console.log(text);
+    handleRatingChange = (e, newRating) => {
+      this.setState({rating: newRating});
+    }
+
+    handleTextChange = (label, e) => {
       let currentReview = this.state.review;
-      currentReview[label] = text;
+      currentReview[label] = e.target.value;
       this.setState({review: currentReview});
     }
 
@@ -92,6 +99,7 @@ export default class EventRater extends React.Component{
               defaultValue={2}
               getLabelText={value => `${value} Heart${value !== 1 ? 's' : ''}`}
               precision={0.5}
+              onChange={this.handleRatingChange}
               icon={<FavoriteIcon fontSize="inherit" />}
               />
           {questions.map(question => (
