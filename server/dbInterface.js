@@ -319,11 +319,20 @@ module.exports.getEvent = function(eventID){
 	});
 };
 
-module.exports.getEventByHost = function(host){
+module.exports.getEventByHost = function(host, lowerBound){
 	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let query = {'host': host};
+
+			let dateRange = {};
+			if (lowerBound != null) {
+				dateRange['$gt'] = lowerBound;
+			}
+			if (Object.keys(dateRange).length != 0) {
+				query['timeDate'] = dateRange;
+			}
+
 			collection.find(query,{}).toArray(function(err, docs) {
 				if(err == null){
 					console.log("getEventByHost() query Success");
