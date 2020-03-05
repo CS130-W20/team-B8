@@ -41,6 +41,39 @@ const styles = theme => ({
   },
 });
 
+/**
+ * check if phone number is valid
+ * @param num: string of phone number
+ */
+function validPhone (num) {
+  if (!num){
+    return false;
+  }
+  return (num.length == 9 && /^\d+$/.test(num));
+}
+
+/**
+ * check if email address is valid
+ * @param email: string of email addr.
+ */
+function validEmail (email) {
+  if (!email) {
+    return false;
+  }
+  return (email.includes("ucla.ed"));
+}
+
+/**
+ * check if password is valid
+ * @ param pwd: string of password
+ */
+function validPassword (pwd) {
+  if (!pwd) {
+    return false;
+  }
+  return (pwd.length >= 7);
+}
+
 
 class Registration extends Component {
   constructor (props) {
@@ -57,7 +90,10 @@ class Registration extends Component {
       phone: '',
       register: false,
       error: false,
-      socket: socket
+      socket: socket,
+      emailErr: '',
+      phoneErr: '',
+      passwordErr: ''
     };
     this.handleOnChangeFirstName = this.handleOnChangeFirstName.bind(this);
     this.handleOnChangeLastName = this.handleOnChangeLastName.bind(this);
@@ -84,6 +120,18 @@ class Registration extends Component {
     this.setState ({
       phone: e.target.value,
     });
+
+    if (!validPhone(this.state.phone)) {
+      this.setState({
+        phoneErr: 'Please enter a valid U.S. phone number.'
+      })
+      console.log(this.state.phoneErr);
+    } else {
+      this.setState({
+        phoneErr: ''
+      })
+    }
+
   };
 
   handleOnChangeUserName = e => {
@@ -96,12 +144,34 @@ class Registration extends Component {
     this.setState ({
       password: e.target.value,
     });
+
+    if (!validPassword(this.state.password)) {
+      this.setState({
+        passwordErr: 'Password must be at least 8 characters long.'
+      })
+      console.log(this.state.passwordErr);
+    } else {
+      this.setState({
+        passwordErr: ''
+      })
+    }
   };
 
   handleOnChangeEmail = e => {
     this.setState ({
       email: e.target.value,
     });
+
+    if (!validEmail(this.state.email)) {
+      this.setState({
+        emailErr: 'Please use a valid ucla.edu email.'
+      })
+      console.log(this.state.emailErr);
+    } else {
+      this.setState({
+        emailErr:''
+      })
+    }
   };
 
   handleOnBlur = async e => {
@@ -126,16 +196,21 @@ class Registration extends Component {
 
   handleRegistration = () => {
     // console.log("onsubmit: reg", this.props.socket);
-    // e.preventDefault ();
+    //e.preventDefault ();
     const data = {
       name: this.state.first_name,
       email: this.state.user_name,
       phone: this.state.phone,
       password: this.state.password,
     };
-    console.log("Register: ", data);
-    this.state.socket.emit('addUser',data["name"], data["email"], data["password"], data["phone"]);
-    this.props.returnToLogin();
+    if (this.state.phoneErr + this.state.emailErr + this.state.passwordErr == '') {
+      console.log("valid form");
+      console.log("Register: ", data);
+      this.state.socket.emit('addUser',data["name"], data["email"], data["password"], data["phone"]);
+      this.props.returnToLogin();
+    } else {
+      console.log("invalid form");
+    }
   };
 
   render () {
@@ -189,6 +264,8 @@ class Registration extends Component {
             value={this.state.email}
             onChange={this.handleOnChangeEmail}
             autoFocus/>
+            {this.state.emailErr.length > 0 &&
+              <span className='error'>{this.state.emailErr}</span>}
           <TextField
             variant="outlined"
             margin="normal"
@@ -201,6 +278,8 @@ class Registration extends Component {
             value={this.state.phone}
             onChange={this.handleOnChangePhone}
             autoFocus/>
+            {this.state.phoneErr.length > 0 &&
+              <span className='error'>{this.state.phoneErr}</span>}
           <TextField
             variant="outlined"
             margin="normal"
@@ -213,6 +292,8 @@ class Registration extends Component {
             autoComplete="current-password"
             value={this.state.password}
             onChange={this.handleOnChangePassword}/>
+            {this.state.passwordErr.length > 0 &&
+              <span className='error'>{this.state.passwordErr}</span>}
           <Button
             fullWidth
             variant="contained"
