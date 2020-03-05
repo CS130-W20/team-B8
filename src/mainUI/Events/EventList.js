@@ -67,12 +67,12 @@ class EventList extends Component {
     }
 
     render() {
-    const { classes, events, refreshEvents, user} = this.props;
+    const { classes, events, refreshEvents, userID, socket} = this.props;
     return (
             <Grid data-testid="Events" item xs={12}>
               <Paper className={classes.paper}>
               <React.Fragment>
-              <EventForm updateFunction={refreshEvents} user={user}/>
+              <EventForm updateFunction={refreshEvents} userID={userID}/>
                     <Table size="small">
                     <TableHead>
                         <TableRow>
@@ -86,7 +86,7 @@ class EventList extends Component {
                     </TableHead>
                     <TableBody>
                         {events.length > 0 ?
-                            events.map(event => event.createEventListRow(refreshEvents))
+                            events.map(event => event.createEventListRow(refreshEvents, socket))
                             :
                             <TableRow>
                             <TableCell align='center' colSpan='6'>

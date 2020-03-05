@@ -1,7 +1,7 @@
 export const REGISTRATION_FIELDS = {
 	NAME : 'Name',
 	PHONE : 'Phone Number',
-	REGISTER: 'Register',
+	REGISTER: 'Need an account? Sign up right here!',
 	CANCEL: 'Cancel',
 	REGISTRATION_HEADING: 'Sign Up'
 }

@@ -39,6 +39,7 @@ class SimpleMap extends Component {
       this.handleClickClose = this.handleClickClose.bind(this);
       this.handleClickOpen = this.handleClickOpen.bind(this);
       this.getMarkerType = this.getMarkerType.bind(this);
+      this.handleAttendEvent = this.handleAttendEvent.bind(this);
 
       navigator.geolocation.getCurrentPosition(
         position => {
@@ -75,18 +76,6 @@ class SimpleMap extends Component {
         return markerTypes.hats;
     }
   }
-  
-  /**
-   * @function registerUserToEvent Calls the observer method in Event Interface to allow users to register user
-   * to an event and receive SMS notifications about the event
-   * Also closes the dialog box so users can keep searching through event
-   */
-  registerUserToEvent() {
-    this.state.currEvent.registerUser(this.props.user);
-    this.handleClickClose();
-    this.props.refreshMap();
-  }
-
 
   /**
    * Event function that will be used for detecting button click and display event details
@@ -106,6 +95,20 @@ class SimpleMap extends Component {
       open: false,
     })
   };
+
+  /**
+   * @function handleAttendEvent Calls the observer method in Event Interface to allow users to register user
+   * to an event and receive SMS notifications about the event
+   * Also closes the dialog box so users can keep searching through event
+   */
+  handleAttendEvent() {
+    console.log('simpleMap registering user: ', this.props.userID);
+    //this.props.socket.emit("addEventAttendee", this.state.currEvent._id, this.props.userID);
+    //this.props.socket.emit("addUserAttendingEvent", this.props.userID.name, this.state.currEvent._id);
+    this.state.currEvent.registerUser(this.props.userID, this.props.socket);
+    this.handleClickClose();
+    this.props.refreshMap();
+  }
 
   /**
    * Default function to load and display component on DOM
@@ -152,12 +155,10 @@ class SimpleMap extends Component {
               <Button onClick={this.handleClickClose} color="primary">
                   Cancel
               </Button>
-              <Button onClick={this.handleClickClose} color="primary">
-                  {/* TODO: ADD TO DB AND UPDATE */}
+              <Button onClick={this.handleAttendEvent} color="primary">
                   Attend
               </Button>
               <Button onClick={this.handleClickClose} color="primary">
-                  {/* TODO: ADD TO DB AND UPDATE */}
                   Message Host
               </Button>
           </DialogActions>

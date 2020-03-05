@@ -7,8 +7,11 @@
  * @see https://www.twilio.com/docs/chat/tutorials/chat-application-node-express
  */
 
-const TWILIO_SID = 'AC513454963ff517f3e07b90baf8f5d8e1';
-const TWILIO_AUTH = 'cb93ae1bbfca766b1f00410a257e06da';
+const TWILIO_SID_TEST = 'AC513454963ff517f3e07b90baf8f5d8e1';
+const TWILIO_AUTH_TEST = 'cb93ae1bbfca766b1f00410a257e06da';
+const TWILIO_SID = 'AC8a8a7e613b05b1800074dcf7f1c35df8';
+const TWILIO_AUTH = '5334098d0ca18acd8c5be141ab504eea';
+
 const client = require('twilio')(TWILIO_SID, TWILIO_AUTH);
 
 // Base class that is used to send messages
@@ -31,10 +34,11 @@ class SMSMessage {
     send() {
         try {
           this.recipients.forEach((toNumber) => {
+            console.log('messaging: ', toNumber);
             client.messages
                   .create({
                     body: this.message,
-                    from: sender,
+                    from: this.sender,
                     to: toNumber,
                   })
                   .then(message => {console.log(message.sid)});
@@ -68,6 +72,7 @@ class ProxySMSMessage extends SMSMessage {
         try {
             this.verifyNumbers();
             this.formatMessage();
+            console.log('Update Message to send: ', this.message);
             super.send();
         } catch (error) {
             throw Error(error);
@@ -112,10 +117,7 @@ class ProxySMSMessage extends SMSMessage {
      */
     formatMessage() {
         try {
-            let tempMessage = `You have just received a text on BruinMeet from ${this.event.host}, in relation to \
-            the event ${this.event.title} at ${this.event.locationName} during ${this.event.date}\r\n\r\n\
-            ${this.message}\r\n\r\n\
-            Feel free to type any message below to reply to ${this.event.host}`;
+            let tempMessage = `You have just received a text on BruinMeet from ${this.event.host.name}, in relation to the event ${this.event.title} at ${this.event.locationName} during ${this.event.date}\r\n\r\n${this.message}\r\n\r\nFeel free to type any message below to reply to ${this.event.host.name}`;
 
             this.message = tempMessage;
         } catch (error) {

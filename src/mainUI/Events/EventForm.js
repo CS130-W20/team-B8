@@ -90,12 +90,13 @@ class EventForm extends Component {
           location: {lat: lat, lng: lng},
           locationName: this.state.location,
           type: this.state.type,
-          host: this.props.user["name"]
+          host: this.props.userID
         }
 
         socket.emit('addEvent', newEvent.title, newEvent.date, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.type, newEvent.host);
-
-        socket.on('serverReply', (event) => {
+        socket.on('addEventReply', (event) => {
+          console.log('addEventReply: ', event);
+          socket.emit('addUserHostingEvent', this.props.userID.name, event);
           this.props.updateFunction();
         })
       },

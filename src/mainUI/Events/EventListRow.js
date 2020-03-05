@@ -43,7 +43,7 @@ export default class EventListRow extends React.Component{
                     tag={tag} 
                     type={type} 
                     updateFunction={this.props.updateFunction}/>
-                <EventMessage/>
+                <EventMessage notifyFunction={this.props.notifyFunction} socket={this.props.socket}/>
                 <EventDelete />
             </TableCell>
             </TableRow>

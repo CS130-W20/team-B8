@@ -92,7 +92,7 @@ export default class EventRater extends React.Component{
         <RateReviewIcon />
       </IconButton>
       <Dialog open={this.state.dialogopen} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">{"Review and Rate " + host + "'s Event!"}</DialogTitle>
+        <DialogTitle id="form-dialog-title">{"Review and Rate " + host.name + "'s Event!"}</DialogTitle>
         <DialogContent>
           <StyledRating
               name="customized-color"

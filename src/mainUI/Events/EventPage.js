@@ -119,7 +119,7 @@ export default class EventPage extends React.Component{
             </EventPageItem>
             <EventPageItem>
                 <PersonIcon color={"grey"}/>
-                {"Hosted by " + currEvent.host}
+                {"Hosted by " + currEvent.host.name}
             </EventPageItem>
         </div>
         </DialogContent>

@@ -262,6 +262,7 @@ module.exports.queryEvents = function(keywordRegex, tags, upperBound, lowerBound
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {};
+			let IDList = [];
 			if (keywordRegex != null) {
 				doc['title'] = keywordRegex;
 			}
@@ -280,7 +281,11 @@ module.exports.queryEvents = function(keywordRegex, tags, upperBound, lowerBound
 				doc['timeDate'] = dateRange;
 			}
 			if (eventIDs != null && eventIDs.length != 0) {
-				doc['tag'] = {'$in': eventIDs };
+				eventIDs.forEach(ID => {
+					console.log(ID);
+					IDList.push(ObjectId(ID));
+				})
+				doc['_id'] = {'$in': IDList };
 			}
 		 	let dbRes = collection.find(doc,{
 				'attendees': 0,
@@ -297,6 +302,7 @@ module.exports.queryEvents = function(keywordRegex, tags, upperBound, lowerBound
 				console.log("queryEvents() query Failed");
 				reject(err);
 			}
+			IDList = [];
 		});
 	});
 };
@@ -325,8 +331,9 @@ module.exports.getEvent = function(eventID){
 module.exports.getEventByHost = function(host, lowerBound){
 	return new Promise(
 		function (resolve, reject) {
+			console.log('host: ', host);
 			const collection = db.collection('Events');
-			let query = {'host': host};
+			let query = {'host.name': host};
 
 			let dateRange = {};
 			if (lowerBound != null) {
@@ -362,7 +369,10 @@ module.exports.getHostAvgRating = function(host){
 			collection.aggregate(agg_pipeline).toArray(function(err, doc) {
 				if(err == null){
 					console.log("getHostAvgRating() query Success:" + doc);
-					resolve(doc[0]['result']);
+					if (doc.length != 0)
+						resolve(doc[0]['result']);
+					else
+						resolve(doc);
 				} else{
 					console.log("getHostAvgRating() query Failed");
 					reject(err);
@@ -433,7 +443,7 @@ module.exports.addEventAttendee = function(eventID, attendee){
 			let doc = {
 				'attendees': attendee
 			};
-		 	collection.updateOne({'_id': eventID},{ '$push': doc},
+		 	collection.updateOne({'_id': ObjectId(eventID)},{ '$push': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("addEventAttendee() Success: " + result);
@@ -446,20 +456,20 @@ module.exports.addEventAttendee = function(eventID, attendee){
 	});
 };
 
-module.exports.removeEventAttendee = function(eventID, attendee){
+module.exports.removeEventAttendee = function(eventID, attendeeID){
 	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
-				'attendees': attendee
+				'attendees': {'_id' : attendeeID}
 			};
-		 	collection.updateOne({'_id': eventID},{ '$pull': doc},
+		 	collection.updateOne({'_id': ObjectId(eventID)},{ '$pull': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
-				console.log("addEventAttendee() Success: " + eventID);
+				console.log("removeEventAttendee() Success: " + eventID);
 				resolve(result);
 			} else{
-				console.log("addEventAttendee() Failed: " + eventID);
+				console.log("removeEventAttendee() Failed: " + eventID);
 				reject(err);
 			}
 		});

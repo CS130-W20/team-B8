@@ -85,7 +85,7 @@ export default class EventReview extends React.Component{
       />
       </div>
       <Dialog open={this.state.dialogopen} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">{"Reviewed by " + user}</DialogTitle>
+        <DialogTitle id="form-dialog-title">{"Reviewed by " + user.name}</DialogTitle>
         <DialogContent>
             <StyledRating
                 name="custom-color"
