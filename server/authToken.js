@@ -11,13 +11,13 @@ module.exports.generateToken(username) = function() {
 }
 
 
-module.exports.verifyJWT = function(token){
+module.exports.decode = function(token){
 	try {
 	  let decoded = jwt.verify(token, key);
-	  return {'username' : decoded.usr, isValid: (decoded.exp > Math.floor(Date.now()/1000))} ;
+	  return {'name' : decoded.usr, isValid: (decoded.exp > Math.floor(Date.now()/1000))} ;
 
 	} catch(err) {
-	  return {'username' : null, isValid: false};
+	  return {'name' : null, isValid: false};
 	}
 }
 
