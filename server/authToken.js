@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 
 const key = "KbPeShVmYp3s6v9y$B&E)H@McQfTjWnZ"
 
-module.exports.generateToken(username) = function() {
+module.exports.generateToken = function(username) {
 	return jwt.sign({
 		'exp': Math.floor(Date.now()/1000) + 2 * 60 * 60,
 		'usr': username

@@ -1,4 +1,5 @@
 import React from 'react';
+import decode from 'jwt-decode';
 import './App.css';
 import {
   BrowserRouter as Router,
@@ -36,21 +37,25 @@ export default class App extends React.Component{
     this.returnToLogin = this.returnToLogin.bind(this);
     this.handleOpen = this.handleOpen.bind(this);
     this.handleClose = this.handleClose.bind(this);
+    this.isTokenExpired = this.isTokenExpired.bind(this);
   }
 
   componentDidMount() {
-    this.state = {
-      loggedIn: false,
-      register: false,
-      socket:  socket,
-      open: false,
-      user: ""
-    };
+    var user = localStorage.getItem('id_user');
+    var token = localStorage.getItem('id_token');
+    console.log('userToken: ', token, user);
+    if (token != null && user != null) {
+      if (!this.isTokenExpired(token)) {
+        this.setState({loggedIn: true, user: user, open: true});
+      }
+    }
   }
 
-  login = (userID) => {
+  login = (userID, token) => {
+    localStorage.setItem('id_token', token);
+    localStorage.setItem('id_user', userID);
     console.log("loggin in...");
-      this.setState({loggedIn: true, user: userID, open: true});
+    this.setState({loggedIn: true, user: userID, open: true});
   }
 
   register = () => {
@@ -77,6 +82,21 @@ export default class App extends React.Component{
     this.setState({
       open: false
     })
+  }
+
+  isTokenExpired = token => {
+    try {
+      const decodedToken = decode(token);
+      console.log("expiry: ", decodedToken.exp, Date.now()/1000);
+      if (decodedToken.exp < Date.now()/1000) {
+        console.log('Valid token');
+        return true;
+      }
+      return false;
+    }
+    catch (err) {
+      return false;
+    }
   }
 
   render() {

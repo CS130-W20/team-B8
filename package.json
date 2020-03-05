@@ -15,6 +15,7 @@
     "fast-deep-equal": "^3.1.1",
     "geolib": "^3.2.1",
     "google-maps-react": "^2.0.2",
+    "jwt-decode": "^2.2.0",
     "material-ui-places": "^1.1.7",
     "mongodb": "^3.5.3",
     "mui-places-autocomplete": "^2.0.0",

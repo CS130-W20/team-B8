@@ -74,10 +74,10 @@ class Login extends Component {
     this.handleOnChangePassword = this.handleOnChangePassword.bind(this);
     this.handleSubmission = this.handleSubmission.bind(this);
 
-    this.props.socket.on("authReply", (status, userID) => {
+    this.props.socket.on("authReply", (status, userID, token) => {
       console.log("serverReply: ", status);
       if (status == "SUCCESS") {
-        this.props.login(userID);
+        this.props.login(userID, token);
         this.setState({
           error: false,
           loginSuccess: true,
@@ -113,7 +113,6 @@ class Login extends Component {
     };
     this.state.socket.emit("authenticate", data.username, data.password);
   };
-
   render() {
     const { loginSuccess, error } = this.state;
     const { classes } = this.props;

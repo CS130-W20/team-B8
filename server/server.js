@@ -49,7 +49,7 @@ io.on("connection", (socket) => {
       console.log("FOUND USER", docs);
       if (docs == null) {
         //no user with that username
-        socket.emit("authReply", "FAIL", docs["name"]);
+        socket.emit("authReply", "FAIL", docs["name"], "");
       }
       else {
         // found a user
@@ -58,12 +58,12 @@ io.on("connection", (socket) => {
         if (docs["password"] == password) {
           // correct password
           // client needs to store generated token
-	  docs['token'] = authToken.generateToken(username);
-          socket.emit("authReply", "SUCCESS", docs["name"]);
+	        docs['token'] = authToken.generateToken(name);
+          socket.emit("authReply", "SUCCESS", docs["name"], docs["token"]);
         }
         else {
           //incorrect pass
-          socket.emit("authReply", "FAIL", docs["name"]);
+          socket.emit("authReply", "FAIL", docs["name"], "");
         }
       }
 
@@ -89,13 +89,8 @@ io.on("connection", (socket) => {
       else {
         // found a user
         console.log("USER FOUND: ", docs);
-	  docs['token'] = authToken.generateToken(username);
-          socket.emit("authTokenReply", "SUCCESS", docs["name"]);
-        }
-        else {
-          //incorrect pass
-          socket.emit("authTokenReply", "FAIL", docs["name"]);
-        }
+	      docs['token'] = authToken.generateToken(username);
+        socket.emit("authTokenReply", "SUCCESS", docs["name"]);
       }
 
     })
