@@ -6,6 +6,7 @@ const server= require('http').Server(app);
 const io = require('socket.io')(server);
 const twilio = require('twilio');
 const ProxySMSMessage = require('./ProxySMSMessage');
+const authToken = require('./authToken');
 
 // TODO: add rooms so not ever user will see everyone's events
 
@@ -56,6 +57,8 @@ io.on("connection", (socket) => {
         console.log("Entered password: ", password);
         if (docs["password"] == password) {
           // correct password
+          // client needs to store generated token
+	  docs['token'] = authToken.generateToken(username);
           socket.emit("authReply", "SUCCESS", docs["name"]);
         }
         else {
@@ -68,6 +71,37 @@ io.on("connection", (socket) => {
     .catch( (error) =>  {
       console.log("ERROR:", error);
       socket.emit("authReply", "FAIL")
+    })
+  })
+
+  socket.on('authenticateToken', (token) => {
+    content = authToken.decode(token);
+    if (content.isValid == false){
+	socket.emit("authTokenReply", "FAIL", null);
+    }
+    let prom = dbInterface.getUser(content.name);
+    prom.then( (docs) => {
+      console.log("FOUND USER", docs);
+      if (docs == null) {
+        //no user with that username
+        socket.emit("authTokenReply", "FAIL", docs["name"]);
+      }
+      else {
+        // found a user
+        console.log("USER FOUND: ", docs);
+	  docs['token'] = authToken.generateToken(username);
+          socket.emit("authTokenReply", "SUCCESS", docs["name"]);
+        }
+        else {
+          //incorrect pass
+          socket.emit("authTokenReply", "FAIL", docs["name"]);
+        }
+      }
+
+    })
+    .catch( (error) =>  {
+      console.log("ERROR:", error);
+      socket.emit("authTokenReply", "FAIL")
     })
   })
 
