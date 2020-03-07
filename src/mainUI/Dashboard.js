@@ -28,7 +28,6 @@ import Profile from './Profile/Profile';
 import EventHistory from './Rating/EventHistory';
 import BMeetEventFactory from './Events/EventFactory';
 import { getDistance } from 'geolib';
-import { isThisSecond } from 'date-fns';
 import { eventTypes } from './markerPrefab/mapMarker';
 
 /**
@@ -140,6 +139,12 @@ const styles = theme => ({
  */
 class Dashboard extends Component {
 
+  /**
+   * The follow constructor binds all the methods to the object and also declares socket event handlers
+   * which are used to handle different types of server replies and responses
+   * @param {Object} props the parameters passed on by the declaring component (i.e. App.js)
+   * Contains the userID (i.e. user email) and socket object
+   */
   constructor(props) {
     super(props);
     this.state = {
@@ -178,7 +183,7 @@ class Dashboard extends Component {
       var eventFuture = []
       var date = new Date();
 
-      response.map(event => {
+      response.forEach(event => {
         var tempDate = new Date(event.timeDate);
         if (tempDate.getTime() < date.getTime())
           eventPast.push(BMeetEventFactory.createEvent(event.type, event));
@@ -199,6 +204,7 @@ class Dashboard extends Component {
 
     /**
      * Handle when we fetch an updated copy of the user object for state reference
+     * every time we receive the updated user object, we will handle the updated pages
      */
     this.props.socket.on('getUserReply', (user) => {
       this.setState({
@@ -239,7 +245,7 @@ class Dashboard extends Component {
       var tempList = []; // Temporarily hold events if we need to filter through them
       var finalList = [] // Actual list of events
 
-      response.map(event => {
+      response.forEach(event => {
         if (!this.state.user.eventsAttending.includes(event._id) && 
             !this.state.user.eventsHosting.includes(event._id)) {
           finalList.push(event);
@@ -255,7 +261,7 @@ class Dashboard extends Component {
       this.state.userLocation.lat != null && 
       this.state.userLocation.lng != null) 
       {
-          finalList.map(event => {
+          finalList.forEach(event => {
             
             var currposition = {latitude: this.state.userLocation.lat,
               longitude: this.state.userLocation.lng};
@@ -318,6 +324,8 @@ class Dashboard extends Component {
                              userID={this.state.user}
                              socket={this.props.socket}
                              refreshEvents={this.refreshEvents}/>
+      default:
+        return null;
     }
   }
 

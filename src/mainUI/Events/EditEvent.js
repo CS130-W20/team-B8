@@ -20,7 +20,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import { IconButton } from '@material-ui/core';
 import LocationSearchInput from './LocationSearcher';
 import Geocode from "react-geocode";
-import { eventTypes, markerTypes } from './../markerPrefab/mapMarker';
+import { eventTypes } from './../markerPrefab/mapMarker';
  
 const
     io = require("socket.io-client"),

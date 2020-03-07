@@ -4,12 +4,11 @@ import TableRow from '@material-ui/core/TableRow';
 import EventEdit from './EditEvent';
 import EventDelete from './DeleteEvent';
 import EventMessage from './MessageEvent';
+import {getTimeString, getDateString} from './EventClasses/formatTimeDate';
 
 
 export default class EventListRow extends React.Component{
-    constructor(props){
-        super(props);
-    }
+
     render(){
         const{
             _id,
@@ -21,9 +20,10 @@ export default class EventListRow extends React.Component{
             type,
         } = this.props;
 
-        let dateObj = new Date(timeDate);
-        const time = dateObj.getHours() + ":" + dateObj.getMinutes();
-        const date = (dateObj.getMonth() + 1) + "-" + dateObj.getDate();
+        let dateObj = new Date(timeDate);      
+
+        const time = getTimeString(dateObj.getHours(), dateObj.getMinutes());
+        const date = getDateString((dateObj.getMonth() + 1), dateObj.getDate(), dateObj.getFullYear());
         const location = locationName.slice(0, locationName.indexOf(','));
         const numAttendees = attendees.length;
 

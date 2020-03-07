@@ -6,12 +6,8 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-
-import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-
-import EventRater from './EventRater';
 
 /**
  * @var useStyle Function object that generates a style off of default MaterialsUI Theme
@@ -61,7 +57,7 @@ class EventHistory extends React.Component{
               <Paper className={classes.paper}>
               <React.Fragment>
                     <Typography style={{padding: '1.5%'}} component="h2" variant="h6" color="primary" gutterBottom>
-                        Your Incoming Events
+                        Your Upcoming Events
                     </Typography>
                     <Table size="small">
                     <TableHead>

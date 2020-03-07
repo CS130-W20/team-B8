@@ -12,8 +12,6 @@ import Paper from '@material-ui/core/Paper';
 import EventForm from './EventForm';
 import Typography from '@material-ui/core/Typography';
 
-import BMeetEventFactory from './EventFactory';
-
 /**
  * @var useStyle Function object that generates a style off of default MaterialsUI Theme
  * @see https://material-ui.com/styles/basics/
