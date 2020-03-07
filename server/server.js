@@ -327,11 +327,33 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('addEventReview', (eventID, user, score, review) => {
+  socket.on('addEventReview', (eventID, user, score, review) => 
     let prom = dbInterface.addEventReview(eventID, user, score, review);
     prom.then( (docs) => {
       console.log("REVIEW ADDED", docs);
       socket.emit("addEventReviewReply", docs);
+    })
+    .catch( (error) =>  {
+      console.log("ERROR:", error);
+      socket.emit("serverError", error)
+    })
+  })
+  socket.on('addImage', (eventID, imageArrayBuffer) => {
+    let prom = dbInterface.addImage(eventID, imageArrayBuffer);
+    prom.then( (docs) => {
+      console.log("IMAGE ADDED", docs);
+      socket.emit("serverReply", docs);
+    })
+    .catch( (error) =>  {
+      console.log("ERROR:", error);
+      socket.emit("serverError", error)
+    })
+  })
+  socket.on('removeImage', (eventID) => {
+    let prom = dbInterface.addImage(eventID);
+    prom.then( (docs) => {
+      console.log("IMAGE REMOVED", docs);
+      socket.emit("serverReply", docs);
     })
     .catch( (error) =>  {
       console.log("ERROR:", error);

@@ -2,6 +2,7 @@
 
 const MongoClient = require('mongodb').MongoClient;
 const {ObjectId} = require('mongodb'); // or ObjectID
+const {Binary} = require('mongodb');
 const assert = require('assert');
 
 // Connection URL
@@ -242,7 +243,8 @@ module.exports.getAllEvents = function(){
 			// Find some documents
 		 	let dbRes = collection.find({},{
 				'attendees': 0,
-				'reviews': 0
+				'reviews': 0,
+				'image': 0
 			}).sort('timeDate',-1);
 			dbRes.toArray(function(err, docs) {
 			if(err == null){
@@ -289,7 +291,8 @@ module.exports.queryEvents = function(keywordRegex, tags, upperBound, lowerBound
 			}
 		 	let dbRes = collection.find(doc,{
 				'attendees': 0,
-				'reviews': 0
+				'reviews': 0,
+				'image': 0
 			}).sort('timeDate',1);
 			if (numberBound != null) {
 				dbRes = dbRes.limit(numberBound);
@@ -313,7 +316,7 @@ module.exports.getEvent = function(eventID){
 			const collection = db.collection('Events');
 			// Find some documents
 
-			let query = {'_id': eventID} ;
+			let query = {'_id': ObjectId(eventID)} ;
 			console.log(query);
 
 		 	collection.findOne(query, function(err, doc) {
@@ -343,7 +346,9 @@ module.exports.getEventByHost = function(host, lowerBound){
 				query['timeDate'] = dateRange;
 			}
 
-			collection.find(query,{}).toArray(function(err, docs) {
+			collection.find(query,{
+				'image': 0
+			}).toArray(function(err, docs) {
 				if(err == null){
 					console.log("getEventByHost() query Success");
 					resolve(docs);
@@ -494,6 +499,46 @@ module.exports.addEventReview = function(eventID, user, score, review){
 				resolve(result);
 			} else{
 				console.log("addEventReview() Failed: " + eventID);
+				reject(err);
+			}
+		});
+	});
+};
+
+module.exports.addImage = function(eventID, imageArrayBuffer){
+	return new Promise(
+		function (resolve, reject) {
+			const collection = db.collection('Events');
+			let doc = {
+				'image': Binary(Buffer.from(imageArrayBuffer))
+			};
+		 	collection.updateOne({'_id': ObjectId(eventID)}, doc,
+		 			{'upsert':false},function(err, result) {
+			if(err == null){
+				console.log("addImage() Success: " + eventID);
+				resolve(result);
+			} else{
+				console.log("addImage() Failed: " + eventID);
+				reject(err);
+			}
+		});
+	});
+};
+
+module.exports.removeImage = function(eventID){
+	return new Promise(
+		function (resolve, reject) {
+			const collection = db.collection('Events');
+			let doc = {
+				'image': null
+			};
+		 	collection.updateOne({'_id': ObjectId(eventID)}, doc,
+		 			{'upsert':false},function(err, result) {
+			if(err == null){
+				console.log("removeImage() Success: " + eventID);
+				resolve(result);
+			} else{
+				console.log("Image() Failed: " + eventID);
 				reject(err);
 			}
 		});
