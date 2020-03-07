@@ -10,6 +10,7 @@ import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import EventForm from './EventForm';
+import Typography from '@material-ui/core/Typography';
 
 import BMeetEventFactory from './EventFactory';
 
@@ -66,12 +67,12 @@ class EventList extends Component {
     }
 
     render() {
-    const { classes, events, refreshEvents } = this.props;
+    const { classes, events, refreshEvents, userID, socket} = this.props;
     return (
             <Grid data-testid="Events" item xs={12}>
               <Paper className={classes.paper}>
               <React.Fragment>
-              <EventForm updateFunction={refreshEvents}/>
+              <EventForm updateFunction={refreshEvents} userID={userID}/>
                     <Table size="small">
                     <TableHead>
                         <TableRow>
@@ -84,14 +85,22 @@ class EventList extends Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {events.map(event => event.createEventListRow(refreshEvents))}
+                        {events.length > 0 ?
+                            events.map(event => event.createEventListRow(refreshEvents, socket))
+                            :
+                            <TableRow>
+                            <TableCell align='center' colSpan='6'>
+                             <Typography style={{padding: '10px'}}align="center">{"You currently aren't hosting any events"}</Typography>
+                            </TableCell>
+                            </TableRow>
+                        }
                     </TableBody>
                     </Table>
-                    <div className={classes.seeMore}>
+                    {events.length > 0 && <div className={classes.seeMore}>
                     <Link color="primary" href="#">
                         See more Events
                     </Link>
-                    </div>
+                    </div>}
                 </React.Fragment>
               </Paper>
             </Grid>     

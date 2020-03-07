@@ -28,6 +28,8 @@ import Profile from './Profile/Profile';
 import EventHistory from './Rating/EventHistory';
 import BMeetEventFactory from './Events/EventFactory';
 import { getDistance } from 'geolib';
+import { isThisSecond } from 'date-fns';
+import { eventTypes } from './markerPrefab/mapMarker';
 
 /**
  * @var drawerWidth CSS Style for setting width of dashboard drawer
@@ -141,9 +143,17 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      user: {},
+      useFilter: false,
       open: false,
       events: [],
-      filters: {},
+      hostEvents: [],
+      attendedEvents: [],
+      upcomingEvents: [],
+      filters: {
+        eventDistance: 1,
+        eventTypes: [eventTypes.music]
+      },
       dashboardPage: 'Map',
       userLocation: {}
     }
@@ -155,7 +165,127 @@ class Dashboard extends Component {
     this.handleEventsIn = this.handleEventsIn.bind(this);
     this.setPage = this.setPage.bind(this);
     this.renderDashboard = this.renderDashboard.bind(this);
+    this.handleDashboardMap = this.handleDashboardMap.bind(this);
+    this.handleEventList = this.handleEventList.bind(this);
+    this.handleEventHistory = this.handleEventHistory.bind(this);
     this.setNewFilter = this.setNewFilter.bind(this);
+
+    /**
+     * Handle when we fetch events by ID
+     */
+    this.props.socket.on('queryEventsIDReply', (response) => {
+      var eventPast = [];
+      var eventFuture = []
+      var date = new Date();
+
+      response.map(event => {
+        var tempDate = new Date(event.timeDate);
+        if (tempDate.getTime() < date.getTime())
+          eventPast.push(BMeetEventFactory.createEvent(event.type, event));
+        else
+          eventFuture.push(BMeetEventFactory.createEvent(event.type, event));
+      });
+
+      this.setState({
+        attendedEvents: eventPast,
+        upcomingEvents: eventFuture
+      }, () => {
+        eventPast = [];
+        eventFuture = [];
+        console.log('handleEventHistory (past): ', this.state.attendedEvents);
+        console.log('handleEventHistory (future): ', this.state.upcomingEvents);
+      });
+    });
+
+    /**
+     * Handle when we fetch an updated copy of the user object for state reference
+     */
+    this.props.socket.on('getUserReply', (user) => {
+      this.setState({
+        user: user
+      }, () => {
+        switch(this.state.dashboardPage) {
+          case "Map":
+            this.handleDashboardMap();
+            break;
+          case "Events":
+            this.handleEventList();
+            break;
+          case "Rate":
+            this.handleEventHistory();
+            break;
+          default:
+            break;
+        }
+      })
+    });
+
+    /**
+     * Handle EventList Events based on ones that the user is hosting
+     */
+    this.props.socket.on('getEventsReply', (response) => {
+      console.log('getEventsReply: ', response);
+      let BMeetEvents = response.map(event => BMeetEventFactory.createEvent(event.type, event));
+      this.setState({
+        hostEvents: BMeetEvents
+      });
+    });
+
+    /**
+     * Handle Google Map Event Markers based on Reply
+     */
+    this.props.socket.on('queryEventsReply', (response) => {
+      console.log('queryEventsReply: ', response);
+      var tempList = []; // Temporarily hold events if we need to filter through them
+      var finalList = [] // Actual list of events
+
+      response.map(event => {
+        if (!this.state.user.eventsAttending.includes(event._id) && 
+            !this.state.user.eventsHosting.includes(event._id)) {
+          finalList.push(event);
+        }
+      });
+
+      /**
+       * If the filter exists, we filter by distance; otherwise, we just return
+       * Check to see that we actually have user's current location- otherwise, we ignore
+       * and wait until it is updated before filtering events
+       */
+      if (Object.keys(this.state.filters).length !== 0 && this.state.userLocation != null && 
+      this.state.userLocation.lat != null && 
+      this.state.userLocation.lng != null) 
+      {
+          finalList.map(event => {
+            
+            var currposition = {latitude: this.state.userLocation.lat,
+              longitude: this.state.userLocation.lng};
+
+            var dist = getDistance(currposition, {latitude: event.location.lat, longitude: event.location.lng});
+
+            if (this.state.filters != null) {
+              if (dist <= this.state.filters.eventDistance * 1000) {
+                console.log('You are ', dist, ' meters away from event');
+                tempList.push(event);
+              }
+            }
+          });
+
+          let BMeetEvents = tempList.map(event => BMeetEventFactory.createEvent(event.type, event));
+          console.log('BMeetEvents withfilter: ',BMeetEvents);
+          this.handleEventsIn(BMeetEvents);
+          finalList = [];
+          tempList = [];
+      } 
+      else 
+      {
+          let BMeetEvents = finalList.map(event => BMeetEventFactory.createEvent(event.type, event));
+          console.log('BMeetEvents nofilter: ', BMeetEvents);
+          this.handleEventsIn(BMeetEvents);
+          finalList = [];
+          tempList = [];
+      }
+    });
+
   }
 
   /**
@@ -166,15 +296,28 @@ class Dashboard extends Component {
    */
   renderDashboard() {
     console.log('Updated Dashboard: ', this.state.events);
+    // Note: this.state.user is the user object stored in the database
     switch(this.state.dashboardPage){
       case "Map":
-        return <GMap events={this.state.events} updateLocation={this.setUserLoc} updateFilter={this.setNewFilter}/>
+        return <GMap events={this.state.events} 
+                     updateLocation={this.setUserLoc} 
+                     updateFilter={this.setNewFilter}
+                     refreshMap={this.refreshEvents}
+                     socket={this.props.socket}
+                     userID={this.state.user}/>
       case "Profile":
-        return <Profile />
+        return <Profile userID={this.state.user}/>
       case "Events":
-        return <EventList events={this.state.events} refreshEvents={this.refreshEvents}/>
+        return <EventList events={this.state.hostEvents} 
+                          userID={this.state.user} 
+                          refreshEvents={this.refreshEvents}
+                          socket={this.props.socket}/>
       case "Rate":
-        return <EventHistory events={this.state.events}/>
+        return <EventHistory eventsPast={this.state.attendedEvents} 
+                             eventsFuture={this.state.upcomingEvents}
+                             userID={this.state.user}
+                             socket={this.props.socket}
+                             refreshEvents={this.refreshEvents}/>
     }
   }
 
@@ -185,18 +328,14 @@ class Dashboard extends Component {
   }
 
   setPage(newPage) {
-    if (newPage == "Events" || newPage == "Map") {
-      this.refreshEvents();
-    }
-
     this.setState({
       dashboardPage: newPage
-    });
+    }, () => {this.refreshEvents()});
   }
 
   setUserLoc (newLocation) {
     console.log('Dashboard newUserLocation: ', newLocation);
-    if (newLocation.lat != this.state.userLocation.lat || newLocation.lng != this.state.userLocation.lng) {
+    if (newLocation.lat !== this.state.userLocation.lat || newLocation.lng !== this.state.userLocation.lng) {
       this.setState({
         userLocation: newLocation
       }, () => {this.refreshEvents();
@@ -212,6 +351,10 @@ class Dashboard extends Component {
       console.log('Dashboard setNewFilter: ', this.state.filters);
       this.refreshEvents();
     });
+  }
+
+  resetFilter () {
+    this.setState({filters: []});
   }
 
   /**
@@ -233,70 +376,55 @@ class Dashboard extends Component {
     };
 
   /**
+   * @function refreshEvents
    * Event handler that fetches events from server
    * Returns and updates this.state.events with the events that are to be sent over
    */
   refreshEvents () {
+    this.props.socket.emit('getUser', this.props.userID);
+  }
+
+  /**
+   * @function handleEventHistory Function that fetches the events to be displayed for rating
+   * separates the list into events user will attend, and user has already attended, based on time
+   */
+  handleEventHistory() {
+    console.log('user: ', this.state.user);
+
+    // Get the events attended by this user
+    this.props.socket.emit('queryEvents', null, null, null, null, null, this.state.user.eventsAttending);
+  }
+
+  /**
+   * @function handleEventList helper function that is used to fetch events to be displayed for EventList
+   */
+  handleEventList() {
+    let date = new Date();
+    console.log('At handleEventList; current Date: ', date.toISOString());
+
+    /**
+     * Fetch all events that the current user is hosting
+     */
+    this.props.socket.emit('getEvents', this.props.userID, date.toISOString());
+  }
+
+  /**
+   * @function handleDashboardMap helper function that is used to fetch events to be displayed for the map
+   */
+  handleDashboardMap() {
     /**
      * Fetch all events depending on the filter that is available
      */
     var newfilter = this.state.filters;
+    let date = new Date();
+    console.log('At handleDashboardMap; current Date: ', date.toISOString());
     if (Object.keys(newfilter).length !== 0 && newfilter.eventTypes.length > 0) {
       console.log('filterEvents: ', newfilter)
-      this.props.socket.emit('queryEvents', null, newfilter.eventTypes, null, null, null);
+      this.props.socket.emit('queryEvents', null, newfilter.eventTypes, null, date.toISOString(), null, null);
     } else {
-      console.log('getting all events');
-      this.props.socket.emit('getAllEvents');
+      console.log('no filter');
+      this.props.socket.emit('queryEvents', null, null, null, date.toISOString(), null, null);
     }
-
-    /**
-     * Handles events based on reply
-     */
-    this.props.socket.on('serverReply', (response) => {
-      console.log('serverReply: ', response);
-      var tempList = []; // Temporarily hold events if we need to filter through them
-      var finalList = [] // Actual list of events
-      response.map(event => {
-        finalList.push(event);
-      });
-
-      /**
-       * If the filter exists, we filter by distance; otherwise, we just return
-       */
-      if (Object.keys(newfilter).length !== 0 && this.state.userLocation != null && 
-          this.state.userLocation.lat != null && 
-          this.state.userLocation.lng != null) 
-          {
-            finalList.map(event => {
-              
-              var currposition = {latitude: this.state.userLocation.lat,
-                longitude: this.state.userLocation.lng};
-
-              var dist = getDistance(currposition, {latitude: event.location.lat, longitude: event.location.lng});
-
-              if (newfilter != null) {
-                if (dist <= newfilter.eventDistance * 1000) {
-                  console.log('You are ', dist, ' meters away from event');
-                  tempList.push(event);
-                }
-              }
-            });
-
-            let BMeetEvents = tempList.map(event => BMeetEventFactory.createEvent(event.type, event));
-            console.log('BMeetEvents withfilter: ',BMeetEvents);
-            this.handleEventsIn(BMeetEvents);
-            finalList = [];
-            tempList = [];
-        } 
-        else 
-        {
-            let BMeetEvents = finalList.map(event => BMeetEventFactory.createEvent(event.type, event));
-            console.log('BMeetEvents nofilter: ', BMeetEvents);
-            this.handleEventsIn(BMeetEvents);
-            finalList = [];
-            tempList = [];
-        }
-    });
   }
 
   /**
@@ -304,7 +432,8 @@ class Dashboard extends Component {
    * Uses open and dashboardPage variables to change the state of the dashboardUI
    */
     render() {
-          const { classes } = this.props;
+          const { classes, userID } = this.props;
+          console.log('Logged in user: ', userID);
           return (
             <div className={classes.root}>
               <CssBaseline />

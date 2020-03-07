@@ -31,19 +31,15 @@ const StyledRating = withStyles({
  * @see https://material-ui.com/components/pickers/
  * @see EventHistory
  * 
- * @author Phipson Lee
+ * @author Lawrence Lee
  * @since 2020-02-15
  */
-export default class EventRater extends React.Component{
+export default class EventReview extends React.Component{
 
   constructor(props){
     super(props);
-    let initialReview = {};
-    this.props.questions.map(question => initialReview[question.label] = "")
     this.state = {
       dialogopen: false,
-      review: initialReview,
-      rating: 2,
     }
   }
 
@@ -60,16 +56,6 @@ export default class EventRater extends React.Component{
     handleClickClose = () => {
         this.setState({dialogopen: false});
     };
-
-    handleClickSubmit = () => {
-      let reviewString = JSON.stringify(this.state.review)
-      // Object.keys(this.state.review)
-      //                 .map(question => question + this.state.review[question])
-      //                 .join('&');
-      this.props.submitReview(this.state.rating, reviewString);
-      this.handleClickClose();
-    }
-
     handleRatingChange = (e, newRating) => {
       this.setState({rating: newRating});
     }
@@ -84,44 +70,42 @@ export default class EventRater extends React.Component{
   /**
    * Renders a form onclick that allows users to offer ratings and review for host based on event
    */
-  const { questions, host} = this.props;
+  const { id, rating, review, user } = this.props;
 
   return (
       <div>
-      <IconButton onClick={this.handleClickOpen}>
-        <RateReviewIcon />
-      </IconButton>
+      <div style={{cursor: 'pointer', textAlign: 'left', float: 'right'}}onClick={this.handleClickOpen}>
+      <StyledRating
+        name={'rating-' + id}
+        value={rating}
+        getLabelText={value => `${value} Heart${value !== 1 ? 's' : ''}`}
+        precision={0.5}
+        icon={<FavoriteIcon fontSize="inherit" />}
+        disabled={true}
+      />
+      </div>
       <Dialog open={this.state.dialogopen} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">{"Review and Rate " + host.name + "'s Event!"}</DialogTitle>
+        <DialogTitle id="form-dialog-title">{"Reviewed by " + user.name}</DialogTitle>
         <DialogContent>
-          <StyledRating
-              name="customized-color"
-              defaultValue={2}
-              getLabelText={value => `${value} Heart${value !== 1 ? 's' : ''}`}
-              precision={0.5}
-              onChange={this.handleRatingChange}
-              icon={<FavoriteIcon fontSize="inherit" />}
-              />
-          {questions.map(question => (
-            <TextField
-              autoFocus
-              margin="dense"
-              key={question.id}
-              id={question.id}
-              label={question.label}
-              //value={this.state.review[question.label]}
-              onChange={(newText) => { this.handleTextChange(question.label, newText)}}
-              fullWidth/>
+            <StyledRating
+                name="custom-color"
+                value={rating}
+                getLabelText={value => `${value} Heart${value !== 1 ? 's' : ''}`}
+                precision={0.5}
+                icon={<FavoriteIcon fontSize="inherit" />}
+                disabled={true}
+            />
+          {Object.keys(review).map(question => (
+            <div key={question}>
+                <b>{question} </b>
+                {review[question]}
+            </div>
           ))}
 
         </DialogContent>
         <DialogActions>
           <Button onClick={this.handleClickClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={this.handleClickSubmit} color="primary">
-            {/* TODO: ADD TO DB AND UPDATE/REMOVE EVENT FROM HISTORY */}
-            Submit
+            Done
           </Button>
         </DialogActions>
       </Dialog>

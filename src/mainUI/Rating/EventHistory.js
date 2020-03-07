@@ -1,5 +1,5 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
 import { withStyles } from "@material-ui/core/styles";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -26,8 +26,7 @@ const styles = theme => ({
         display: 'flex',
         overflow: 'auto',
         flexDirection: 'column',
-        height: "100%",
-        
+        height: "100%",        
     },
     seeMore: {
         textAlign: 'center',
@@ -35,35 +34,6 @@ const styles = theme => ({
         paddingBottom: theme.spacing(2)
     },
 });
-
-function preventDefault(event) {
-    event.preventDefault();
-}
-
-/**
- * Helper function to display data of each event based on entry
- * @see  https://github.com/mui-org/material-ui/tree/master/docs/src/pages/getting-started/templates/dashboard
- * @param {Integer} id Unique id of event for internal use
- * @param {String} date Date of event in terms of DD/MM/YYYY
- * @param {String} name Name of Event
- * @param {String} location Location of Event
- * @param {String} time Time of event in AM/PM
- * @param {Integer} attendees Number of attendees for that event
- */
-function createData(id, date, name, location, time, attendees) {
-    return { id, date, name, location, time, attendees};
-}
-
-/**
- * @var rows Simple test data used to query and fetch events for display
- */
-const rows = [
-    createData(0, '16 Mar, 2019', 'Event A', 'Tupelo, MS', '6AM', 44),
-    createData(1, '16 Mar, 2019', 'Event B', 'London, UK', '6AM', 99),
-    createData(2, '16 Mar, 2019', 'Event C', 'Boston, MA', '6AM', 81),
-    createData(3, '16 Mar, 2019', 'Event D', 'Gary, IN', '6AM', 39),
-    createData(4, '15 Mar, 2019', 'Event E', 'Long Branch, NJ', '6AM', 79),
-  ];
 
 /**
  * Function component that uses Google Material UI Dialog Boxes
@@ -80,8 +50,9 @@ class EventHistory extends React.Component{
      * @var classes Calls useStyles to generate CSS style inherited from Materials UI Theme
      */
     render = () => {
-        const { classes, events } = this.props;
-        console.log("events: ", events)
+        const { classes, eventsPast, eventsFuture, userID, socket, refreshEvents } = this.props;
+        console.log(eventsPast);
+        console.log(eventsFuture);
     /**
      * Renders a table showing the events that the user has attended (currently using test data)
      */
@@ -89,6 +60,9 @@ class EventHistory extends React.Component{
             <Grid data-testid="Ratings" item xs={12}>
               <Paper className={classes.paper}>
               <React.Fragment>
+                    <Typography style={{padding: '1.5%'}} component="h2" variant="h6" color="primary" gutterBottom>
+                        Your Incoming Events
+                    </Typography>
                     <Table size="small">
                     <TableHead>
                         <TableRow>
@@ -97,31 +71,37 @@ class EventHistory extends React.Component{
                         <TableCell>Location</TableCell>
                         <TableCell>Time</TableCell>
                         <TableCell>Attendees</TableCell>
-                        <TableCell align="right">Edit</TableCell>
+                        <TableCell align="right">Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {events.map(event => event.createEventHistoryRow())}
-                        {/* {rows.map(row => (
-                        <TableRow key={row.id}>
-                            <TableCell>{row.date}</TableCell>
-                            <TableCell>{row.name}</TableCell>
-                            <TableCell>{row.location}</TableCell>
-                            <TableCell>{row.time}</TableCell>
-                            <TableCell>{row.attendees}</TableCell>
-                            <TableCell align="right">
-                                <EventRater />
-                            </TableCell>
-                        </TableRow>
-                        ))} */}
+                        {eventsFuture.map(event => event.createEventHistoryRow(userID, socket, false, refreshEvents))}
                     </TableBody>
                     </Table>
-                    <div className={classes.seeMore}>
-                    {/* <Link color="primary" href="#" onClick={preventDefault}>
-                        See more Events
-                    </Link> */}
-                    </div>
                 </React.Fragment>
+                <div style={{padding: 20}}/>
+                <React.Fragment>
+                    {/* TODO: After rating an event, remove the user from the event */}
+                    <Typography style={{padding: '1.5%'}} component="h2" variant="h6" color="primary" gutterBottom>
+                        Your Previous Events
+                    </Typography>
+                    <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                        <TableCell>Date</TableCell>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Location</TableCell>
+                        <TableCell>Time</TableCell>
+                        <TableCell>Attendees</TableCell>
+                        <TableCell align="right">Reviews</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {eventsPast.map(event => event.createEventHistoryRow(userID, socket, true, refreshEvents))}
+                    </TableBody>
+                    </Table>
+                </React.Fragment>
+                <div style={{padding: 20}}/>
               </Paper>
             </Grid>     
     );

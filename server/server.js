@@ -6,6 +6,8 @@ const server= require('http').Server(app);
 const io = require('socket.io')(server);
 const twilio = require('twilio');
 const ProxySMSMessage = require('./ProxySMSMessage');
+const authToken = require('./authToken');
+
 // TODO: add rooms so not ever user will see everyone's events
 
 /**
@@ -47,7 +49,7 @@ io.on("connection", (socket) => {
       console.log("FOUND USER", docs);
       if (docs == null) {
         //no user with that username
-        socket.emit("authReply", "FAIL", docs["name"]);
+        socket.emit("authReply", "FAIL", docs["name"], "");
       }
       else {
         // found a user
@@ -55,11 +57,13 @@ io.on("connection", (socket) => {
         console.log("Entered password: ", password);
         if (docs["password"] == password) {
           // correct password
-          socket.emit("authReply", "SUCCESS", docs["name"]);
+          // client needs to store generated token
+	        docs['token'] = authToken.generateToken(name);
+          socket.emit("authReply", "SUCCESS", docs["name"], docs["token"]);
         }
         else {
           //incorrect pass
-          socket.emit("authReply", "FAIL", docs["name"]);
+          socket.emit("authReply", "FAIL", docs["name"], "");
         }
       }
 
@@ -67,6 +71,32 @@ io.on("connection", (socket) => {
     .catch( (error) =>  {
       console.log("ERROR:", error);
       socket.emit("authReply", "FAIL")
+    })
+  })
+
+  socket.on('authenticateToken', (token) => {
+    content = authToken.decode(token);
+    if (content.isValid == false){
+	socket.emit("authTokenReply", "FAIL", null);
+    }
+    let prom = dbInterface.getUser(content.name);
+    prom.then( (docs) => {
+      console.log("FOUND USER", docs);
+      if (docs == null) {
+        //no user with that username
+        socket.emit("authTokenReply", "FAIL", docs["name"]);
+      }
+      else {
+        // found a user
+        console.log("USER FOUND: ", docs);
+	      docs['token'] = authToken.generateToken(username);
+        socket.emit("authTokenReply", "SUCCESS", docs["name"]);
+      }
+
+    })
+    .catch( (error) =>  {
+      console.log("ERROR:", error);
+      socket.emit("authTokenReply", "FAIL")
     })
   })
 
@@ -79,7 +109,7 @@ io.on("connection", (socket) => {
     prom.then( (docs) => {
       // if promise is resolved
       console.log("USER ADDED", docs);
-      socket.emit("serverReply", docs);
+      socket.emit("addUserReply", docs);
     })
     .catch( (error) =>  {
       // if promise is rejected
@@ -94,9 +124,9 @@ io.on("connection", (socket) => {
       console.log("FOUND USER", docs);
       let prom2 = dbInterface.getHostAvgRating(docs.name);
       prom2.then(avg_score => {
-	console.log("FOUND USER", docs);
-	docs['avgScore'] = avg_score;
-	socket.emit("getUserReply", docs);
+        console.log("FOUND USER", docs);
+        docs['avgScore'] = avg_score;
+        socket.emit("getUserReply", docs);
       }
       ).catch( err => reject(err));
     })
@@ -110,7 +140,7 @@ io.on("connection", (socket) => {
     let prom = dbInterface.updateUserPassword(name, newpass);
     prom.then( (docs) => {
       console.log("USER UPDATED", docs);
-      socket.emit("serverReply", docs);
+      socket.emit("updateUserPasswordReply", docs);
     })
     .catch( (error) =>  {
       console.log("ERROR:", error);
@@ -122,7 +152,7 @@ io.on("connection", (socket) => {
     let prom = dbInterface.updateUserDetails(name, interestList, phone);
     prom.then( (docs) => {
       console.log("USER INTERESTS UPDATED", docs);
-      socket.emit("serverReply", docs);
+      socket.emit("updateUserInterestsReply", docs);
     })
     .catch( (error) =>  {
       console.log("ERROR:", error);
@@ -134,7 +164,7 @@ io.on("connection", (socket) => {
     let prom = dbInterface.addUserAttendingEvent(name, eventId);
     prom.then( (docs) => {
       console.log("USER ATTENDING NEW EVENT", docs);
-      socket.emit("serverReply", docs);
+      socket.emit("addUserAttendingEventReply", docs);
     })
     .catch( (error) =>  {
       console.log("ERROR:", error);
@@ -146,7 +176,7 @@ io.on("connection", (socket) => {
     let prom = dbInterface.removeUserAttendingEvent(name, eventId);
     prom.then( (docs) => {
       console.log("USER NO LONGER ATTENDING", docs);
-      socket.emit("serverReply", docs);
+      socket.emit("removeUserAttendingEventReply", docs);
     })
     .catch( (error) =>  {
       console.log("ERROR:", error);
@@ -158,7 +188,7 @@ io.on("connection", (socket) => {
     let prom = dbInterface.addUserHostingEvent(name, eventId);
     prom.then( (docs) => {
       console.log("ADDED HOST EVENT", docs);
-      socket.emit("serverReply", docs);
+      socket.emit("addUserHostingEventReply", docs);
     })
     .catch( (error) =>  {
       console.log("ERROR:", error);
@@ -170,7 +200,7 @@ io.on("connection", (socket) => {
     let prom = dbInterface.removeUserHostingEvent(name, eventId);
     prom.then( (docs) => {
       console.log("HOST REMOVED", docs);
-      socket.emit("serverReply", docs);
+      socket.emit("removeUserHostingEventReply", docs);
     })
     .catch( (error) =>  {
       console.log("ERROR:", error);
@@ -182,7 +212,7 @@ io.on("connection", (socket) => {
     let prom = dbInterface.getAllEvents();
     prom.then( (docs) => {
       console.log("EVENTS:", docs);
-      socket.emit("serverReply", docs);
+      socket.emit("getAllEventsReply", docs);
     })
     .catch( (error) =>  {
       console.log("ERROR:", error);
@@ -190,16 +220,25 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('queryEvents', (keywordRegex, tags, upperBound, lowerBound, numberBound) => {
-    let prom = dbInterface.queryEvents(keywordRegex, tags, upperBound, lowerBound, numberBound);
-    prom.then( (docs) => {
-      console.log("EVENTS", docs);
-      socket.emit("serverReply", docs);
-    })
-    .catch( (error) =>  {
-      console.log("ERROR:", error);
-      socket.emit("serverError", error)
-    })
+  socket.on('queryEvents', (keywordRegex, tags, upperBound, lowerBound, numberBound, eventIDs) => {
+    if (eventIDs != null && eventIDs.length == 0) {
+        console.log("NO EVENTS");
+        socket.emit("queryEventsIDReply", []);
+    } else {
+      let prom = dbInterface.queryEvents(keywordRegex, tags, upperBound, lowerBound, numberBound, eventIDs);
+      prom.then( (docs) => {
+        console.log("EVENTS", docs);
+        if (eventIDs != null) {
+          socket.emit("queryEventsIDReply", docs);
+        } else {
+          socket.emit("queryEventsReply", docs);
+        }
+      })
+      .catch( (error) =>  {
+        console.log("ERROR:", error);
+        socket.emit("serverError", error)
+      })
+    }
   })
 
   socket.on('getEvent', (eventId) => {
@@ -226,11 +265,24 @@ io.on("connection", (socket) => {
     })
   })
 
+  socket.on('getAttendedEvents', (user) => {
+    let prom = dbInterface.getAllEvents();
+    prom.then( (docs) => {
+      var attended = docs.filter(event => event.attendees.indexOf(user) >= 0);
+      console.log("ATTENDED EVENTS:", attended);
+      socket.emit("getAttendedEventsReply", attended);
+    })
+    .catch( (error) =>  {
+      console.log("ERROR:", error);
+      socket.emit("serverError", error)
+    })
+  })
+
   socket.on('addEvent', (title, date, tag, location, locationName, type, host) => {
     let prom = dbInterface.addEvent(title, date, tag, location, locationName, type, host);
     prom.then( (docs) => {
       console.log("NEW EVENT", docs);
-      socket.emit("serverReply", docs);
+      socket.emit("addEventReply", docs);
     })
     .catch( (error) =>  {
       console.log("ERROR:", error);
@@ -239,10 +291,10 @@ io.on("connection", (socket) => {
   })
 
   socket.on('updateEvent', (eventID, title, timeDate, tag, location, locationName, type, description) => {
-    let prom = dbInterface.updateEvent(eventId, title, timeDate, tag, location, locationName, type, description);
+    let prom = dbInterface.updateEvent(eventID, title, timeDate, tag, location, locationName, type, description);
     prom.then( (docs) => {
       console.log("EVENT UPDATED", docs);
-      socket.emit("serverReply", docs);
+      socket.emit("updateEventReply", docs);
     })
     .catch( (error) =>  {
       console.log("ERROR:", error);
@@ -251,13 +303,14 @@ io.on("connection", (socket) => {
   })
 
   socket.on('addEventAttendee', (eventID, attendee) => {
-    let prom = dbInterface.addEventAttendee(eventId, attendee);
+    //TODO: does the db call overwrite with one attendee or append?
+    let prom = dbInterface.addEventAttendee(eventID, attendee);
     prom.then( (docs) => {
       console.log("NEW ATTENDEE", docs);
-      socket.emit("serverReply", docs);
+      socket.emit("addEventAttendeeReply", docs);
     })
     .catch( (error) =>  {
-      // console.log("ERROR:", error);
+      console.log("ERROR:", error);
       socket.emit("serverError", error)
     })
   })
@@ -266,7 +319,7 @@ io.on("connection", (socket) => {
     let prom = dbInterface.removeEventAttendee(eventID, attendee);
     prom.then( (docs) => {
       console.log("REMOVED ATTENDEE", docs);
-      socket.emit("serverReply", docs);
+      socket.emit("removeEventAttendeeReply", docs);
     })
     .catch( (error) =>  {
       console.log("ERROR:", error);
@@ -274,11 +327,11 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('addEventReview', (eventID, user, score, review) => {
-    let prom = dbInterface.removeEventAttendee(eventID, attendee);
+  socket.on('addEventReview', (eventID, user, score, review) => 
+    let prom = dbInterface.addEventReview(eventID, user, score, review);
     prom.then( (docs) => {
       console.log("REVIEW ADDED", docs);
-      socket.emit("serverReply", docs);
+      socket.emit("addEventReviewReply", docs);
     })
     .catch( (error) =>  {
       console.log("ERROR:", error);
@@ -313,7 +366,7 @@ io.on("connection", (socket) => {
     try {
       smsMsg.send();
       console.log("serverReply", "Successfully sent to all recipients!")
-      socket.emit("serverReply", "Successfully sent to all recipients!")
+      socket.emit("messageUsersReply", "Successfully sent to all recipients!")
     } catch (error) {
       console.log("ERROR:", error);
       socket.emit("serverError", error);
