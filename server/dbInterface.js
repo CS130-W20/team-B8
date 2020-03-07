@@ -331,6 +331,27 @@ module.exports.getEvent = function(eventID){
 	});
 };
 
+module.exports.removeEvent = function(eventID){
+	return new Promise(
+		function (resolve, reject) {
+			const collection = db.collection('Events');
+			// Find some documents
+
+			let query = {'_id': ObjectId(eventID)} ;
+			console.log(query);
+
+		 	collection.removeOne(query, function(err, doc) {
+			if(err == null){
+				console.log("removeEvent() query Success" + doc);
+				resolve(doc);
+			} else{
+				console.log("removeEvent() query Failed");
+				reject(err);
+			}
+		});
+	});
+};
+
 module.exports.getEventByHost = function(host, lowerBound){
 	return new Promise(
 		function (resolve, reject) {
