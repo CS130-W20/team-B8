@@ -24,6 +24,10 @@ const
     io = require("socket.io-client"),
     socket = io.connect("http://localhost:8000");
 
+const apiURL = 'https://api.imgur.com/3/image'
+const apiID = '8305eaba1add5f7'
+const apiKey = 'd4050ae840b54cb4d1ba3082a48d909788ae0bc7'
+
 /**
  * @var useStyle Function object that generates a style off of default MaterialsUI Theme
  * @see https://github.com/mui-org/material-ui/tree/master/docs/src/pages/getting-started/templates/dashboard
@@ -59,6 +63,7 @@ class EventForm extends Component {
       dialogopen: false,
       open: false,
       type: '',
+      image: null,
     }
     this.handleClickOpen = this.handleClickOpen.bind(this);
     this.handleClickClose = this.handleClickClose.bind(this);
@@ -83,7 +88,6 @@ class EventForm extends Component {
         const { lat, lng } = response.results[0].geometry.location;
 
         var newEvent = {
-          eventId: 1,
           title: this.state.title,
           date: this.state.date,
           tag: [this.state.type],
@@ -95,6 +99,17 @@ class EventForm extends Component {
 
         socket.emit('addEvent', newEvent.title, newEvent.date, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.type, newEvent.host);
         socket.on('addEventReply', (event) => {
+          var file = this.state.image
+          if(file){
+            var reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            console.log("event id for img:",event);
+            reader.onload = function(){
+              var dataBuffer = new Buffer(new Uint8Array(reader.result)); 
+              console.log("what", dataBuffer)
+              socket.emit('addImage', event, dataBuffer);
+            }
+          }
           console.log('addEventReply: ', event);
           socket.emit('addUserHostingEvent', this.props.userID.name, event);
           this.props.updateFunction();
@@ -184,6 +199,13 @@ class EventForm extends Component {
       })
     }
 
+    uploadImage = (e) => {
+      var files = e.target.files
+      if(files.length > 0){
+        this.setState({image: files[0]});
+      }
+    }
+
   /**
    * Renders event form based on button click and state changes. Creates event upon submission of form.
    */
@@ -237,6 +259,8 @@ class EventForm extends Component {
               'aria-label': 'change time',
               }}/>
               </MuiPickersUtilsProvider>
+              
+              <div style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
               <FormControl className={classes.formControl}>
               <InputLabel id="demo-controlled-open-select-label">Event Type</InputLabel>
               <Select
@@ -258,7 +282,19 @@ class EventForm extends Component {
               <MenuItem value={eventTypes.houseParty}>House Party</MenuItem>
               <MenuItem value={eventTypes.music}>Music Concert/Festival</MenuItem>
               </Select>
-              </FormControl>
+                <Button
+                variant="contained"
+                component="label"
+                >
+                  Upload image
+                  <input
+                    type="file"
+                    style={{display: "none"}}
+                    onChange={this.uploadImage}
+                  />
+              </Button>
+            </FormControl>
+              </div>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleClickClose} color="primary">

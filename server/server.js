@@ -327,7 +327,7 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('addEventReview', (eventID, user, score, review) => 
+  socket.on('addEventReview', (eventID, user, score, review) => {
     let prom = dbInterface.addEventReview(eventID, user, score, review);
     prom.then( (docs) => {
       console.log("REVIEW ADDED", docs);
@@ -339,6 +339,7 @@ io.on("connection", (socket) => {
     })
   })
   socket.on('addImage', (eventID, imageArrayBuffer) => {
+    console.log("LMAO: ", eventID, imageArrayBuffer)
     let prom = dbInterface.addImage(eventID, imageArrayBuffer);
     prom.then( (docs) => {
       console.log("IMAGE ADDED", docs);

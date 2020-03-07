@@ -506,12 +506,14 @@ module.exports.addEventReview = function(eventID, user, score, review){
 };
 
 module.exports.addImage = function(eventID, imageArrayBuffer){
+	console.log("LOL", eventID, imageArrayBuffer)
+	
 	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Events');
-			let doc = {
+			let doc = {'$set': {
 				'image': Binary(Buffer.from(imageArrayBuffer))
-			};
+			}};
 		 	collection.updateOne({'_id': ObjectId(eventID)}, doc,
 		 			{'upsert':false},function(err, result) {
 			if(err == null){

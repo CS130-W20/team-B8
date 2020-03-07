@@ -9,6 +9,22 @@ import LocationOnIcon from '@material-ui/icons/LocationOn';
 import QueryBuilderIcon from '@material-ui/icons/QueryBuilder';
 import PersonIcon from '@material-ui/icons/Person';
 
+// String.prototype.hexEncode = function(){
+//     var hex, i;
+
+//     var result = "";
+//     for (i=0; i<this.length; i++) {
+//         hex = this.charCodeAt(i).toString(16);
+//         result += ("000"+hex).slice(-4);
+//     }
+
+//     return result
+// }
+
+function hexToBase64(str) {
+    return btoa(str);
+}
+
 class CalendarDate extends React.Component{
     monthToStr = (month) => {
         switch(month){
@@ -95,6 +111,8 @@ export default class EventPage extends React.Component{
         const {
             currEvent
         } = this.props;
+        
+        console.log('image:', typeof currEvent.image)
 
         const eventDate = new Date(currEvent.timeDate);
         const dateString = "Sunday, April 26, 2020 at 8 AM – 12 PM";
@@ -108,7 +126,9 @@ export default class EventPage extends React.Component{
         </DialogTitle>
         <DialogContent>
         <div style={this.getEventPageStyle()}>
-            <img style={this.getImageStyle()} src={"https://media1.s-nbcnews.com/j/newscms/2018_39/1371648/snickers-today-main-180928_4cde44fa22fddd80622982a044bb5709.fit-760w.jpg"}/>
+            {currEvent.image && 
+            <img style={this.getImageStyle()} src={'data:image/jpeg;base64,' + currEvent.image}/>
+            }
             <EventPageItem>
                 <QueryBuilderIcon color={"grey"}/>
                 {dateString}
@@ -119,7 +139,7 @@ export default class EventPage extends React.Component{
             </EventPageItem>
             <EventPageItem>
                 <PersonIcon color={"grey"}/>
-                {"Hosted by " + currEvent.host.name}
+                {"Hosted by " + currEvent.host}
             </EventPageItem>
         </div>
         </DialogContent>

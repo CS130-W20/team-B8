@@ -19,6 +19,7 @@ export default class BMeetEvent{
     constructor(props) {
         this._id = props._id;
         this.title =  props.title;
+        this.image = props.image;
         this.description = props.description;
         this.timeDate = props.timeDate;
         this.tag = props.tag;
