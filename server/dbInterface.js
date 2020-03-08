@@ -371,13 +371,17 @@ module.exports.getHostAvgRating = function(host){
 			let group = {'$group' : {'_id' : '$host', 'reviews': {'$push':{'rating': '$reviews.score', 'review': '$reviews.review', 'user': '$reviews.user.name', 'event': '$title'}}, 'result' : {'$avg':'$reviews.score'}}};
 
 			let agg_pipeline = [mat, unw, group];
-			collection.aggregate(agg_pipeline).toArray(function(err, doc) {
+			collection.aggregate(agg_pipeline).toArray(function(err, docs) {
 				if(err == null){
-					console.log("getHostAvgRating() query Success:" + doc);
-					if (doc.length != 0)
-						resolve(doc[0]);
-					else
-						resolve(doc);
+					console.log("getHostAvgRating() query Success:" + docs);
+					if(docs.length != 0){
+						var docToSend = {};
+						docToSend.result = docs.reduce((avg,doc) => (avg + doc.result/docs.length), 0);
+						docToSend.reviews = docs.reduce((revs,doc) => revs.concat(doc.reviews), []);
+						resolve(docToSend);
+					}
+					else 
+						resolve(docs)
 				} else{
 					console.log("getHostAvgRating() query Failed");
 					reject(err);
@@ -506,7 +510,6 @@ module.exports.addEventReview = function(eventID, user, score, review){
 };
 
 module.exports.addImage = function(eventID, imageArrayBuffer){
-	console.log("LOL", eventID, imageArrayBuffer)
 	
 	return new Promise(
 		function (resolve, reject) {

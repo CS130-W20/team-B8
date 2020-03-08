@@ -340,7 +340,6 @@ io.on("connection", (socket) => {
     })
   })
   socket.on('addImage', (eventID, imageArrayBuffer) => {
-    console.log("LMAO: ", eventID, imageArrayBuffer)
     let prom = dbInterface.addImage(eventID, imageArrayBuffer);
     prom.then( (docs) => {
       console.log("IMAGE ADDED", docs);

@@ -79,7 +79,7 @@ export default function Profile(props) {
             {props.userID.name}
           </Typography>
           <Title>Rating</Title>
-          {props.userID.avgScore.length == 0?
+          {!props.userID.avgScore || props.userID.avgScore.length == 0 ?
             <Title>You haven't been rated yet</Title>
             :
             <StyledRating

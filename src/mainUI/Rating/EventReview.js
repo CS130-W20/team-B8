@@ -34,7 +34,7 @@ export default class EventReview extends React.Component{
                 disabled={true}
             />
         {Object.keys(review).map(question => (
-        <div key={question}>
+        <div style={{margin: '5px'}} key={question}>
             <b>{question} </b>
             {review[question]}
         </div>

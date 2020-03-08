@@ -9,6 +9,19 @@ import PeopleOutlineIcon from '@material-ui/icons/PeopleOutline';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import Rating from '@material-ui/lab/Rating';
 import { withStyles } from '@material-ui/core/styles';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
+const fontStyle = {
+    color: 'rgba(0, 0, 0, 0.87)',
+    fontSize: '0.875rem',
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    fontWeight: '400',
+    lineHeight: '1.43',
+    letterSpacing: '0.01071em',
+}
 
 const StyledRating = withStyles({
     iconFilled: {
@@ -18,6 +31,54 @@ const StyledRating = withStyles({
       color: '#ff3d47',
     },
 })(Rating);
+
+class EventReviewRow extends React.Component{
+    getStyle = () => ({
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        // paddingTop: '2px',
+        // paddingBottom: '3px',
+        // fontSize: '12px',
+        // border: '1px solid grey',
+        // boxShadow: '1px 1px grey'
+    });
+    render = () => {
+        const {
+            rating,
+            review,
+            user,
+            event
+        } = this.props;
+        return (
+            <ExpansionPanel>
+                <ExpansionPanelSummary 
+                    style={this.getStyle()}
+                    expandIcon={<ExpandMoreIcon />}
+                >
+                <StyledRating
+                name="custom-color"
+                value={rating}
+                getLabelText={value => `${value} Heart${value !== 1 ? 's' : ''}`}
+                precision={0.5}
+                icon={<FavoriteIcon fontSize="inherit" />}
+                disabled={true}
+                style={{marginRight: '5px'}}
+                />
+                <span>{"by " + user + " for "}<i>{event}</i></span>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails style={{flexDirection: 'column'}}>
+                    {Object.keys(review).map(question => (
+                    <div style={{marginBottom: '5px'}}key={question}>
+                        <b>{question} </b>
+                        {review[question]}
+                    </div>
+                    ))}
+                </ExpansionPanelDetails>
+            </ExpansionPanel>
+        );
+    }
+}
 
 class CalendarDate extends React.Component{
     monthToStr = (month) => {
@@ -69,13 +130,14 @@ class EventPageItem extends React.Component{
         alignItems: 'center',
         paddingTop: '2px',
         paddingBottom: '3px',
-        fontSize: '12px',
-        borderBottom: '1px solid grey'
+        borderBottom: '1px solid grey',
+        ...fontStyle
     });
     render = () => (
         <Typography style={this.pageItemStyle()} gutterBottom>
             <div style={{marginRight: '10px'}}> {this.props.children[0]} </div>
             {this.props.children[1]}
+            {this.props.children.length > 2 && this.props.children[2]}
         </Typography>
     );
 }
@@ -111,13 +173,13 @@ export default class EventPage extends React.Component{
     });
 
     getDescriptionStyle = () => ({
-        fontSize: '12px',
         padding: '5px',
         width: '100%',
         overflowY: 'scroll',
         maxHeight: '60px',
         borderBottom: '1px solid gray',
         marginBottom: '5px',
+        ...fontStyle
     })
 
     render = () => {
@@ -127,7 +189,6 @@ export default class EventPage extends React.Component{
             reviews
         } = this.props;
         
-        console.log('avgScore:', avgScore, 'reviews:', reviews)
 
         const eventDate = new Date(currEvent.timeDate);
         const dateString = "Sunday, April 26, 2020 at 8 AM – 12 PM";
@@ -160,21 +221,31 @@ export default class EventPage extends React.Component{
             <EventPageItem>
                 <PersonIcon color={"grey"} fontSize={'small'}/>
                 {"Hosted by " + currEvent.host.name}
+                <StyledRating
+                name="custom-color"
+                value={avgScore}
+                getLabelText={value => `${value} Heart${value !== 1 ? 's' : ''}`}
+                precision={0.1}
+                icon={<FavoriteIcon fontSize="small" />}
+                disabled={true}
+                style={{marginLeft: '5px'}}
+                />
             </EventPageItem>
             <EventPageItem>
                 <PeopleOutlineIcon color={"grey"} fontSize={'small'}/>
                 {currEvent.attendees.length + (currEvent.attendees.length === 1 ? " person going" : "  people going")}
             </EventPageItem>
-            {currEvent.reviews.map((review,index) => (
-                <StyledRating
-                  name={'rating-' + index }
-                  value={review.score}
-                  getLabelText={value => `${value} Heart${value !== 1 ? 's' : ''}`}
-                  precision={0.5}
-                  icon={<FavoriteIcon fontSize="inherit" />}
-                  disabled={true}
-                />
-            ))}
+            <div style={{fontWeight: 'bold', padding: '10px', borderBottom: '1px solid gray'}}> {'Reviews of this host:'} </div>
+
+            {reviews && reviews.map((reviewObj,index) => {
+                const {
+                    rating,
+                    review,
+                    user,
+                    event 
+                } = reviewObj;
+                return <EventReviewRow rating={rating} review={JSON.parse(review)} user={user} event={event}/>
+            })}
 {/*             
             {events.length > 0 && 
             <div className={classes.seeMore}>
