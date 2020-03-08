@@ -118,8 +118,8 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('getUser', (name) => {
-    let prom = dbInterface.getUser(name);
+  socket.on('getUser', (email) => {
+    let prom = dbInterface.getUser(email);
     prom.then( (docs) => {
       console.log("FOUND USER", docs);
       let prom2 = dbInterface.getHostAvgRating(docs.name);
@@ -278,8 +278,8 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('addEvent', (title, date, tag, location, locationName, type, host) => {
-    let prom = dbInterface.addEvent(title, date, tag, location, locationName, type, host);
+  socket.on('addEvent', (title, date, tag, location, locationName, type, host, description) => {
+    let prom = dbInterface.addEvent(title, date, tag, location, locationName, type, host, description);
     prom.then( (docs) => {
       console.log("NEW EVENT", docs);
       socket.emit("addEventReply", docs);

@@ -43,7 +43,7 @@ module.exports.getUser = function(username){
 			const collection = db.collection('Users');
 			// Find some documents
 
-			let query = {'name': username} ;
+			let query = {'email': username} ;
 			console.log(query);
 
 		 	collection.findOne(query, function(err, doc) {

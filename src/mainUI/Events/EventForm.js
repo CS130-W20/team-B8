@@ -62,8 +62,10 @@ class EventForm extends Component {
       title: '',
       dialogopen: false,
       open: false,
+      description: '',
       type: '',
       image: null,
+      previewImage: '',
     }
     this.handleClickOpen = this.handleClickOpen.bind(this);
     this.handleClickClose = this.handleClickClose.bind(this);
@@ -89,6 +91,7 @@ class EventForm extends Component {
 
         var newEvent = {
           title: this.state.title,
+          description: this.state.description,
           date: this.state.date,
           tag: [this.state.type],
           location: {lat: lat, lng: lng},
@@ -97,16 +100,14 @@ class EventForm extends Component {
           host: this.props.userID
         }
 
-        socket.emit('addEvent', newEvent.title, newEvent.date, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.type, newEvent.host);
+        socket.emit('addEvent', newEvent.title, newEvent.date, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.type, newEvent.host, newEvent.description);
         socket.on('addEventReply', (event) => {
           var file = this.state.image
           if(file){
             var reader = new FileReader();
             reader.readAsArrayBuffer(file);
-            console.log("event id for img:",event);
             reader.onload = function(){
               var dataBuffer = new Buffer(new Uint8Array(reader.result)); 
-              console.log("what", dataBuffer)
               socket.emit('addImage', event, dataBuffer);
             }
           }
@@ -150,6 +151,16 @@ class EventForm extends Component {
         date: date
       })    
     };
+
+  /**
+   * @function handleDescriptionChange Function that takes in a description and updates it for event
+   * @param {String} date Description of event
+   */
+  handleDescriptionChange = description => {
+    this.setState({
+      description: description
+    })    
+  };
 
   /**
    * @function handleChange Function that changes the state variable type based on selected event type
@@ -202,9 +213,25 @@ class EventForm extends Component {
     uploadImage = (e) => {
       var files = e.target.files
       if(files.length > 0){
+        var reader = new FileReader();
+        reader.onload = (e) => {
+          this.setState({previewImage: e.target.result});
+        }
+        reader.readAsDataURL(files[0]);
         this.setState({image: files[0]});
       }
     }
+
+    getImageContainerStyle = () => ({
+      width: '550px',
+      height: '200px',
+      overflow: 'hidden',
+      marginBottom: '-40px',
+  })
+  getImageStyle = () => ({
+      height: 'auto',
+      width: '550px',
+  });
 
   /**
    * Renders event form based on button click and state changes. Creates event upon submission of form.
@@ -219,6 +246,22 @@ class EventForm extends Component {
       <Dialog data-testid="event-create-dialog" open={this.state.dialogopen} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
           <DialogTitle id="form-dialog-title">Create A New Event</DialogTitle>
           <DialogContent>
+            <div style={this.getImageContainerStyle()}>
+            <img style={this.getImageStyle()} src={this.state.previewImage ? 
+            this.state.previewImage
+            : 'https://lh3.googleusercontent.com/proxy/Qe8V5Hwb-cD6ZXzkehYtxggyL9ODf86fvHXoIflZM-27jbbL8V5qcsXS1MkeHJMZsiWpm5n5FS2cL9MrIDCjV1Y-_y99c263BBYayegnQnAAz_nhPG44rWhaWE3k'}/>
+            </div>
+            <Button style={{height: '50px', position: 'relative', top:'0px', left: '400px', marginBottom: '0px'}}
+                variant="contained"
+                component="label"
+                >
+                  Upload image
+                  <input
+                    type="file"
+                    style={{display: "none"}}
+                    onChange={this.uploadImage}
+                  />
+              </Button>
               <TextField
               autoFocus
               margin="dense"
@@ -260,8 +303,16 @@ class EventForm extends Component {
               }}/>
               </MuiPickersUtilsProvider>
               
-              <div style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-              <FormControl className={classes.formControl}>
+              <TextField
+                margin="dense"
+                label="Description"
+                multiline
+                rows={2}
+                rowsMax={4}
+                onChange={this.handleDescriptionChange}
+                fullWidth
+              />
+              <FormControl className={classes.formControl} >
               <InputLabel id="demo-controlled-open-select-label">Event Type</InputLabel>
               <Select
               inputProps={{
@@ -282,19 +333,9 @@ class EventForm extends Component {
               <MenuItem value={eventTypes.houseParty}>House Party</MenuItem>
               <MenuItem value={eventTypes.music}>Music Concert/Festival</MenuItem>
               </Select>
-                <Button
-                variant="contained"
-                component="label"
-                >
-                  Upload image
-                  <input
-                    type="file"
-                    style={{display: "none"}}
-                    onChange={this.uploadImage}
-                  />
-              </Button>
-            </FormControl>
-              </div>
+              </FormControl>
+          
+   
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleClickClose} color="primary">

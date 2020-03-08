@@ -8,22 +8,8 @@ import Typography from '@material-ui/core/Typography';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import QueryBuilderIcon from '@material-ui/icons/QueryBuilder';
 import PersonIcon from '@material-ui/icons/Person';
-
-// String.prototype.hexEncode = function(){
-//     var hex, i;
-
-//     var result = "";
-//     for (i=0; i<this.length; i++) {
-//         hex = this.charCodeAt(i).toString(16);
-//         result += ("000"+hex).slice(-4);
-//     }
-
-//     return result
-// }
-
-function hexToBase64(str) {
-    return btoa(str);
-}
+import PeopleOutlineIcon from '@material-ui/icons/PeopleOutline';
+import TextField from '@material-ui/core/TextField';
 
 class CalendarDate extends React.Component{
     monthToStr = (month) => {
@@ -60,9 +46,9 @@ class CalendarDate extends React.Component{
         const monthStr = this.monthToStr(this.props.month)
         const date = this.props.date;
         return (
-            <div style={{display: 'flex', flexDirection: 'column', backgroundColor: 'white', height: '50px', width: '50px', borderRadius: '5px', alignItems: 'center', marginRight: '10px'}}>
-                <span style={{fontSize: '12px', color: 'red'}}> {monthStr} </span>
-                <span style={{fontSize: '18px', color: 'black'}}> {date} </span>
+            <div style={{display: 'flex', flexDirection: 'column', backgroundColor: 'white', height: '40px', width: '40px', borderRadius: '5px', alignItems: 'center', marginRight: '10px'}}>
+                <span style={{fontSize: '10px', color: 'red'}}> {monthStr} </span>
+                <span style={{fontSize: '14px', color: 'black'}}> {date} </span>
             </div>
         )
     }
@@ -73,8 +59,10 @@ class EventPageItem extends React.Component{
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        paddingTop: '5px',
-        paddingBottom: '5px',
+        paddingTop: '2px',
+        paddingBottom: '3px',
+        fontSize: '12px',
+        borderBottom: '1px solid grey'
     });
     render = () => (
         <Typography style={this.pageItemStyle()} gutterBottom>
@@ -92,27 +80,44 @@ export default class EventPage extends React.Component{
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
+        padding: '3px',
     });
 
     getEventPageStyle = () => ({
         backgroundColor: 'white', 
-        height: '500px',
-        maxHeight: 'calc(90vh - 200px)', 
+        height: '800px',
+        maxHeight: 'calc(90vh - 150px)', 
         overflowY: 'scroll',
         width: '500px',
     });
 
+    getImageContainerStyle = () => ({
+        width: '500px',
+        height: '200px',
+        overflow: 'hidden',
+        marginBottom: '5px',
+    })
     getImageStyle = () => ({
-        height: 'auto', 
-        width: '500px'
+        height: 'auto',
+        width: '500px',
     });
+
+    getDescriptionStyle = () => ({
+        fontSize: '12px',
+        padding: '5px',
+        width: '100%',
+        overflowY: 'scroll',
+        maxHeight: '60px',
+        borderBottom: '1px solid gray',
+        marginBottom: '5px',
+    })
 
     render = () => {
         const {
             currEvent
         } = this.props;
         
-        console.log('image:', typeof currEvent.image)
+        console.log('current event:', currEvent)
 
         const eventDate = new Date(currEvent.timeDate);
         const dateString = "Sunday, April 26, 2020 at 8 AM – 12 PM";
@@ -127,20 +132,36 @@ export default class EventPage extends React.Component{
         <DialogContent>
         <div style={this.getEventPageStyle()}>
             {currEvent.image && 
+            <div style={this.getImageContainerStyle()}>
             <img style={this.getImageStyle()} src={'data:image/jpeg;base64,' + currEvent.image}/>
+            </div>
             }
+            <div style={this.getDescriptionStyle()}>
+                {currEvent.description}
+            </div>
             <EventPageItem>
-                <QueryBuilderIcon color={"grey"}/>
+                <QueryBuilderIcon color={"grey"} fontSize={'small'}/>
                 {dateString}
             </EventPageItem>
             <EventPageItem>
-                <LocationOnIcon color={"grey"}/>
+                <LocationOnIcon color={"grey"} fontSize={'small'}/>
                 {currEvent.locationName}
             </EventPageItem>
             <EventPageItem>
-                <PersonIcon color={"grey"}/>
-                {"Hosted by " + currEvent.host}
+                <PersonIcon color={"grey"} fontSize={'small'}/>
+                {"Hosted by " + currEvent.host.name}
             </EventPageItem>
+            <EventPageItem>
+                <PeopleOutlineIcon color={"grey"} fontSize={'small'}/>
+                {currEvent.attendees.length + (currEvent.attendees.length === 1 ? " person going" : "  people going")}
+            </EventPageItem>
+{/*             
+            {events.length > 0 && 
+            <div className={classes.seeMore}>
+                    <Link color="primary" href="#">
+                        See more reviews
+                    </Link>
+            </div>} */}
         </div>
         </DialogContent>
         </div>

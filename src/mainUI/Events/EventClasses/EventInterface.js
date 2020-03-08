@@ -52,6 +52,8 @@ export default class BMeetEvent{
                 key={this._id} 
                 _id={this._id}
                 title={this.title}
+                image={this.image}
+                description={this.description}
                 timeDate={this.timeDate}
                 locationName={this.locationName}
                 attendees={this.attendees}

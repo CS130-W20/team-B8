@@ -19,6 +19,8 @@ export default class EventListRow extends React.Component{
             attendees,
             tag,
             type,
+            description,
+            image
         } = this.props;
 
         let dateObj = new Date(timeDate);
@@ -38,11 +40,13 @@ export default class EventListRow extends React.Component{
                 <EventEdit 
                     _id={_id} 
                     title={title} 
+                    image={image}
                     date={timeDate} 
                     location={location} 
                     tag={tag} 
                     type={type} 
-                    updateFunction={this.props.updateFunction}/>
+                    updateFunction={this.props.updateFunction}
+                    description={description}/>
                 <EventMessage notifyFunction={this.props.notifyFunction} socket={this.props.socket}/>
                 <EventDelete />
             </TableCell>
