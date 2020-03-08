@@ -5,7 +5,8 @@ import Slider from '@material-ui/core/Slider';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import { eventTypes } from './../markerPrefab/mapMarker';
-import update from 'react-addons-update'; // ES6
+import Switch from '@material-ui/core/Switch';
+
 
 const styles = theme => ({
     root: {
@@ -67,11 +68,13 @@ class GMapFilter extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            enableFilters: false,
             eventTypes: [eventTypes.music],
             eventDistance: 1,
         }
         this.handleType = this.handleType.bind(this);
         this.handleDistance = this.handleDistance.bind(this);
+        this.handleToggle = this.handleToggle.bind(this);
     }
 
     handleType = (event, newTypes) => {
@@ -97,11 +100,29 @@ class GMapFilter extends Component {
         }
     }
 
+    handleToggle = (value) => {
+        this.setState({
+            enableFilters: value,
+        }, () => {
+            this.props.updateFilter(this.state);
+        });
+    }
+
   
     render() {
         const { classes } = this.props;
         return (
         <div className={classes.root}>
+            <Typography id="discrete-slider-always" style={{paddingTop: 10}}gutterBottom>
+            Enable Filters
+            </Typography>
+            <div className={classes.toggleContainer}>
+                <Switch
+                    checked={this.state.enableFilters}
+                    onChange={() => {this.handleToggle(!this.state.enableFilters)}}
+                    value={this.state.enableFilters}
+                    inputProps={{ 'aria-label': 'toggle filter'}}/>
+            </div>
             <Typography id="discrete-slider-always" style={{paddingBottom: 30}}gutterBottom>
             Distance
             </Typography>
@@ -115,6 +136,7 @@ class GMapFilter extends Component {
                 valueLabelDisplay="on"
                 min={1}
                 max={5}
+                disabled={!this.state.enableFilters}
             />
             <Typography id="discrete-slider-always" style={{paddingTop: 10}}gutterBottom>
             Event Types
@@ -126,16 +148,20 @@ class GMapFilter extends Component {
                 aria-label="eventFilters"
                 style={{width: "100%", justifyContent: "center"}}
             >
-                <ToggleButton value={eventTypes.barHopping} aria-label={eventTypes.barHopping}>
+                <ToggleButton value={eventTypes.barHopping} aria-label={eventTypes.barHopping} 
+                disabled={!this.state.enableFilters}>
                 <Typography className={classes.typography}>Bars</Typography>
                 </ToggleButton>
-                <ToggleButton value={eventTypes.rave} aria-label={eventTypes.rave}>
+                <ToggleButton value={eventTypes.rave} aria-label={eventTypes.rave}
+                disabled={!this.state.enableFilters}>
                     <Typography className={classes.typography}>Raves</Typography>
                 </ToggleButton>
-                <ToggleButton value={eventTypes.houseParty} aria-label={eventTypes.houseParty}>
+                <ToggleButton value={eventTypes.houseParty} aria-label={eventTypes.houseParty}
+                disabled={!this.state.enableFilters}>
                     <Typography className={classes.typography}>Party</Typography>
                 </ToggleButton>
-                <ToggleButton value={eventTypes.music} aria-label={eventTypes.music}>
+                <ToggleButton value={eventTypes.music} aria-label={eventTypes.music}
+                disabled={!this.state.enableFilters}>
                     <Typography className={classes.typography}>Music</Typography>
                 </ToggleButton>
             </ToggleButtonGroup>

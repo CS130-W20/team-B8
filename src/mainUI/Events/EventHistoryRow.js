@@ -4,6 +4,7 @@ import TableRow from '@material-ui/core/TableRow';
 import EventReviewDialog from '../Rating/EventReviewDialog';
 import EventRater from '../Rating/EventRater';
 import EventCancel from '../Rating/EventCancel';
+import {getTimeString, getDateString} from './EventClasses/formatTimeDate';
 
 
 export default class EventHistoryRow extends React.Component{
@@ -37,14 +38,16 @@ export default class EventHistoryRow extends React.Component{
             submitReview,
             tag,
             review,
-            leaveEvent
+            leaveEvent,
+            successAlert,
+            failAlert,
         } = this.props;
 
         const userReview = this.state.userReview;
 
         let dateObj = new Date(timeDate);
-        const time = dateObj.getHours() + ":" + dateObj.getMinutes();
-        const date = (dateObj.getMonth() + 1) + "-" + dateObj.getDate();
+        const time = getTimeString(dateObj.getHours(), dateObj.getMinutes());
+        const date = getDateString((dateObj.getMonth() + 1), dateObj.getDate(), dateObj.getFullYear());
         const location = locationName.slice(0, locationName.indexOf(','));
         const numAttendees = attendees.length;
 
@@ -61,7 +64,7 @@ export default class EventHistoryRow extends React.Component{
                 : review ?
                 <EventRater questions={questions} host={host} submitReview={submitReview}/>
                 :
-                <EventCancel leaveEvent={leaveEvent}/>}
+                <EventCancel leaveEvent={leaveEvent} successAlert={successAlert} failAlert={failAlert}/>}
             </TableCell>
         </TableRow>
         )

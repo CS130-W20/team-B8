@@ -37,13 +37,14 @@ MongoClient.connect(url, function(err, client) {
 }
 */
 
-module.exports.getUser = function(username){
+module.exports.getUser = function(email){
 	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			// Find some documents
 
-			let query = {'name': username} ;
+			let query = {'email': email} ;
+			console.log(query);
 
 		 	collection.findOne(query, function(err, doc) {
 			if(err == null){
@@ -72,10 +73,10 @@ module.exports.addUser = function(name, email, password, phone){
 			}
 		 	collection.insertOne(doc,{},function(err, result) {
 			if(err == null){
-				console.log("addUser() query Success: " + name);
+				console.log("addUser() query Success: " + email);
 				resolve(result);
 			} else{
-				console.log("addUser() query failed: " + name);
+				console.log("addUser() query failed: " + email);
 				reject(err);
 			}
 		});
@@ -83,26 +84,26 @@ module.exports.addUser = function(name, email, password, phone){
 };
 
 
-module.exports.updateUserPassword = function(name, password){
+module.exports.updateUserPassword = function(email, password){
 	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			let doc = {};
 			doc.password = password;
 
-		 	collection.updateOne({'name': name},{ '$set': doc}, {'upsert':false},function(err, result) {
+		 	collection.updateOne({'email': email},{ '$set': doc}, {'upsert':false},function(err, result) {
 			if(err == null){
-				console.log("updateUserPassword() Success: " + name);
+				console.log("updateUserPassword() Success: " + email);
 				resolve(result);
 			} else{
-				console.log("updateUserPassword() Failed: " + name);
+				console.log("updateUserPassword() Failed: " + email);
 				reject(err);
 			}
 		});
 	});
 };
 
-module.exports.updateUserDetails = function(name, interestList, phone){
+module.exports.updateUserDetails = function(email, interestList, phone){
 	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
@@ -110,35 +111,35 @@ module.exports.updateUserDetails = function(name, interestList, phone){
 			doc.interests = interestList;
 			doc.phone = phone;
 
-		 	collection.updateOne({'name': name},{ '$set': doc}, {'upsert':false},function(err, result) {
+		 	collection.updateOne({'email': email},{ '$set': doc}, {'upsert':false},function(err, result) {
 			if(err == null){
-				console.log("updateUserDetails() Success: " + name);
+				console.log("updateUserDetails() Success: " + email);
 				resolve(result);
 			} else{
-				console.log("updateUserDetailss() Failed: " + name);
+				console.log("updateUserDetailss() Failed: " + email);
 				reject(err);
 			}
 		});
 	});
 };
 
-module.exports.addUserAttendingEvent = function(name, eventID){
+module.exports.addUserAttendingEvent = function(email, eventID){
 	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			let doc = {
 				'eventsAttending': eventID
 			};
-		 	collection.updateOne({'name': name},{ '$push': doc},
+		 	collection.updateOne({'email': email},{ '$push': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("addUserAttendingEvent() Success: "
-				+ name
+				+ email
 				+ ":" + eventID);
 				resolve(result);
 			} else{
 				console.log("addUserAttendingEvent() Failed: "
-				+ name
+				+ email
 				+ ":" + eventID);
 				reject(err);
 			}
@@ -146,23 +147,23 @@ module.exports.addUserAttendingEvent = function(name, eventID){
 	});
 };
 
-module.exports.removeUserAttendingEvent = function(name, eventID){
+module.exports.removeUserAttendingEvent = function(email, eventID){
 	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			let doc = {
 				'eventsAttending': eventID
 			};
-		 	collection.updateOne({'name': name},{ '$pull': doc},
+		 	collection.updateOne({'email': email},{ '$pull': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("removeUserAttendingEvent() Success: "
-				+ name
+				+ email
 				+ ":" + eventID);
 				resolve(result);
 			} else{
 				console.log("removeUserAttendingEvent() Failed: "
-				+ name
+				+ email
 				+ ":" + eventID);
 				reject(err);
 			}
@@ -170,23 +171,23 @@ module.exports.removeUserAttendingEvent = function(name, eventID){
 	});
 };
 
-module.exports.addUserHostingEvent = function(name, eventID){
+module.exports.addUserHostingEvent = function(email, eventID){
 	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			let doc = {
 				'eventsHosting': eventID
 			};
-		 	collection.updateOne({'name': name},{ '$push': doc},
+		 	collection.updateOne({'email': email},{ '$push': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("addUserHostingEvent() Success: "
-				+ name
+				+ email
 				+ ":" + eventID);
 				resolve(result);
 			} else{
 				console.log("addUserHostingEvent() Failed: "
-				+ name
+				+ email
 				+ ":" + eventID);
 				reject(err);
 			}
@@ -194,23 +195,23 @@ module.exports.addUserHostingEvent = function(name, eventID){
 	});
 };
 
-module.exports.removeUserHostingEvent = function(name, eventID){
+module.exports.removeUserHostingEvent = function(email, eventID){
 	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			let doc = {
 				'eventsHosting': eventID
 			};
-		 	collection.updateOne({'name': name},{ '$pull': doc},
+		 	collection.updateOne({'email': email},{ '$pull': doc},
 		 			{'upsert':false},function(err, result) {
 			if(err == null){
 				console.log("removeUserHostingEvent() Success: "
-				+ name
+				+ email
 				+ ":" + eventID);
 				resolve(result);
 			} else{
 				console.log("removeUserHostingEvent() Failed: "
-				+ name
+				+ email
 				+ ":" + eventID);
 				reject(err);
 			}
@@ -335,7 +336,7 @@ module.exports.getEventByHost = function(host, lowerBound){
 		function (resolve, reject) {
 			console.log('host: ', host);
 			const collection = db.collection('Events');
-			let query = {'host.name': host};
+			let query = {'host.email': host};
 
 			let dateRange = {};
 			if (lowerBound != null) {

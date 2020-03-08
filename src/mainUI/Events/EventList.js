@@ -12,8 +12,6 @@ import Paper from '@material-ui/core/Paper';
 import EventForm from './EventForm';
 import Typography from '@material-ui/core/Typography';
 
-import BMeetEventFactory from './EventFactory';
-
 /**
  * @var useStyle Function object that generates a style off of default MaterialsUI Theme
  * @see https://material-ui.com/styles/basics/
@@ -67,12 +65,14 @@ class EventList extends Component {
     }
 
     render() {
-    const { classes, events, refreshEvents, userID, socket} = this.props;
+    const { classes, events, refreshEvents, userID, socket, successAlert, failAlert} = this.props;
     return (
             <Grid data-testid="Events" item xs={12}>
               <Paper className={classes.paper}>
               <React.Fragment>
-              <EventForm updateFunction={refreshEvents} userID={userID}/>
+              <EventForm updateFunction={refreshEvents} userID={userID}
+                         successAlert={successAlert}
+                         failAlert={failAlert}/>
                     <Table size="small">
                     <TableHead>
                         <TableRow>
@@ -86,7 +86,7 @@ class EventList extends Component {
                     </TableHead>
                     <TableBody>
                         {events.length > 0 ?
-                            events.map(event => event.createEventListRow(refreshEvents, socket))
+                            events.map(event => event.createEventListRow(refreshEvents, socket, successAlert, failAlert))
                             :
                             <TableRow>
                             <TableCell align='center' colSpan='6'>
@@ -96,11 +96,11 @@ class EventList extends Component {
                         }
                     </TableBody>
                     </Table>
-                    {events.length > 0 && <div className={classes.seeMore}>
+                    {/*events.length > 0 && <div className={classes.seeMore}>
                     <Link color="primary" href="#">
                         See more Events
                     </Link>
-                    </div>}
+                    </div>*/}
                 </React.Fragment>
               </Paper>
             </Grid>     

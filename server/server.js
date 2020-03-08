@@ -43,13 +43,13 @@ io.on("connection", (socket) => {
   Add a new user to the "Users" collection in the DB.
   Other event listeners are similar to this.
   */
-  socket.on('authenticate', (name, password) => {
-    let prom = dbInterface.getUser(name);
+  socket.on('authenticate', (email, password) => {
+    let prom = dbInterface.getUser(email);
     prom.then( (docs) => {
       console.log("FOUND USER", docs);
       if (docs == null) {
         //no user with that username
-        socket.emit("authReply", "FAIL", docs["name"], "");
+        socket.emit("authReply", "FAIL", docs["email"], "");
       }
       else {
         // found a user
@@ -58,12 +58,12 @@ io.on("connection", (socket) => {
         if (docs["password"] == password) {
           // correct password
           // client needs to store generated token
-	        docs['token'] = authToken.generateToken(name);
-          socket.emit("authReply", "SUCCESS", docs["name"], docs["token"]);
+	        docs['token'] = authToken.generateToken(email);
+          socket.emit("authReply", "SUCCESS", docs["email"], docs["token"]);
         }
         else {
           //incorrect pass
-          socket.emit("authReply", "FAIL", docs["name"], "");
+          socket.emit("authReply", "FAIL", docs["email"], "");
         }
       }
 
@@ -84,13 +84,13 @@ io.on("connection", (socket) => {
       console.log("FOUND USER", docs);
       if (docs == null) {
         //no user with that username
-        socket.emit("authTokenReply", "FAIL", docs["name"]);
+        socket.emit("authTokenReply", "FAIL", docs["email"]);
       }
       else {
         // found a user
         console.log("USER FOUND: ", docs);
 	      docs['token'] = authToken.generateToken(username);
-        socket.emit("authTokenReply", "SUCCESS", docs["name"]);
+        socket.emit("authTokenReply", "SUCCESS", docs["email"]);
       }
 
     })
@@ -118,11 +118,11 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('getUser', (name) => {
-    let prom = dbInterface.getUser(name);
+  socket.on('getUser', (email) => {
+    let prom = dbInterface.getUser(email);
     prom.then( (docs) => {
       console.log("FOUND USER", docs);
-      let prom2 = dbInterface.getHostAvgRating(docs.name);
+      let prom2 = dbInterface.getHostAvgRating(docs.email);
       prom2.then(avg_score => {
         console.log("FOUND USER", docs);
         docs['avgScore'] = avg_score;
@@ -136,8 +136,8 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('updateUserPassword', (name, newpass) => {
-    let prom = dbInterface.updateUserPassword(name, newpass);
+  socket.on('updateUserPassword', (email, newpass) => {
+    let prom = dbInterface.updateUserPassword(email, newpass);
     prom.then( (docs) => {
       console.log("USER UPDATED", docs);
       socket.emit("updateUserPasswordReply", docs);
@@ -148,8 +148,8 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('updateUserInterests', (name, interestList, phone) => {
-    let prom = dbInterface.updateUserDetails(name, interestList, phone);
+  socket.on('updateUserInterests', (email, interestList, phone) => {
+    let prom = dbInterface.updateUserDetails(email, interestList, phone);
     prom.then( (docs) => {
       console.log("USER INTERESTS UPDATED", docs);
       socket.emit("updateUserInterestsReply", docs);
@@ -160,8 +160,8 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('addUserAttendingEvent', (name, eventId) => {
-    let prom = dbInterface.addUserAttendingEvent(name, eventId);
+  socket.on('addUserAttendingEvent', (email, eventId) => {
+    let prom = dbInterface.addUserAttendingEvent(email, eventId);
     prom.then( (docs) => {
       console.log("USER ATTENDING NEW EVENT", docs);
       socket.emit("addUserAttendingEventReply", docs);
@@ -172,8 +172,8 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('removeUserAttendingEvent', (name, eventId) => {
-    let prom = dbInterface.removeUserAttendingEvent(name, eventId);
+  socket.on('removeUserAttendingEvent', (email, eventId) => {
+    let prom = dbInterface.removeUserAttendingEvent(email, eventId);
     prom.then( (docs) => {
       console.log("USER NO LONGER ATTENDING", docs);
       socket.emit("removeUserAttendingEventReply", docs);
@@ -184,8 +184,8 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('addUserHostingEvent', (name, eventId) => {
-    let prom = dbInterface.addUserHostingEvent(name, eventId);
+  socket.on('addUserHostingEvent', (email, eventId) => {
+    let prom = dbInterface.addUserHostingEvent(email, eventId);
     prom.then( (docs) => {
       console.log("ADDED HOST EVENT", docs);
       socket.emit("addUserHostingEventReply", docs);
@@ -196,8 +196,8 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('removeUserHostingEvent', (name, eventId) => {
-    let prom = dbInterface.removeUserHostingEvent(name, eventId);
+  socket.on('removeUserHostingEvent', (email, eventId) => {
+    let prom = dbInterface.removeUserHostingEvent(email, eventId);
     prom.then( (docs) => {
       console.log("HOST REMOVED", docs);
       socket.emit("removeUserHostingEventReply", docs);
