@@ -253,7 +253,7 @@ class EventForm extends Component {
             <div style={this.getImageContainerStyle()}>
             <img style={this.getImageStyle()} src={this.state.previewImage ? 
             this.state.previewImage
-            : 'https://lh3.googleusercontent.com/proxy/Qe8V5Hwb-cD6ZXzkehYtxggyL9ODf86fvHXoIflZM-27jbbL8V5qcsXS1MkeHJMZsiWpm5n5FS2cL9MrIDCjV1Y-_y99c263BBYayegnQnAAz_nhPG44rWhaWE3k'}/>
+            : 'https://i.imgur.com/9UUY6dO.png'}/>
             </div>
             <Button style={{height: '50px', position: 'relative', top:'0px', left: '400px', marginBottom: '0px'}}
                 variant="contained"

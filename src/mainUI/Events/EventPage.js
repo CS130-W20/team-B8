@@ -115,8 +115,8 @@ class CalendarDate extends React.Component{
         const monthStr = this.monthToStr(this.props.month)
         const date = this.props.date;
         return (
-            <div style={{display: 'flex', flexDirection: 'column', backgroundColor: 'white', height: '40px', width: '40px', borderRadius: '5px', alignItems: 'center', marginRight: '10px'}}>
-                <span style={{fontSize: '10px', color: 'red'}}> {monthStr} </span>
+            <div style={{display: 'flex', flexDirection: 'column', backgroundColor: '#fc5185', height: '40px', width: '40px', borderRadius: '0px', alignItems: 'center', marginRight: '10px'}}>
+                <span style={{fontSize: '10px', color: 'white'}}> {monthStr} </span>
                 <span style={{fontSize: '14px', color: 'black'}}> {date} </span>
             </div>
         )
@@ -150,7 +150,7 @@ export default class EventPage extends React.Component{
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        padding: '3px',
+        padding: '0px',
     });
 
     getEventPageStyle = () => ({
@@ -190,14 +190,26 @@ export default class EventPage extends React.Component{
         } = this.props;
         
 
+        const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+        const months = ['January','February','March','April','May','June','July','August','September','October','November','December']
+        
         const eventDate = new Date(currEvent.timeDate);
-        const dateString = "Sunday, April 26, 2020 at 8 AM – 12 PM";
+        const dayOfWeek = days[eventDate.getDay()];
+        const date = eventDate.getDate();
+        const month = months[eventDate.getMonth()];
+        var year = eventDate.getFullYear();
+        var hour = eventDate.getHours() % 12;
+        hour = hour == 0 ? 12 : hour;
+        var minutes = eventDate.getMinutes();
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        const AMPM = eventDate.getHours() < 12 ? "AM" : "PM";
+        const dateString = `${dayOfWeek}, ${month} ${date}, ${year} at ${hour}:${minutes} ${AMPM} `;
         return (
         <div>
         <DialogTitle style={this.getTitleStyle()} id="form-dialog-title">
             <div style ={ this.getTitleStyle()}>
             <CalendarDate month={eventDate.getMonth()} date={eventDate.getDate()}/>
-            {currEvent.title}
+            <div style={{marginLeft: '10px'}}> {currEvent.title} </div>
             </div>
         </DialogTitle>
         <DialogContent>
