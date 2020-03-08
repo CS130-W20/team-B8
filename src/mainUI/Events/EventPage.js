@@ -122,10 +122,12 @@ export default class EventPage extends React.Component{
 
     render = () => {
         const {
-            currEvent
+            currEvent,
+            avgScore,
+            reviews
         } = this.props;
         
-        console.log('current event:', currEvent)
+        console.log('avgScore:', avgScore, 'reviews:', reviews)
 
         const eventDate = new Date(currEvent.timeDate);
         const dateString = "Sunday, April 26, 2020 at 8 AM – 12 PM";

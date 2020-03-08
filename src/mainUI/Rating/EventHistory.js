@@ -47,6 +47,7 @@ class EventHistory extends React.Component{
      */
     render = () => {
         const { classes, eventsPast, eventsFuture, userID, socket, refreshEvents, successAlert, failAlert } = this.props;
+        console.log('refreshing',refreshEvents)
         console.log(eventsPast);
         console.log(eventsFuture);
     /**

@@ -365,17 +365,17 @@ module.exports.getHostAvgRating = function(host){
 	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Events');
-			let query = {'host': host};
+			let query = {'host.email': host}
 			let mat = {'$match' : query};
 			let unw = {'$unwind' : "$reviews"};
-			let group = {'$group' : {'_id' : '$host', 'result' : {'$avg':'$reviews.score'}}};
+			let group = {'$group' : {'_id' : '$host', 'reviews': {'$push':{'rating': '$reviews.score', 'review': '$reviews.review', 'user': '$reviews.user.name', 'event': '$title'}}, 'result' : {'$avg':'$reviews.score'}}};
 
 			let agg_pipeline = [mat, unw, group];
 			collection.aggregate(agg_pipeline).toArray(function(err, doc) {
 				if(err == null){
 					console.log("getHostAvgRating() query Success:" + doc);
 					if (doc.length != 0)
-						resolve(doc[0]['result']);
+						resolve(doc[0]);
 					else
 						resolve(doc);
 				} else{

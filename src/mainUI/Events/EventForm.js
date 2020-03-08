@@ -44,6 +44,18 @@ const styles = theme => ({
     },
   });
 
+const defaultState = {
+  date: new Date(),
+  location: '',
+  title: '',
+  dialogopen: false,
+  open: false,
+  description: '',
+  type: '',
+  image: null,
+  previewImage: '',
+}
+  
 /**
  * Function component that uses Google Material UI Dialog Boxes
  * Uses IconButton to toggle display, and allows users create Events.
@@ -56,17 +68,7 @@ const styles = theme => ({
 class EventForm extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      date: new Date(),
-      location: '',
-      title: '',
-      dialogopen: false,
-      open: false,
-      description: '',
-      type: '',
-      image: null,
-      previewImage: '',
-    }
+    this.state = defaultState;
     this.handleClickOpen = this.handleClickOpen.bind(this);
     this.handleClickClose = this.handleClickClose.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
@@ -122,6 +124,7 @@ class EventForm extends Component {
       }
     );
     this.handleClickClose();
+    //this.setState(defaultState);
   }
 
 
@@ -140,7 +143,7 @@ class EventForm extends Component {
     handleClickClose = () => {
       this.setState({
         dialogopen: false
-      })    
+      })   
     };
 
   /**

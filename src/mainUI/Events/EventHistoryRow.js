@@ -19,7 +19,7 @@ export default class EventHistoryRow extends React.Component{
         const {
             user,
             refreshEvents,
-        } = this.props
+        } = this.props;
         this.props.submitReview(user, rating, review, refreshEvents);
         this.setState({
             userReview: {user: user, score: rating, review: review}
@@ -62,7 +62,7 @@ export default class EventHistoryRow extends React.Component{
                 {userReview ? 
                 <EventReviewDialog rating={userReview.score} review={JSON.parse(userReview.review)} user={userReview.user} id={_id}/>
                 : review ?
-                <EventRater questions={questions} host={host} submitReview={submitReview}/>
+                <EventRater questions={questions} host={host} submitReview={this.submitReview}/>
                 :
                 <EventCancel leaveEvent={leaveEvent} successAlert={successAlert} failAlert={failAlert}/>}
             </TableCell>

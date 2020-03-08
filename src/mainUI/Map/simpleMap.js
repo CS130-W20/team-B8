@@ -34,6 +34,8 @@ class SimpleMap extends Component {
       this.state = {
           open: false,
           currEvent: {},
+          avgScore: null,
+          reviews: null,
       }
     
       this.handleClickClose = this.handleClickClose.bind(this);
@@ -81,6 +83,10 @@ class SimpleMap extends Component {
    * Event function that will be used for detecting button click and display event details
    */
   handleClickOpen(event) {
+    this.props.socket.emit("getUser", event.host.email);
+    this.props.socket.on("getUserReply", (user) => {
+        this.setState({avgScore: user.avgScore, reviews: user.reviews});
+    });
     this.setState({
       open: true,
       currEvent: event
@@ -151,7 +157,7 @@ class SimpleMap extends Component {
           })}
         </Map>
         <Dialog data-testid="map-dialog" open={this.state.open} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
-          <EventPage currEvent={this.state.currEvent}></EventPage>
+          <EventPage currEvent={this.state.currEvent} avgScore={this.state.avgScore} reviews={this.state.reviews}></EventPage>
           <DialogActions>
               <Button onClick={this.handleClickClose} color="primary">
                   Cancel
