@@ -196,6 +196,7 @@ class Registration extends Component {
       console.log("valid form");
       console.log("Register: ", data);
       this.state.socket.emit('addUser',data["name"], data["email"], data["password"], data["phone"]);
+      this.props.successAlert("Successfully registered user! Login using your email and password!");
       this.props.returnToLogin();
     } else {
       console.log("invalid form");

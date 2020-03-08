@@ -32,7 +32,9 @@ class GMap extends Component {
                                    events={events}
                                    refreshMap={refreshMap}
                                    socket={socket}
-                                   userID={userID}/>
+                                   userID={userID}
+                                   successAlert={this.props.successAlert}
+                                   failAlert={this.props.failAlert}/>
                     </Paper>
                 </Grid>
                 {/* Map Settings? */}

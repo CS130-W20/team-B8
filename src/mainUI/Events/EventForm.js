@@ -97,6 +97,7 @@ class EventForm extends Component {
         socket.on('addEventReply', (event) => {
           console.log('addEventReply: ', event);
           socket.emit('addUserHostingEvent', this.props.userID.email, event);
+          this.props.successAlert("Successfully created event: "+  newEvent.title + "!");
           this.props.updateFunction();
         })
       },

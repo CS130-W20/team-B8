@@ -44,6 +44,7 @@ export default function EventCancel(props) {
     
     const removeFromEvent = () => {
       props.leaveEvent();
+      props.successAlert("You have left the event. We're sad to see you go...");
       handleClickClose();
     }
 

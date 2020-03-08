@@ -45,6 +45,8 @@ export default function EventMessage(props) {
 
     const handleMessage = () => {
       props.notifyFunction(textMessage, props.socket);
+      handleClickClose();
+      props.successAlert("Successfully notified all users!");
     }
 
   /**

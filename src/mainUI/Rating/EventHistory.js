@@ -46,7 +46,7 @@ class EventHistory extends React.Component{
      * @var classes Calls useStyles to generate CSS style inherited from Materials UI Theme
      */
     render = () => {
-        const { classes, eventsPast, eventsFuture, userID, socket, refreshEvents } = this.props;
+        const { classes, eventsPast, eventsFuture, userID, socket, refreshEvents, successAlert, failAlert } = this.props;
         console.log(eventsPast);
         console.log(eventsFuture);
     /**
@@ -71,7 +71,7 @@ class EventHistory extends React.Component{
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {eventsFuture.map(event => event.createEventHistoryRow(userID, socket, false, refreshEvents))}
+                        {eventsFuture.map(event => event.createEventHistoryRow(userID, socket, false, refreshEvents, successAlert, failAlert))}
                     </TableBody>
                     </Table>
                 </React.Fragment>
@@ -93,7 +93,7 @@ class EventHistory extends React.Component{
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {eventsPast.map(event => event.createEventHistoryRow(userID, socket, true, refreshEvents))}
+                        {eventsPast.map(event => event.createEventHistoryRow(userID, socket, true, refreshEvents, successAlert, failAlert))}
                     </TableBody>
                     </Table>
                 </React.Fragment>

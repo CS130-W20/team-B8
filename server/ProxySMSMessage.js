@@ -10,7 +10,7 @@
 const TWILIO_SID_TEST = 'AC513454963ff517f3e07b90baf8f5d8e1';
 const TWILIO_AUTH_TEST = 'cb93ae1bbfca766b1f00410a257e06da';
 const TWILIO_SID = 'AC8a8a7e613b05b1800074dcf7f1c35df8';
-const TWILIO_AUTH = '5334098d0ca18acd8c5be141ab504eea';
+const TWILIO_AUTH = '4dd8f302aa01e33b974f723a9b458222';
 
 const client = require('twilio')(TWILIO_SID, TWILIO_AUTH);
 

@@ -106,6 +106,7 @@ class SimpleMap extends Component {
     //this.props.socket.emit("addEventAttendee", this.state.currEvent._id, this.props.userID);
     //this.props.socket.emit("addUserAttendingEvent", this.props.userID.name, this.state.currEvent._id);
     this.state.currEvent.registerUser(this.props.userID, this.props.socket);
+    this.props.successAlert("You have confirmed your attendance to " + this.state.currEvent.title + "!");
     this.handleClickClose();
     this.props.refreshMap();
   }

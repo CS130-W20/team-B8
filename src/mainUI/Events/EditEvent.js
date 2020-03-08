@@ -127,6 +127,7 @@ class EventEdit extends Component{
 
         socket.on('updateEventReply', (event) => {
           console.log("updateEventReply: ", event);
+          this.props.successAlert("Successfully updated the event: " + newEvent.title + "!");
           this.props.updateFunction();
         })
 

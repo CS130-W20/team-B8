@@ -45,7 +45,7 @@ export default class BMeetEvent{
    * @param none
    * @return EventListRow component corresponding to this Event
    */
-    createEventListRow(updateFunction, socket) {
+    createEventListRow(updateFunction, socket, successAlert, failAlert) {
         return (
             <EventListRow
                 key={this._id} 
@@ -58,7 +58,9 @@ export default class BMeetEvent{
                 type={this.type}
                 updateFunction={updateFunction}
                 notifyFunction={this.notifyUsers}
-                socket={socket}/>
+                socket={socket}
+                successAlert={successAlert}
+                failAlert={failAlert}/>
         )
     }
 
@@ -67,7 +69,7 @@ export default class BMeetEvent{
    * @param none
    * @return EventHistoryRow component corresponding to this Event
    */
-    createEventHistoryRow(user, socket, hasPassed, refreshEvents){
+    createEventHistoryRow(user, socket, hasPassed, refreshEvents, successAlert, failAlert){
         console.log(this.reviews);
         let userReview = this.reviews.reduce((userReview, reviewObj) => {
             return (reviewObj.user._id === user._id) ? reviewObj : userReview
@@ -91,6 +93,8 @@ export default class BMeetEvent{
                 refreshEvents={refreshEvents}
                 submitReview={this.submitReview}
                 review={hasPassed}
+                successAlert={successAlert}
+                failALert={failAlert}
                 leaveEvent={() => {
                     this.removeUser(user, socket);
                     refreshEvents();
@@ -146,7 +150,21 @@ export default class BMeetEvent{
         // add user to event object
         socket.emit("addEventAttendee", this._id, user);
         // add event to user object
-        socket.emit("addUserAttendingEvent", user.name, this._id);
+        socket.emit("addUserAttendingEvent", user.email, this._id);
+
+        let req = {
+            "sender": TRIAL_NUMBER,//this.host.phone, // You can use TRIAL_NUMBER to send an actual message not using your phone number
+            "recipients": [user.phone],
+            "message": "This is your receipt for attending this event. Please show this when you arrive! Hope to see you there!"
+            }
+        let event = {
+        "host": this.host,
+        "title": this.title,
+        "locationName": this.locationName,
+        "hostNumber": this.host.phone
+        }
+
+        socket.emit("messageUsers", req, event);
     }
 
     /**
@@ -157,7 +175,7 @@ export default class BMeetEvent{
     removeUser(user, socket) {
         console.log("Removing user: ", user, "from event: ", this._id);
         // remove user from event object
-        socket.emit("removeUserAttendingEvent", user.name, this._id);
+        socket.emit("removeUserAttendingEvent", user.email, this._id);
         // remove event from user object
         socket.emit("removeEventAttendee", this._id, user._id);
     }
@@ -182,14 +200,15 @@ export default class BMeetEvent{
         console.log('recipientPhones: ', recipients);
 
         let req = {
-        "sender": this.host.phone, // You can use TRIAL_NUMBER to send an actual message not using your phone number
+        "sender": TRIAL_NUMBER,//this.host.phone, // You can use TRIAL_NUMBER to send an actual message not using your phone number
         "recipients": recipients,
         "message": msg
         }
         let event = {
         "host": this.host,
         "title": this.title,
-        "locationName": this.locationName
+        "locationName": this.locationName,
+        "hostNumber": this.host.phone
         }
         socket.emit("messageUsers", req, event);
     }

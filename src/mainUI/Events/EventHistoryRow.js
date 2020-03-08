@@ -38,7 +38,9 @@ export default class EventHistoryRow extends React.Component{
             submitReview,
             tag,
             review,
-            leaveEvent
+            leaveEvent,
+            successAlert,
+            failAlert,
         } = this.props;
 
         const userReview = this.state.userReview;
@@ -62,7 +64,7 @@ export default class EventHistoryRow extends React.Component{
                 : review ?
                 <EventRater questions={questions} host={host} submitReview={submitReview}/>
                 :
-                <EventCancel leaveEvent={leaveEvent}/>}
+                <EventCancel leaveEvent={leaveEvent} successAlert={successAlert} failAlert={failAlert}/>}
             </TableCell>
         </TableRow>
         )

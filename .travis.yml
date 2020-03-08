@@ -5,7 +5,7 @@ cache:
   directories:
   - node_modules
 script:
-  - npm test
-  - npm run build
+  - npm test --no-fail-on-warnings
+  - npm run build --no-fail-on-warnings
   - node ./server/dbtest.js
   - node ./server/ProxySMSTest.js

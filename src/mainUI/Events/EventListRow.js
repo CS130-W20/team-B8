@@ -42,8 +42,13 @@ export default class EventListRow extends React.Component{
                     location={location} 
                     tag={tag} 
                     type={type} 
-                    updateFunction={this.props.updateFunction}/>
-                <EventMessage notifyFunction={this.props.notifyFunction} socket={this.props.socket}/>
+                    updateFunction={this.props.updateFunction}
+                    successAlert={this.props.successAlert}
+                    failAlert={this.props.failAlert}/>
+                <EventMessage notifyFunction={this.props.notifyFunction} 
+                                socket={this.props.socket}
+                                successAlert={this.props.successAlert}
+                                failAlert={this.props.failAlert}/>
                 <EventDelete />
             </TableCell>
             </TableRow>
