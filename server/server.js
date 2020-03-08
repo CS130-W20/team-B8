@@ -118,8 +118,8 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('getUser', (email) => {
-    let prom = dbInterface.getUser(email);
+  socket.on('getUser', (name) => {
+    let prom = dbInterface.getUser(name);
     prom.then( (docs) => {
       console.log("FOUND USER", docs);
       let prom2 = dbInterface.getHostAvgRating(docs.name);

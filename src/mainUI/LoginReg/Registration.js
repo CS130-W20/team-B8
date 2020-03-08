@@ -199,7 +199,7 @@ class Registration extends Component {
     //e.preventDefault ();
     const data = {
       name: this.state.first_name,
-      email: this.state.email,
+      email: this.state.user_name,
       phone: this.state.phone,
       password: this.state.password,
     };
