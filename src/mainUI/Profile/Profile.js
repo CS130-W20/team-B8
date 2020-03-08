@@ -4,10 +4,21 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import FavoriteIcon from '@material-ui/icons/Favorite';
 import Paper from '@material-ui/core/Paper';
+import Rating from '@material-ui/lab/Rating';
 import Title from './Title';
+
+const StyledRating = withStyles({
+  iconFilled: {
+    color: '#ff6d75',
+  },
+  iconHover: {
+    color: '#ff3d47',
+  },
+})(Rating);
 
 /**
  * @var useStyle Function object that generates a style off of default MaterialsUI Theme
@@ -42,12 +53,16 @@ const useStyles = makeStyles(theme => ({
  * @author Phipson Lee
  * @since 2020-02-15
  */
-export default function Profile() {
+export default function Profile(props) {
     /**
    * @var classes Calls Material-UI useStyles to generate/inherit material UI styles generated from a default theme
    */
     const classes = useStyles();
-  
+
+    const calculateRating = (ratingArray) => {
+
+    };
+
     /**
    * Renders User profile onto screen
    */
@@ -61,10 +76,20 @@ export default function Profile() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5" style={{padding: '10% 0'}}>
-            Your Name
+            {props.userID.name}
           </Typography>
-          <Title>Your Events</Title>
-          <Title>Your Rating</Title>
+          <Title>Rating</Title>
+          {props.userID.avgScore.length == 0?
+            <Title>You haven't been rated yet</Title>
+            :
+            <StyledRating
+              name="customized-color"
+              defaultValue={props.userID.avgScore}
+              getLabelText={value => `${value} Heart${value !== 1 ? 's' : ''}`}
+              precision={0.5}
+              icon={<FavoriteIcon fontSize="inherit" />}
+              />
+          }
         </div>
         </Paper>
         </Grid>

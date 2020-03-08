@@ -1,21 +1,10 @@
 import React, {Component} from 'react';
-import Message from '../elements/Message';
-import Error from '../elements/Error';
-import {
-  REGISTRATION_FIELDS,
-  REGISTRATION_MESSAGE,
-  COMMON_FIELDS,
-  ERROR_IN_REGISTRATION,
-} from '../MessageBundle';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
@@ -49,7 +38,7 @@ function validPhone (num) {
   if (!num){
     return false;
   }
-  return (num.length == 9 && /^\d+$/.test(num));
+  return (num.length === 9 && /^\d+$/.test(num));
 }
 
 /**
@@ -198,15 +187,16 @@ class Registration extends Component {
     // console.log("onsubmit: reg", this.props.socket);
     //e.preventDefault ();
     const data = {
-      name: this.state.first_name,
-      email: this.state.user_name,
+      name: this.state.first_name + " " + this.state.last_name,
+      email: this.state.email,
       phone: this.state.phone,
       password: this.state.password,
     };
-    if (this.state.phoneErr + this.state.emailErr + this.state.passwordErr == '') {
+    if (this.state.phoneErr + this.state.emailErr + this.state.passwordErr === '') {
       console.log("valid form");
       console.log("Register: ", data);
       this.state.socket.emit('addUser',data["name"], data["email"], data["password"], data["phone"]);
+      this.props.successAlert("Successfully registered user! Login using your email and password!");
       this.props.returnToLogin();
     } else {
       console.log("invalid form");
@@ -214,7 +204,6 @@ class Registration extends Component {
   };
 
   render () {
-    const {register, error, user_name_taken} = this.state;
     const {classes} = this.props;
     return (
       <Container component="main" maxWidth="xs">

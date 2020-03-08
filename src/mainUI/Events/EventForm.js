@@ -18,7 +18,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import LocationSearchInput from './LocationSearcher';
 import Geocode from "react-geocode";
-import { eventTypes, markerTypes } from './../markerPrefab/mapMarker';
+import { eventTypes } from './../markerPrefab/mapMarker';
  
 const
     io = require("socket.io-client"),
@@ -112,7 +112,8 @@ class EventForm extends Component {
             }
           }
           console.log('addEventReply: ', event);
-          socket.emit('addUserHostingEvent', this.props.userID.name, event);
+          socket.emit('addUserHostingEvent', this.props.userID.email, event);
+          this.props.successAlert("Successfully created event: "+  newEvent.title + "!");
           this.props.updateFunction();
         })
       },

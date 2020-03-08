@@ -21,15 +21,14 @@ import MapIcon from '@material-ui/icons/Map';
 import FaceIcon from '@material-ui/icons/Face';
 import DateRangeIcon from '@material-ui/icons/DateRange';
 import RateReviewIcon from '@material-ui/icons/RateReview';
-
 import GMap from './Map/GMap';
 import EventList from './Events/EventList';
 import Profile from './Profile/Profile';
 import EventHistory from './Rating/EventHistory';
 import BMeetEventFactory from './Events/EventFactory';
 import { getDistance } from 'geolib';
-import { isThisSecond } from 'date-fns';
 import { eventTypes } from './markerPrefab/mapMarker';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 /**
  * @var drawerWidth CSS Style for setting width of dashboard drawer
@@ -140,6 +139,12 @@ const styles = theme => ({
  */
 class Dashboard extends Component {
 
+  /**
+   * The follow constructor binds all the methods to the object and also declares socket event handlers
+   * which are used to handle different types of server replies and responses
+   * @param {Object} props the parameters passed on by the declaring component (i.e. App.js)
+   * Contains the userID (i.e. user email) and socket object
+   */
   constructor(props) {
     super(props);
     this.state = {
@@ -151,6 +156,7 @@ class Dashboard extends Component {
       attendedEvents: [],
       upcomingEvents: [],
       filters: {
+        enableFilters: false,
         eventDistance: 1,
         eventTypes: [eventTypes.music]
       },
@@ -178,7 +184,7 @@ class Dashboard extends Component {
       var eventFuture = []
       var date = new Date();
 
-      response.map(event => {
+      response.forEach(event => {
         var tempDate = new Date(event.timeDate);
         if (tempDate.getTime() < date.getTime())
           eventPast.push(BMeetEventFactory.createEvent(event.type, event));
@@ -199,8 +205,10 @@ class Dashboard extends Component {
 
     /**
      * Handle when we fetch an updated copy of the user object for state reference
+     * every time we receive the updated user object, we will handle the updated pages
      */
     this.props.socket.on('getUserReply', (user) => {
+      console.log('Dashboard user: ', user);
       this.setState({
         user: user
       }, () => {
@@ -239,23 +247,26 @@ class Dashboard extends Component {
       var tempList = []; // Temporarily hold events if we need to filter through them
       var finalList = [] // Actual list of events
 
-      response.map(event => {
+      response.forEach(event => {
         if (!this.state.user.eventsAttending.includes(event._id) && 
             !this.state.user.eventsHosting.includes(event._id)) {
           finalList.push(event);
         }
       });
 
+      console.log('Filtered events finalList: ', finalList);
+
       /**
        * If the filter exists, we filter by distance; otherwise, we just return
        * Check to see that we actually have user's current location- otherwise, we ignore
        * and wait until it is updated before filtering events
        */
-      if (Object.keys(this.state.filters).length !== 0 && this.state.userLocation != null && 
-      this.state.userLocation.lat != null && 
-      this.state.userLocation.lng != null) 
+      if (this.state.filters.enableFilters &&
+        Object.keys(this.state.filters).length !== 0 && this.state.userLocation != null && 
+        this.state.userLocation.lat != null && 
+        this.state.userLocation.lng != null) 
       {
-          finalList.map(event => {
+          finalList.forEach(event => {
             
             var currposition = {latitude: this.state.userLocation.lat,
               longitude: this.state.userLocation.lng};
@@ -304,29 +315,45 @@ class Dashboard extends Component {
                      updateFilter={this.setNewFilter}
                      refreshMap={this.refreshEvents}
                      socket={this.props.socket}
-                     userID={this.state.user}/>
+                     userID={this.state.user}
+                     successAlert={this.props.successAlert}
+                     successFail={this.props.failAlert}/>
       case "Profile":
         return <Profile userID={this.state.user}/>
       case "Events":
         return <EventList events={this.state.hostEvents} 
                           userID={this.state.user} 
                           refreshEvents={this.refreshEvents}
-                          socket={this.props.socket}/>
+                          socket={this.props.socket}
+                          successAlert={this.props.successAlert}
+                          successFail={this.props.failAlert}/>
       case "Rate":
         return <EventHistory eventsPast={this.state.attendedEvents} 
                              eventsFuture={this.state.upcomingEvents}
                              userID={this.state.user}
                              socket={this.props.socket}
-                             refreshEvents={this.refreshEvents}/>
+                             refreshEvents={this.refreshEvents}
+                             successAlert={this.props.successAlert}
+                             failAlert={this.props.failAlert}/>
+      default:
+        return null;
     }
   }
 
+  /**
+   * 
+   * @param {Object} newEvents 
+   */
   handleEventsIn(newEvents) {
     this.setState({
       events: newEvents
     });
   }
 
+  /**
+   * 
+   * @param {String} newPage The string tag for the new page that we will be showing
+   */
   setPage(newPage) {
     this.setState({
       dashboardPage: newPage
@@ -418,7 +445,7 @@ class Dashboard extends Component {
     var newfilter = this.state.filters;
     let date = new Date();
     console.log('At handleDashboardMap; current Date: ', date.toISOString());
-    if (Object.keys(newfilter).length !== 0 && newfilter.eventTypes.length > 0) {
+    if (this.state.filters.enableFilters && Object.keys(newfilter).length !== 0 && newfilter.eventTypes.length > 0) {
       console.log('filterEvents: ', newfilter)
       this.props.socket.emit('queryEvents', null, newfilter.eventTypes, null, date.toISOString(), null, null);
     } else {
@@ -426,6 +453,8 @@ class Dashboard extends Component {
       this.props.socket.emit('queryEvents', null, null, null, date.toISOString(), null, null);
     }
   }
+
+
 
   /**
    * Default return function that renders dashboard onto browser
@@ -452,9 +481,7 @@ class Dashboard extends Component {
                     BruinMeet
                   </Typography>
                   <IconButton color="inherit">
-                    <Badge badgeContent={4} color="secondary">
-                      <NotificationsIcon />
-                    </Badge>
+                    <ExitToAppIcon color="inherit" onClick={this.props.logoutFunction}/>
                   </IconButton>
                 </Toolbar>
               </AppBar>

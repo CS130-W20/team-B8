@@ -26,6 +26,9 @@ export default class App extends React.Component{
   constructor(props){
     super(props);
     this.state = {
+      displayGreen: false,
+      displayRed: false,
+      displayMessage: '',
       loggedIn: false,
       register: false,
       socket:  socket,
@@ -38,6 +41,9 @@ export default class App extends React.Component{
     this.handleOpen = this.handleOpen.bind(this);
     this.handleClose = this.handleClose.bind(this);
     this.isTokenExpired = this.isTokenExpired.bind(this);
+    this.logout = this.logout.bind(this);
+    this.returnFailMessage = this.returnFailMessage.bind(this);
+    this.returnSuccessMessage = this.returnSuccessMessage.bind(this);
   }
 
   componentDidMount() {
@@ -46,7 +52,8 @@ export default class App extends React.Component{
     console.log('userToken: ', token, user);
     if (token != null && user != null) {
       if (!this.isTokenExpired(token)) {
-        this.setState({loggedIn: true, user: user, open: true});
+        this.setState({loggedIn: true, user: user},
+          () => this.returnSuccessMessage("Successfully logged in. Have fun!"));
       }
     }
   }
@@ -55,7 +62,13 @@ export default class App extends React.Component{
     localStorage.setItem('id_token', token);
     localStorage.setItem('id_user', userID);
     console.log("loggin in...");
-    this.setState({loggedIn: true, user: userID, open: true});
+    this.setState({loggedIn: true, user: userID}, 
+      () => this.returnSuccessMessage("Successfully logged in. Have fun!"));
+  }
+
+  logout = () => {
+    this.setState({loggedIn: false, user: ""},
+      () => this.returnSuccessMessage("Successfully logged out. Hope to see you soon!"));
   }
 
   register = () => {
@@ -80,7 +93,9 @@ export default class App extends React.Component{
 
   handleClose = () => {
     this.setState({
-      open: false
+      open: false,
+      displayGreen: false,
+      displayRed: false,
     })
   }
 
@@ -99,32 +114,54 @@ export default class App extends React.Component{
     }
   }
 
+  returnSuccessMessage = (message) => {
+    this.setState({
+      displayMessage: message,
+      displayGreen: true,
+      displayRed: false,
+    });
+  }
+
+  returnFailMessage = (message) => {
+    this.setState({
+      displayMessage: message,
+      displayRed: true,
+      displayGreen: false
+    });
+  }
+
   render() {
     return (
       <div>
-        <Snackbar open={this.state.open && !this.state.loggedIn} autoHideDuration={6000} onClose={this.handleClose}>
-          <Alert severity="error">Failed to log in</Alert>
+        <Snackbar open={this.state.displayGreen} autoHideDuration={3000} onClose={this.handleClose}>
+          <Alert severity="success">{this.state.displayMessage}</Alert>
         </Snackbar>
-        <Snackbar open={this.state.open && this.state.loggedIn} autoHideDuration={6000} onClose={this.handleClose}>
-          <Alert severity="success">Successfully logged in! Have fun!</Alert>
+        <Snackbar open={this.state.displayRed} autoHideDuration={3000} onClose={this.handleClose}>
+          <Alert severity="error">{this.state.displayMessage}</Alert>
         </Snackbar>
       {this.state.loggedIn?
       <Router>
         <div>
-          <Dashboard socket={this.state.socket} userID={this.state.user}/>
+          <Dashboard socket={this.state.socket} userID={this.state.user} logoutFunction={this.logout} 
+            successAlert={this.returnSuccessMessage}
+            failAlert={this.returnFailMessage}/>
         </div>
       </Router>
       :
       this.state.register?
       <Router>
         <div>
-          <Registration socket={socket} returnToLogin={this.returnToLogin}/>
+          <Registration socket={socket} returnToLogin={this.returnToLogin}
+          successAlert={this.returnSuccessMessage}
+          failAlert={this.returnFailMessage}/>
         </div>
       </Router>
       :
       <Router>
         <div>
-          <Login socket={socket} login={this.login} registerUser={this.register} error={this.handleOpen}/>
+          <Login socket={socket} login={this.login} registerUser={this.register} error={this.handleOpen}
+          successAlert={this.returnSuccessMessage}
+          failAlert={this.returnFailMessage}/>
         </div>
       </Router>}
       </div>
