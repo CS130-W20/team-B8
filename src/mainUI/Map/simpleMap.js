@@ -138,9 +138,9 @@ class SimpleMap extends Component {
           <Marker
             position={userLocation}/>
           {events.map((marker, i) =>{
-                console.log(marker);
                 //this.renderMarker(marker, i);
-                return(
+                if(!marker) return
+                return marker && (
                   <Marker
                     onClick={() => this.handleClickOpen(marker)}
                     position={{ lat: marker.location.lat, lng: marker.location.lng}}

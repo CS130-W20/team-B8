@@ -134,7 +134,7 @@ class Registration extends Component {
       password: e.target.value,
     });
 
-    if (!validPassword(this.state.password)) {
+    if (!validPassword(e.target.value)) {
       this.setState({
         passwordErr: 'Password must be at least 8 characters long.'
       })
