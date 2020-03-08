@@ -9,7 +9,18 @@ import LocationOnIcon from '@material-ui/icons/LocationOn';
 import QueryBuilderIcon from '@material-ui/icons/QueryBuilder';
 import PersonIcon from '@material-ui/icons/Person';
 import PeopleOutlineIcon from '@material-ui/icons/PeopleOutline';
-import TextField from '@material-ui/core/TextField';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import Rating from '@material-ui/lab/Rating';
+import { withStyles } from '@material-ui/core/styles';
+
+const StyledRating = withStyles({
+    iconFilled: {
+      color: '#ff6d75',
+    },
+    iconHover: {
+      color: '#ff3d47',
+    },
+})(Rating);
 
 class CalendarDate extends React.Component{
     monthToStr = (month) => {
@@ -155,6 +166,16 @@ export default class EventPage extends React.Component{
                 <PeopleOutlineIcon color={"grey"} fontSize={'small'}/>
                 {currEvent.attendees.length + (currEvent.attendees.length === 1 ? " person going" : "  people going")}
             </EventPageItem>
+            {currEvent.reviews.map((review,index) => (
+                <StyledRating
+                  name={'rating-' + index }
+                  value={review.score}
+                  getLabelText={value => `${value} Heart${value !== 1 ? 's' : ''}`}
+                  precision={0.5}
+                  icon={<FavoriteIcon fontSize="inherit" />}
+                  disabled={true}
+                />
+            ))}
 {/*             
             {events.length > 0 && 
             <div className={classes.seeMore}>
