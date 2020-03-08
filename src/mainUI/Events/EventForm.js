@@ -157,9 +157,9 @@ class EventForm extends Component {
    * @function handleDescriptionChange Function that takes in a description and updates it for event
    * @param {String} date Description of event
    */
-  handleDescriptionChange = description => {
+  handleDescriptionChange = event => {
     this.setState({
-      description: description
+      description: event.target.value
     })    
   };
 
