@@ -90,7 +90,7 @@ class GMapFilter extends Component {
     }
 
     handleDistance = (event, newVal) => {
-        if (newVal != this.state.eventDistance) {
+        if (newVal !== this.state.eventDistance) {
             this.setState({
                 eventDistance: newVal,
             }, () => {

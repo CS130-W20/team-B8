@@ -1,7 +1,7 @@
 import React from 'react';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import EventReviewDialog from '../Rating/EventReviewDialog';
+import EventReview from '../Rating/EventReview';
 import EventRater from '../Rating/EventRater';
 import EventCancel from '../Rating/EventCancel';
 import {getTimeString, getDateString} from './EventClasses/formatTimeDate';
@@ -13,18 +13,19 @@ export default class EventHistoryRow extends React.Component{
         this.state = {
             userReview: props.userReview
         }
+        this.submitFunction = this.submitFunction.bind(this);
     }
 
-    submitReview = (rating, review) => {
+    submitFunction(rating, review){
         const {
             user,
             refreshEvents,
-        } = this.props;
+        } = this.props
         this.props.submitReview(user, rating, review, refreshEvents);
         this.setState({
             userReview: {user: user, score: rating, review: review}
         });
-    }
+    };
 
     render(){
         const{
@@ -60,9 +61,9 @@ export default class EventHistoryRow extends React.Component{
             <TableCell>{numAttendees}</TableCell>
             <TableCell align="right">
                 {userReview ? 
-                <EventReviewDialog rating={userReview.score} review={JSON.parse(userReview.review)} user={userReview.user} id={_id}/>
+                <EventReview rating={userReview.score} review={JSON.parse(userReview.review)} user={userReview.user} id={_id}/>
                 : review ?
-                <EventRater questions={questions} host={host} submitReview={this.submitReview}/>
+                <EventRater questions={questions} host={host} submitFunction={this.submitFunction}/>
                 :
                 <EventCancel leaveEvent={leaveEvent} successAlert={successAlert} failAlert={failAlert}/>}
             </TableCell>

@@ -2,7 +2,7 @@ import React from 'react';
 import EventListRow from '../EventListRow';
 import EventHistoryRow from '../EventHistoryRow';
 import { Marker } from 'google-maps-react';
-import { getMarkerType, markerTypes } from '../../markerPrefab/mapMarker';
+import { getMarkerType } from '../../markerPrefab/mapMarker';
 import { DialogContent } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 
@@ -10,7 +10,7 @@ const io = require("socket.io-client"),
 socket = io.connect("http://localhost:8000");
 
 
-const TEST_NUMBER = "+15005550006"; // Won't actually send message, but will give you success response
+//const TEST_NUMBER = "+15005550006"; // Won't actually send message, but will give you success response
 const TRIAL_NUMBER = "17205753789"; // Actual trial number you can use to test message sending
 
 // BMeetEvent: A base class type that is used to generate event objects

@@ -133,9 +133,30 @@ io.on("connection", (socket) => {
     })
     .catch( (error) =>  {
       console.log("ERROR:", error);
+      socket.emit("getUserError", error)
+    })
+  });
+
+  socket.on('getHost', (email) => {
+    let prom = dbInterface.getUser(email);
+    prom.then( (docs) => {
+      console.log("FOUND HOST", docs);
+      let prom2 = dbInterface.getHostAvgRating(docs.email);
+      prom2.then(doc => {
+        console.log("FOUND REVIEWS", doc);
+        if (Object.keys(doc).length > 0) {
+          docs['avgScore'] = doc.result;
+          docs['reviews'] = doc.reviews;
+        }
+        socket.emit("getHostReply", docs);
+      }
+      ).catch( err => reject(err));
+    })
+    .catch( (error) =>  {
+      console.log("ERROR:", error);
       socket.emit("serverError", error)
     })
-  })
+  });
 
   socket.on('updateUserPassword', (email, newpass) => {
     let prom = dbInterface.updateUserPassword(email, newpass);

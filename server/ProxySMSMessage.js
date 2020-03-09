@@ -117,7 +117,7 @@ class ProxySMSMessage extends SMSMessage {
      */
     formatMessage() {
         try {
-            let tempMessage = `You have just received a text on BruinMeet from ${this.event.host.name}, in relation to the event ${this.event.title} at ${this.event.locationName} during ${this.event.date}\r\n\r\n${this.message}\r\n\r\nFeel free to type any message below to reply to ${this.event.host.name}`;
+            let tempMessage = `You have just received a text on BruinMeet from ${this.event.host.name}, in relation to the event ${this.event.title} at ${this.event.locationName} during ${this.event.date}\r\n\r\n${this.message}\r\n\r\nFeel free to message ${this.event.host.name} at ${this.event.host.phone}`;
 
             this.message = tempMessage;
         } catch (error) {

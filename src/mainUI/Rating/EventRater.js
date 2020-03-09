@@ -66,7 +66,7 @@ export default class EventRater extends React.Component{
       // Object.keys(this.state.review)
       //                 .map(question => question + this.state.review[question])
       //                 .join('&');
-      this.props.submitReview(this.state.rating, reviewString);
+      this.props.submitFunction(this.state.rating, reviewString);
       this.handleClickClose();
     }
 

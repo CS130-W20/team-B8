@@ -1,16 +1,9 @@
 import React, { Component } from 'react';
 //import { Link } from 'react-router-dom';
 //import LoginService from '../services/LoginService';
-import Message from '../elements/Message';
-import Error from '../elements/Error';
 import {
-  COMMON_FIELDS,
   REGISTRATION_FIELDS,
-  LOGIN_FIELDS,
-  LOGIN_MESSAGE,
-  ERROR_IN_LOGIN,
 } from '../MessageBundle';
-import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -19,10 +12,9 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Link from '@material-ui/core/Link';
+import BMLogo from './../BruinMeetLogo.png';
 
 //const io = require("socket.io-client"),
 //socket = io.connect("http://localhost:8000");
@@ -76,14 +68,14 @@ class Login extends Component {
 
     this.props.socket.on("authReply", (status, userID, token) => {
       console.log("serverReply: ", status);
-      if (status == "SUCCESS") {
+      if (status === "SUCCESS") {
         this.props.login(userID, token);
         this.setState({
           error: false,
           loginSuccess: true,
         });
       }
-      else if (status == "FAIL") {
+      else if (status === "FAIL") {
         this.props.error();
         this.setState({
           loginSuccess: false,
@@ -114,7 +106,6 @@ class Login extends Component {
     this.state.socket.emit("authenticate", data.username, data.password);
   };
   render() {
-    const { loginSuccess, error } = this.state;
     const { classes } = this.props;
 
     return (
@@ -123,12 +114,7 @@ class Login extends Component {
       <Grid item xs={false} sm={4} md={7} className={classes.image} />
       <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
         <div className={classes.paper}>
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign in
-          </Typography>
+          <img style={{width: 250, height: 250}}src={BMLogo}/>
           <form className={classes.form} noValidate>
             <TextField
               variant="outlined"
@@ -154,10 +140,6 @@ class Login extends Component {
               value={this.state.password}
               onChange={this.handleOnChangePassword}
               autoComplete="current-password"/>
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
             <Button
               fullWidth
               variant="contained"

@@ -163,7 +163,7 @@ export default class EventPage extends React.Component{
 
     getImageContainerStyle = () => ({
         width: '500px',
-        height: '200px',
+        height: 'auto',
         overflow: 'hidden',
         marginBottom: '5px',
     })
@@ -199,7 +199,7 @@ export default class EventPage extends React.Component{
         const month = months[eventDate.getMonth()];
         var year = eventDate.getFullYear();
         var hour = eventDate.getHours() % 12;
-        hour = hour == 0 ? 12 : hour;
+        hour = hour === 0 ? 12 : hour;
         var minutes = eventDate.getMinutes();
         minutes = minutes < 10 ? '0' + minutes : minutes;
         const AMPM = eventDate.getHours() < 12 ? "AM" : "PM";
@@ -216,7 +216,7 @@ export default class EventPage extends React.Component{
         <div style={this.getEventPageStyle()}>
             {currEvent.image && 
             <div style={this.getImageContainerStyle()}>
-            <img style={this.getImageStyle()} src={'data:image/jpeg;base64,' + currEvent.image}/>
+            <img style={this.getImageStyle()} alt={"Event image can't be displayed"}  src={'data:image/jpeg;base64,' + currEvent.image}/>
             </div>
             }
             <div style={this.getDescriptionStyle()}>
@@ -247,9 +247,8 @@ export default class EventPage extends React.Component{
                 <PeopleOutlineIcon color={"grey"} fontSize={'small'}/>
                 {currEvent.attendees.length + (currEvent.attendees.length === 1 ? " person going" : "  people going")}
             </EventPageItem>
-            <div style={{fontWeight: 'bold', padding: '10px', borderBottom: '1px solid gray'}}> {'Reviews of this host:'} </div>
-
-            {reviews && reviews.map((reviewObj,index) => {
+            {/*<div style={{fontWeight: 'bold', padding: '10px', borderBottom: '1px solid gray'}}> {'Reviews of this host:'} </div>*/}
+            {reviews.map((reviewObj, index) => {
                 const {
                     rating,
                     review,
@@ -258,7 +257,7 @@ export default class EventPage extends React.Component{
                 } = reviewObj;
                 return <EventReviewRow rating={rating} review={JSON.parse(review)} user={user} event={event}/>
             })}
-{/*             
+            {/*             
             {events.length > 0 && 
             <div className={classes.seeMore}>
                     <Link color="primary" href="#">

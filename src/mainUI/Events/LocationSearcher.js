@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
 import PlacesAutocomplete, {
   geocodeByAddress,
-  getLatLng,
 } from 'react-places-autocomplete';
 import TextField from '@material-ui/core/TextField';
-import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
+import { GoogleApiWrapper } from 'google-maps-react';
 
 
 /**
@@ -34,12 +33,6 @@ class LocationSearchInput extends Component {
   };
  
   render() {
-    const {
-      locationNameId,
-      setLocation,
-      setWaitingForLocation
-    } = this.props;
-
     return (
       <PlacesAutocomplete
         value={this.state.address}

@@ -9,11 +9,9 @@ import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import NotificationsIcon from '@material-ui/icons/Notifications';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -29,6 +27,7 @@ import BMeetEventFactory from './Events/EventFactory';
 import { getDistance } from 'geolib';
 import { eventTypes } from './markerPrefab/mapMarker';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import BMLogo from './BruinMeetLogo.png';
 
 /**
  * @var drawerWidth CSS Style for setting width of dashboard drawer
@@ -55,7 +54,7 @@ const styles = theme => ({
     ...theme.mixins.toolbar,
   },
   appBar: {
-    backgroundColor: '#6a2c70',
+    backgroundColor: '#311d3f',
     color: '#f5f5f5',
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
@@ -228,6 +227,10 @@ class Dashboard extends Component {
       })
     });
 
+    this.props.socket.on('getUserError', (error) => {
+      this.props.loginError();
+    })
+
     /**
      * Handle EventList Events based on ones that the user is hosting
      */
@@ -247,12 +250,16 @@ class Dashboard extends Component {
       var tempList = []; // Temporarily hold events if we need to filter through them
       var finalList = [] // Actual list of events
 
-      response.forEach(event => {
-        if (!this.state.user.eventsAttending.includes(event._id) && 
-            !this.state.user.eventsHosting.includes(event._id)) {
-          finalList.push(event);
-        }
-      });
+      if (Object.keys(this.state.user).length > 0) {
+        response.forEach(event => {
+          console.log('User: ', this.state.user);
+
+          if (!this.state.user.eventsAttending.includes(event._id) && 
+              !this.state.user.eventsHosting.includes(event._id)) {
+            finalList.push(event);
+          }
+        });
+      }
 
       console.log('Filtered events finalList: ', finalList);
 
@@ -307,6 +314,7 @@ class Dashboard extends Component {
    */
   renderDashboard() {
     console.log('Updated Dashboard: ', this.state.events);
+    console.log('Updated User: ', this.state.user);
     // Note: this.state.user is the user object stored in the database
     switch(this.state.dashboardPage){
       case "Map":
@@ -477,6 +485,7 @@ class Dashboard extends Component {
                     className={clsx(classes.menuButton, this.state.open && classes.menuButtonHidden)}>
                   <MenuIcon />
                   </IconButton>
+                  <img style={{width: 50, height: 50}}src={BMLogo}/>
                   <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
                     BruinMeet
                   </Typography>

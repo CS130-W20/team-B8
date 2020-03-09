@@ -279,7 +279,7 @@ class EventEdit extends Component{
           <DialogTitle id="form-dialog-title">Update Your Event</DialogTitle>
           <DialogContent>
           <div style={this.getImageContainerStyle()}>
-            <img style={this.getImageStyle()} src={this.state.previewImage ? 
+            <img style={this.getImageStyle()} alt={"Event image can't be displayed."} src={this.state.previewImage ? 
             this.state.previewImage
             : 'https://lh3.googleusercontent.com/proxy/Qe8V5Hwb-cD6ZXzkehYtxggyL9ODf86fvHXoIflZM-27jbbL8V5qcsXS1MkeHJMZsiWpm5n5FS2cL9MrIDCjV1Y-_y99c263BBYayegnQnAAz_nhPG44rWhaWE3k'}/>
             </div>

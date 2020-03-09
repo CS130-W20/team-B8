@@ -9,6 +9,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import BMLogo from './../BruinMeetLogo.png';
 
 const styles = theme => ({
   paper: {
@@ -209,10 +210,8 @@ class Registration extends Component {
       <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
+      <img style={{width: 100, height: 100}}src={BMLogo}/>
+        <Typography style={{paddingTop: 50}}component="h1" variant="h5">
           Create an Account
         </Typography>
         <form className={classes.form} noValidate>

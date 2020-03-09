@@ -3,9 +3,6 @@ import decode from 'jwt-decode';
 import './App.css';
 import {
   BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
 } from "react-router-dom";
 import Dashboard from './mainUI/Dashboard';
 import Login from './mainUI/LoginReg/Login';
@@ -44,6 +41,7 @@ export default class App extends React.Component{
     this.logout = this.logout.bind(this);
     this.returnFailMessage = this.returnFailMessage.bind(this);
     this.returnSuccessMessage = this.returnSuccessMessage.bind(this);
+    this.loginError = this.loginError.bind(this)
   }
 
   componentDidMount() {
@@ -52,8 +50,7 @@ export default class App extends React.Component{
     console.log('userToken: ', token, user);
     if (token != null && user != null) {
       if (!this.isTokenExpired(token)) {
-        this.setState({loggedIn: true, user: user},
-          () => this.returnSuccessMessage("Successfully logged in. Have fun!"));
+        this.setState({loggedIn: true, user: user});
       }
     }
   }
@@ -69,6 +66,11 @@ export default class App extends React.Component{
   logout = () => {
     this.setState({loggedIn: false, user: ""},
       () => this.returnSuccessMessage("Successfully logged out. Hope to see you soon!"));
+  }
+
+  loginError = () => {
+    this.setState({loggedIn: false, user: ""},
+      () => this.returnFailMessage("Couldn't find user. Please register or try to login again"));
   }
 
   register = () => {
@@ -142,16 +144,20 @@ export default class App extends React.Component{
       {this.state.loggedIn?
       <Router>
         <div>
-          <Dashboard socket={this.state.socket} userID={this.state.user} logoutFunction={this.logout} 
+          <Dashboard socket={this.state.socket} 
+            userID={this.state.user} 
+            logoutFunction={this.logout} 
             successAlert={this.returnSuccessMessage}
-            failAlert={this.returnFailMessage}/>
+            failAlert={this.returnFailMessage}
+            loginError={this.loginError}/>
         </div>
       </Router>
       :
       this.state.register?
       <Router>
         <div>
-          <Registration socket={socket} returnToLogin={this.returnToLogin}
+          <Registration socket={socket} 
+          returnToLogin={this.returnToLogin}
           successAlert={this.returnSuccessMessage}
           failAlert={this.returnFailMessage}/>
         </div>
@@ -159,7 +165,9 @@ export default class App extends React.Component{
       :
       <Router>
         <div>
-          <Login socket={socket} login={this.login} registerUser={this.register} error={this.handleOpen}
+          <Login socket={socket} login={this.login} 
+          registerUser={this.register} 
+          error={this.handleOpen}
           successAlert={this.returnSuccessMessage}
           failAlert={this.returnFailMessage}/>
         </div>

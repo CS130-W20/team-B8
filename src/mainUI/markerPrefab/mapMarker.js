@@ -54,7 +54,7 @@ class CustomMarker extends Marker {
       <div className="marker"
       style={{ cursor: 'pointer'}}
       title={this.state.name}>
-        <img src={this.state.type} className="markerIcon"/>
+        <img src={this.state.type} alt={"Map marker can't be displayed"} className="markerIcon"/>
       </div>
     );
   };

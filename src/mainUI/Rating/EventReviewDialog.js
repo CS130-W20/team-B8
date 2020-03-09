@@ -1,6 +1,5 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -9,8 +8,6 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import Rating from '@material-ui/lab/Rating';
 import { withStyles } from '@material-ui/core/styles';
 import EventReview  from './EventReview';
-import RateReviewIcon from '@material-ui/icons/RateReview';
-import { IconButton } from '@material-ui/core';
 
 /**
  * @var useStyle Function object that generates a style off of default MaterialsUI Theme

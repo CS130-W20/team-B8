@@ -1,27 +1,31 @@
 export function getTimeString(hours, mins) {
+    var timeHR, timeMin;
+
     if (hours < 10)
-        var timeHR = "0" + hours;
+        timeHR = "0" + hours;
     else
-        var timeHR = hours;
+        timeHR = hours;
 
     if (mins < 10)
-        var timeMin = "0" + mins;
+        timeMin = "0" + mins;
     else
-        var timeMin = mins;
+        timeMin = mins;
 
     return timeHR + ":" + timeMin;
 };
 
 export function getDateString(month, day, year) {
+    var dateMONTH, dateDAY;
+
     if (month < 10)
-        var dateMONTH = "0" + month;
+        dateMONTH = "0" + month;
     else
-        var dateMONTH = month;
+        dateMONTH = month;
 
     if (day < 10)
-        var dateDAY = "0" + day;
+        dateDAY = "0" + day;
     else
-        var dateDAY = day;
+        dateDAY = day;
 
     return dateMONTH + '-' + dateDAY + '-' + year;
 }

@@ -23,6 +23,7 @@ class GMap extends Component {
     render() {
         const {classes, events, updateLocation, updateFilter, refreshMap, socket, userID} = this.props;
         console.log('GMap events: ', events);
+        console.log('GMap user: ', userID);
         return(
             <Grid data-testid="Map" container spacing={3} style={{height: "80vh"}}>
                 {/* Map */}

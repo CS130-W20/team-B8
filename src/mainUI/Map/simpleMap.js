@@ -34,8 +34,8 @@ class SimpleMap extends Component {
       this.state = {
           open: false,
           currEvent: {},
-          avgScore: null,
-          reviews: null,
+          avgScore: [],
+          reviews: [],
       }
     
       this.handleClickClose = this.handleClickClose.bind(this);
@@ -57,6 +57,13 @@ class SimpleMap extends Component {
           this.setState({ loading: false });
         }
       );
+
+      this.props.socket.on("getHostReply", (user) => {
+        console.log('Event host: ', user);
+        if ("avgScore" in user && "reviews" in user) {
+          this.setState({avgScore: user.avgScore, reviews: user.reviews});
+        }
+    });
     }
 
   /**
@@ -83,10 +90,7 @@ class SimpleMap extends Component {
    * Event function that will be used for detecting button click and display event details
    */
   handleClickOpen(event) {
-    this.props.socket.emit("getUser", event.host.email);
-    this.props.socket.on("getUserReply", (user) => {
-        this.setState({avgScore: user.avgScore, reviews: user.reviews});
-    });
+    this.props.socket.emit("getHost", event.host.email);
     this.setState({
       open: true,
       currEvent: event
@@ -145,7 +149,8 @@ class SimpleMap extends Component {
             position={userLocation}/>
           {events.map((marker, i) =>{
                 //this.renderMarker(marker, i);
-                if(!marker) return
+                if(!marker) 
+                  return null;
                 return marker && (
                   <Marker
                     onClick={() => this.handleClickOpen(marker)}
@@ -164,9 +169,6 @@ class SimpleMap extends Component {
               </Button>
               <Button onClick={this.handleAttendEvent} color="primary">
                   Attend
-              </Button>
-              <Button onClick={this.handleClickClose} color="primary">
-                  Message Host
               </Button>
           </DialogActions>
           </Dialog>

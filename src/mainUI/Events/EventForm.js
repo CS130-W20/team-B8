@@ -24,10 +24,6 @@ const
     io = require("socket.io-client"),
     socket = io.connect("http://localhost:8000");
 
-const apiURL = 'https://api.imgur.com/3/image'
-const apiID = '8305eaba1add5f7'
-const apiKey = 'd4050ae840b54cb4d1ba3082a48d909788ae0bc7'
-
 /**
  * @var useStyle Function object that generates a style off of default MaterialsUI Theme
  * @see https://github.com/mui-org/material-ui/tree/master/docs/src/pages/getting-started/templates/dashboard
@@ -228,7 +224,7 @@ class EventForm extends Component {
 
     getImageContainerStyle = () => ({
       width: '550px',
-      height: '200px',
+      height: 'auto',
       overflow: 'hidden',
       marginBottom: '-40px',
   })
@@ -251,7 +247,7 @@ class EventForm extends Component {
           <DialogTitle id="form-dialog-title">Create A New Event</DialogTitle>
           <DialogContent>
             <div style={this.getImageContainerStyle()}>
-            <img style={this.getImageStyle()} src={this.state.previewImage ? 
+            <img style={this.getImageStyle()} alt={"Event image can't be displayed"} src={this.state.previewImage ? 
             this.state.previewImage
             : 'https://i.imgur.com/9UUY6dO.png'}/>
             </div>

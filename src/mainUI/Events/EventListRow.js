@@ -18,7 +18,6 @@ export default class EventListRow extends React.Component{
             attendees,
             tag,
             type,
-            description,
             image
         } = this.props;
 
