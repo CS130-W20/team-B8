@@ -243,7 +243,7 @@ class EventForm extends Component {
           <DialogTitle id="form-dialog-title">Create A New Event</DialogTitle>
           <DialogContent>
             <div style={this.getImageContainerStyle()}>
-            <img style={this.getImageStyle()} alt={"Event image can't be displayed"} src={this.state.previewImage ? 
+            <img style={this.getImageStyle()} alt={"Event Representation"} src={this.state.previewImage ? 
             this.state.previewImage
             : 'https://i.imgur.com/9UUY6dO.png'}/>
             </div>
