@@ -22,7 +22,6 @@ export default class BMeetEvent{
         this.image = props.image;
         this.description = props.description;
         this.timeDate = props.timeDate;
-        this.tag = props.tag;
         this.location = props.location;
         this.locationName = props.locationName;
         this.host =  props.host;
@@ -57,7 +56,6 @@ export default class BMeetEvent{
                 timeDate={this.timeDate}
                 locationName={this.locationName}
                 attendees={this.attendees}
-                tag={this.tag}
                 type={this.type}
                 updateFunction={updateFunction}
                 notifyFunction={this.notifyUsers}
@@ -88,7 +86,6 @@ export default class BMeetEvent{
                 timeDate={this.timeDate}
                 locationName={this.locationName}
                 attendees={this.attendees}
-                tag={this.tag}     
                 host={this.host}
                 questions={this.questions}
                 userReview={userReview}

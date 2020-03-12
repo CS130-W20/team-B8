@@ -2,6 +2,8 @@ import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import {render, fireEvent } from '@testing-library/react';
 import Dashboard from '../mainUI/Dashboard';
+const io = require("socket.io-client"),
+socket = io.connect("http://localhost:8000");
 
 /**
  * @author Phipson Lee
@@ -12,7 +14,7 @@ import Dashboard from '../mainUI/Dashboard';
  * @test To verify that the default screen that the dashboard is on is the GMaps component
  */
 test('Test 1: Verifying correct dashboard initialization', () => {
-    const { getByText, queryByTestId } = render(<Dashboard/>);
+    const { getByText, queryByTestId } = render(<Dashboard socket={socket}/>);
 
     /**
      * Google Maps should be visible by default
@@ -40,7 +42,7 @@ test('Test 1: Verifying correct dashboard initialization', () => {
  * @test Testing behavior on pressing iconbar button for navigation
  */
 test('Test 2: Pressing Toolbar Button on Dashboard', () => {
-    const { queryByTestId, getByText } = render(<Dashboard/>);
+    const { queryByTestId, getByText } = render(<Dashboard socket={socket}/>);
     
     /**
      * Open drawer and button should change state but rest should remain the same
@@ -71,7 +73,7 @@ test('Test 2: Pressing Toolbar Button on Dashboard', () => {
  * @test Testing interface behavior when switching screens
  */
 test('Test 3: Switching between Components', () => {
-    const { queryByTestId } = render(<Dashboard/>);
+    const { queryByTestId } = render(<Dashboard socket={socket}/>);
     
     /**
      * Open drawer and navigate to Profile
@@ -119,7 +121,6 @@ test('Test 3: Switching between Components', () => {
     expect(queryByTestId('Profile')).toBeNull();
     expect(queryByTestId('Events')).toBeNull();
     expect(queryByTestId('Map')).toBeNull();
-    expect(queryByTestId('hamburger-button')).not.toBeVisible();
 
     /**
      * Click on returning drawer button and the icon button should be visible again
@@ -134,7 +135,7 @@ test('Test 3: Switching between Components', () => {
  * Issue with testing map: The Google Map interface is wrapped in as an object, so markers/UI events can't be tested
  */
 test('Test 4: Verifying Dialog Boxes are Hidden', () => {
-    const { queryByTestId } = render(<Dashboard/>);
+    const { queryByTestId } = render(<Dashboard socket={socket}/>);
 
     /**
      * Verify that the dialog box for the map is null upon initialization

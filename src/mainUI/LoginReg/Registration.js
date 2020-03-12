@@ -1,11 +1,9 @@
 import React, {Component} from 'react';
-import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -50,7 +48,7 @@ function validEmail (email) {
   if (!email) {
     return false;
   }
-  return (email.includes("ucla.ed"));
+  return (email.includes("ucla.edu"));
 }
 
 /**
@@ -168,20 +166,6 @@ class Registration extends Component {
     this.setState ({
       user_name: e.target.value,
     });
-    // const data = {
-    //   user_name: this.state.user_name,
-    // };
-    // socket.emit('getUser',data);
-    // socket.on("reply",(status)=>{
-    //   console.log("server reply: ", event);
-    //   if (event=="EXISTS") this.setSate({user_name_taken:true});
-    //   else this.setState({user_name_taken:false});
-    // })
-    // const isUsernameTaken = await UsernameValidation (data);
-
-    // isUsernameTaken === 204
-    //   ? this.setState ({user_name_taken: true})
-    //   : this.setState ({user_name_taken: false});
   };
 
   handleRegistration = () => {
@@ -209,13 +193,16 @@ class Registration extends Component {
     return (
       <Container component="main" maxWidth="xs">
       <CssBaseline />
-      <div className={classes.paper}>
+      <div 
+      data-testid="register"
+      className={classes.paper}>
       <img style={{width: 100, height: 100}}src={BMLogo}/>
         <Typography style={{paddingTop: 50}}component="h1" variant="h5">
           Create an Account
         </Typography>
         <form className={classes.form} noValidate>
           <TextField
+            data-testid="register-first"
             variant="outlined"
             margin="normal"
             required
@@ -229,6 +216,7 @@ class Registration extends Component {
             autoFocus
           />
           <TextField
+            data-testid="register-last"
             variant="outlined"
             margin="normal"
             required
@@ -241,6 +229,7 @@ class Registration extends Component {
             onChange={this.handleOnChangeLastName}
             autoFocus/>
           <TextField
+            data-testid="register-email"
             variant="outlined"
             margin="normal"
             required
@@ -255,6 +244,7 @@ class Registration extends Component {
             {this.state.emailErr.length > 0 &&
               <span className='error'>{this.state.emailErr}</span>}
           <TextField
+            data-testid="register-phone"
             variant="outlined"
             margin="normal"
             required
@@ -269,6 +259,7 @@ class Registration extends Component {
             {this.state.phoneErr.length > 0 &&
               <span className='error'>{this.state.phoneErr}</span>}
           <TextField
+            data-testid="register-password"
             variant="outlined"
             margin="normal"
             required
@@ -294,7 +285,9 @@ class Registration extends Component {
             <Grid item xs>
             </Grid>
             <Grid item>
-              <Link onClick={this.props.returnToLogin}>
+              <Link 
+                data-testid="login-account"
+                onClick={this.props.returnToLogin}>
                 {"Already have an account? Login here!"}
               </Link>
             </Grid>

@@ -78,7 +78,6 @@ class EventHistory extends React.Component{
                 </React.Fragment>
                 <div style={{padding: 20}}/>
                 <React.Fragment>
-                    {/* TODO: After rating an event, remove the user from the event */}
                     <Typography style={{padding: '1.5%'}} component="h2" variant="h6" color="primary" gutterBottom>
                         Your Previous Events
                     </Typography>

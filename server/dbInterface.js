@@ -30,7 +30,6 @@ MongoClient.connect(url, function(err, client) {
 	name: String,
 	email: String,
 	password: String,
-	interests: [String/int/enum],
 	phone: String,
 	eventsAttending: [int],
 	eventsHosting:[int]
@@ -66,7 +65,6 @@ module.exports.addUser = function(name, email, password, phone){
 				'name': name,
 				'email': email,
 				'password': password,
-				'interests': [],
 				'phone': phone,
 				'eventsAttending': [],
 				'eventsHosting':[]
@@ -103,12 +101,11 @@ module.exports.updateUserPassword = function(email, password){
 	});
 };
 
-module.exports.updateUserDetails = function(email, interestList, phone){
+module.exports.updateUserDetails = function(email, phone){
 	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Users');
 			let doc = {};
-			doc.interests = interestList;
 			doc.phone = phone;
 
 		 	collection.updateOne({'email': email},{ '$set': doc}, {'upsert':false},function(err, result) {
@@ -226,7 +223,6 @@ module.exports.removeUserHostingEvent = function(email, eventID){
 	title: String
 	description: String
 	timeDate: Date
-	tag:[String/int/enum],
 	location: TBD
 	locationName: String
 	type: String
@@ -412,14 +408,13 @@ module.exports.getHostAvgRating = function(host){
 	)
 }
 
-module.exports.addEvent = function(title, timeDate, tag, location, locationName, type, host,description){
+module.exports.addEvent = function(title, timeDate, location, locationName, type, host,description){
 	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
 				'title': title,
 				'timeDate': timeDate,
-				'tag': tag,
 				'location': location,
 				'locationName': locationName,
 				'type': type,
@@ -440,14 +435,13 @@ module.exports.addEvent = function(title, timeDate, tag, location, locationName,
 	});
 };
 
-module.exports.updateEvent = function(eventID, title, timeDate, tag, location, locationName, type, description){
+module.exports.updateEvent = function(eventID, title, timeDate, location, locationName, type, description){
 	return new Promise(
 		function (resolve, reject) {
 			const collection = db.collection('Events');
 			let doc = {
 				'title': title,
 				'timeDate': timeDate,
-				'tag': tag,
 				'type': type,
 				'location': location,
 				'locationName': locationName,

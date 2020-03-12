@@ -16,7 +16,7 @@ import { IconButton } from '@material-ui/core';
  * @author Phipson Lee
  * @since 2020-02-15
  */
-export default function EventDelete() {
+export default function EventDelete(props) {
   /**
    * @var dialogopen Hook set to false to indicate state of dashboard
    * @var setDOpen Function that changes the state variable open
@@ -37,6 +37,13 @@ export default function EventDelete() {
         setDOpen(false);
     };
 
+    const handleDelete = () => {
+      props.socket.emit('removeEvent', props._id);
+      handleClickClose();
+      props.successAlert("Successfully removed event");
+      props.updateFunction();
+    } 
+
   return (
     <div>
       <IconButton onClick={handleClickOpen}>
@@ -48,8 +55,7 @@ export default function EventDelete() {
           <Button onClick={handleClickClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleClickClose} color="primary">
-            {/* TODO: ADD TO DB AND UPDATE */}
+          <Button onClick={handleDelete} color="primary">
             Delete
           </Button>
         </DialogActions>

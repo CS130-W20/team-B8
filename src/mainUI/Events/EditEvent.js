@@ -122,7 +122,6 @@ class EventEdit extends Component{
         var newEvent = {
           eventId: this.state.id,
           title: this.state.title,
-          tag: [this.state.type],
           date: this.state.date,
           location: {lat: lat, lng: lng},
           locationName: this.state.location,
@@ -130,7 +129,7 @@ class EventEdit extends Component{
           description: this.state.description,
         }
 
-        socket.emit('updateEvent', newEvent.eventId, newEvent.title, newEvent.date, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.type, newEvent.description);
+        socket.emit('updateEvent', newEvent.eventId, newEvent.title, newEvent.date, newEvent.location, newEvent.locationName, newEvent.type, newEvent.description);
 
         socket.on('updateEventReply', (event) => {
           var file = this.state.image

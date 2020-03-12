@@ -7,8 +7,6 @@ import {
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
@@ -109,7 +107,9 @@ class Login extends Component {
     const { classes } = this.props;
 
     return (
-      <Grid container component="main" className={classes.root}>
+      <Grid 
+        data-testid="login-div"
+        container component="main" className={classes.root}>
       <CssBaseline />
       <Grid item xs={false} sm={4} md={7} className={classes.image} />
       <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
@@ -117,6 +117,7 @@ class Login extends Component {
           <img style={{width: 250, height: 250}}src={BMLogo}/>
           <form className={classes.form} noValidate>
             <TextField
+              data-testid="login-email"
               variant="outlined"
               margin="normal"
               required
@@ -129,6 +130,7 @@ class Login extends Component {
               onChange={this.handleOnChangeUserName}
               autoFocus/>
             <TextField
+              data-testid="login-password"
               variant="outlined"
               margin="normal"
               required
@@ -152,7 +154,9 @@ class Login extends Component {
               <Grid item xs>
               </Grid>
               <Grid item>
-              <Link onClick={this.props.registerUser}>
+              <Link 
+                    data-testid="create-account"
+                    onClick={this.props.registerUser}>
                      {REGISTRATION_FIELDS.REGISTER} </Link>  {' '}
               </Grid>
             </Grid>

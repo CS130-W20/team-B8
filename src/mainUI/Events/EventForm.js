@@ -19,10 +19,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import LocationSearchInput from './LocationSearcher';
 import Geocode from "react-geocode";
 import { eventTypes } from './../markerPrefab/mapMarker';
- 
-const
-    io = require("socket.io-client"),
-    socket = io.connect("http://localhost:8000");
 
 /**
  * @var useStyle Function object that generates a style off of default MaterialsUI Theme
@@ -74,6 +70,21 @@ class EventForm extends Component {
     this.handleLocChange = this.handleLocChange.bind(this);
     this.handleTextChange = this.handleTextChange.bind(this);
     this.createEvent = this.createEvent.bind(this);
+
+    this.props.socket.on('addEventReply', (event) => {
+      var file = this.state.image
+      if(file){
+        var reader = new FileReader();
+        reader.readAsArrayBuffer(file);
+        reader.onload = function(){
+          var dataBuffer = new Buffer(new Uint8Array(reader.result)); 
+          this.props.socket.emit('addImage', event, dataBuffer);
+        }
+      }
+      console.log('addEventReply: ', event);
+      this.props.socket.emit('addUserHostingEvent', this.props.userID.email, event);
+      this.props.updateFunction();
+    })
   }
 
   /**
@@ -91,29 +102,14 @@ class EventForm extends Component {
           title: this.state.title,
           description: this.state.description,
           date: this.state.date,
-          tag: [this.state.type],
           location: {lat: lat, lng: lng},
           locationName: this.state.location,
           type: this.state.type,
           host: this.props.userID
         }
 
-        socket.emit('addEvent', newEvent.title, newEvent.date, newEvent.tag, newEvent.location, newEvent.locationName, newEvent.type, newEvent.host, newEvent.description);
-        socket.on('addEventReply', (event) => {
-          var file = this.state.image
-          if(file){
-            var reader = new FileReader();
-            reader.readAsArrayBuffer(file);
-            reader.onload = function(){
-              var dataBuffer = new Buffer(new Uint8Array(reader.result)); 
-              socket.emit('addImage', event, dataBuffer);
-            }
-          }
-          console.log('addEventReply: ', event);
-          socket.emit('addUserHostingEvent', this.props.userID.email, event);
-          this.props.successAlert("Successfully created event: "+  newEvent.title + "!");
-          this.props.updateFunction();
-        })
+        this.props.socket.emit('addEvent', newEvent.title, newEvent.date, newEvent.location, newEvent.locationName, newEvent.type, newEvent.host, newEvent.description);
+        this.props.successAlert("Successfully created event: "+  newEvent.title + "!");
       },
       error => {
         console.error(error);
@@ -265,9 +261,7 @@ class EventForm extends Component {
               <TextField
               autoFocus
               margin="dense"
-              inputProps={{
-                "data-testid" :"event-title"
-              }}
+              data-testid="event-title"
               id="event-title"
               label="Name of Event"
               value={this.state.title}
@@ -281,9 +275,7 @@ class EventForm extends Component {
               <KeyboardDatePicker
               margin="normal"
               id="event-date"
-              inputProps={{
-                "data-testid" :"event-date"
-              }}
+              data-testid="event-date"
               format="MM/dd/yyyy"
               value={this.state.date}
               onChange={this.handleDateChange}
@@ -293,9 +285,7 @@ class EventForm extends Component {
               <KeyboardTimePicker
               margin="normal"
               id="event-time"
-              inputProps={{
-                "data-testid":"event-time"
-              }}
+              data-testid="event-time"
               value={this.state.date}
               onChange={this.handleDateChange}
               KeyboardButtonProps={{
@@ -306,6 +296,7 @@ class EventForm extends Component {
               <TextField
                 margin="dense"
                 label="Description"
+                data-testid="event-description"
                 multiline
                 rows={2}
                 rowsMax={4}
@@ -315,9 +306,7 @@ class EventForm extends Component {
               <FormControl className={classes.formControl} >
               <InputLabel id="demo-controlled-open-select-label">Event Type</InputLabel>
               <Select
-              inputProps={{
-                "data-testid":"event-select"
-              }}
+              data-testid="event-select"
               labelId="demo-controlled-open-select-label"
               id="event-select"
               open={this.state.open}

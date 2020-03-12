@@ -69,7 +69,9 @@ class EventList extends Component {
             <Grid data-testid="Events" item xs={12}>
               <Paper className={classes.paper}>
               <React.Fragment>
-              <EventForm updateFunction={refreshEvents} userID={userID}
+              <EventForm updateFunction={refreshEvents} 
+                         userID={userID}
+                         socket={socket}
                          successAlert={successAlert}
                          failAlert={failAlert}/>
                     <Table size="small">

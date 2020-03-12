@@ -313,8 +313,8 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('addEvent', (title, date, tag, location, locationName, type, host, description) => {
-    let prom = dbInterface.addEvent(title, date, tag, location, locationName, type, host, description);
+  socket.on('addEvent', (title, date, location, locationName, type, host, description) => {
+    let prom = dbInterface.addEvent(title, date, location, locationName, type, host, description);
     prom.then( (docs) => {
       console.log("NEW EVENT", docs);
       socket.emit("addEventReply", docs);
@@ -325,8 +325,8 @@ io.on("connection", (socket) => {
     })
   })
 
-  socket.on('updateEvent', (eventID, title, timeDate, tag, location, locationName, type, description) => {
-    let prom = dbInterface.updateEvent(eventID, title, timeDate, tag, location, locationName, type, description);
+  socket.on('updateEvent', (eventID, title, timeDate, location, locationName, type, description) => {
+    let prom = dbInterface.updateEvent(eventID, title, timeDate, location, locationName, type, description);
     prom.then( (docs) => {
       console.log("EVENT UPDATED", docs);
       socket.emit("updateEventReply", docs);

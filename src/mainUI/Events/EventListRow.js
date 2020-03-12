@@ -16,7 +16,6 @@ export default class EventListRow extends React.Component{
             timeDate,
             locationName,
             attendees,
-            tag,
             type,
             image
         } = this.props;
@@ -42,7 +41,6 @@ export default class EventListRow extends React.Component{
                     image={image}
                     date={timeDate} 
                     location={location} 
-                    tag={tag} 
                     type={type} 
                     updateFunction={this.props.updateFunction}
                     successAlert={this.props.successAlert}
@@ -51,7 +49,10 @@ export default class EventListRow extends React.Component{
                                 socket={this.props.socket}
                                 successAlert={this.props.successAlert}
                                 failAlert={this.props.failAlert}/>
-                <EventDelete />
+                <EventDelete _id={_id} 
+                             successAlert={this.props.successAlert}
+                             updateFunction={this.props.updateFunction}
+                             socket={this.props.socket}/>
             </TableCell>
             </TableRow>
         )

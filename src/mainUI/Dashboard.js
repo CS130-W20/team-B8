@@ -72,11 +72,12 @@ const styles = theme => ({
   },
   menuButton: {
     marginRight: 36,
-    color: 'white'
+    color: 'white',
+    visibility: 'visible',
   },
   menuButtonHidden: {
     display: 'none',
-    visibility: "hidden",
+    visibility: 'hidden',
   },
   title: {
     flexGrow: 1,
@@ -472,7 +473,9 @@ class Dashboard extends Component {
           const { classes, userID } = this.props;
           console.log('Logged in user: ', userID);
           return (
-            <div className={classes.root}>
+            <div 
+              data-testid="dashboard"
+              className={classes.root}>
               <CssBaseline />
               <AppBar position="absolute" className={clsx(classes.appBar, this.state.open && classes.appBarShift)}>
                 <Toolbar className={classes.toolbar}>
@@ -480,7 +483,6 @@ class Dashboard extends Component {
                     data-testid="hamburger-button"
                     edge="start"
                     color="inherit"
-                    aria-label="open drawer"
                     onClick={this.handleDrawerOpen}
                     className={clsx(classes.menuButton, this.state.open && classes.menuButtonHidden)}>
                   <MenuIcon />
