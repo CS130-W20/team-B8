@@ -275,6 +275,19 @@ io.on("connection", (socket) => {
     })
   })
 
+  socket.on('removeEvent', (eventId) => {
+    let prom = dbInterface.removeEvent(eventId);
+    prom.then( (docs) => {
+      console.log("EVENT", docs);
+      socket.emit("removeEventReply", docs);
+    })
+    .catch( (error) =>  {
+      console.log("ERROR:", error);
+      socket.emit("serverError", error)
+    })
+  })
+  
+
   socket.on('getEvents', (host) => {
     let prom = dbInterface.getEventByHost(host);
     prom.then( (docs) => {
