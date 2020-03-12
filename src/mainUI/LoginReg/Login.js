@@ -114,7 +114,7 @@ class Login extends Component {
       <Grid item xs={false} sm={4} md={7} className={classes.image} />
       <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
         <div className={classes.paper}>
-          <img style={{width: 250, height: 250}}src={BMLogo}/>
+          <img alt={"BruinMeet Logo"}style={{width: 250, height: 250}}src={BMLogo}/>
           <form className={classes.form} noValidate>
             <TextField
               data-testid="login-email"

@@ -216,7 +216,7 @@ export default class EventPage extends React.Component{
         <div style={this.getEventPageStyle()}>
             {currEvent.image && 
             <div style={this.getImageContainerStyle()}>
-            <img style={this.getImageStyle()} alt={"Event image can't be displayed"}  src={'data:image/jpeg;base64,' + currEvent.image}/>
+            <img style={this.getImageStyle()} alt={"Event Representation"}  src={'data:image/jpeg;base64,' + currEvent.image}/>
             </div>
             }
             <div style={this.getDescriptionStyle()}>

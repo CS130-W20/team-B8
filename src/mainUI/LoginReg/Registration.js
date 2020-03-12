@@ -196,7 +196,7 @@ class Registration extends Component {
       <div 
       data-testid="register"
       className={classes.paper}>
-      <img style={{width: 100, height: 100}}src={BMLogo}/>
+      <img alt={"BruinMeet Logo"} style={{width: 100, height: 100}}src={BMLogo}/>
         <Typography style={{paddingTop: 50}}component="h1" variant="h5">
           Create an Account
         </Typography>

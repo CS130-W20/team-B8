@@ -54,10 +54,6 @@ const styles = theme => ({
 function valuetext(value) {
     return `${value}km`;
 }
-
-function valueLabelFormat(value) {
-    return marks.findIndex(mark => mark.value === value) + 1;
-}
   
 /**
  * @see https://material-ui.com/components/toggle-button/

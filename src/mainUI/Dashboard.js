@@ -487,7 +487,7 @@ class Dashboard extends Component {
                     className={clsx(classes.menuButton, this.state.open && classes.menuButtonHidden)}>
                   <MenuIcon />
                   </IconButton>
-                  <img style={{width: 50, height: 50}}src={BMLogo}/>
+                  <img alt={"BruinMeet Logo"}style={{width: 50, height: 50}}src={BMLogo}/>
                   <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
                     BruinMeet
                   </Typography>

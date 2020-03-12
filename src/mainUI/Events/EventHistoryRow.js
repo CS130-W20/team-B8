@@ -36,7 +36,6 @@ export default class EventHistoryRow extends React.Component{
             attendees,
             host,
             questions,
-            submitReview,
             review,
             leaveEvent,
             successAlert,
