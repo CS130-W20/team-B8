@@ -18,31 +18,38 @@ import { IconButton } from '@material-ui/core';
  */
 export default function EventMessage(props) {
 /**
-   * @var dialogopen Hook set to false to indicate state of dashboard
-   * @var setDOpen Function that changes the state variable open
+   * Hook set to false to indicate state of dashboard
+   * Function that changes the state variable open
    */
   const [dialogopen, setDOpen] = React.useState(false);
 
   const [textMessage, setText] = React.useState('');
 
   /**
-   * @var handleClickOpen Function that sets the dialog box to close
+   * Function that sets the dialog box to close
    */
     const handleClickOpen = () => {
         setDOpen(true);
     };
 
   /**
-   * @var handleClickClose Function that sets the dialog box to close
+   * Function that sets the dialog box to close
    */
     const handleClickClose = () => {
         setDOpen(false);
     };
 
+    /**
+     * Helper function that updates the type of text to display on the UI based on user input
+     * @param {String} text 
+     */
     const handleTextChange = (text) => {
       setText(text.target.value);
     }
 
+    /**
+     * Helper function that passes and calls notify all users via observer pattern in event interface
+     */
     const handleMessage = () => {
       props.notifyFunction(textMessage, props.socket);
       handleClickClose();

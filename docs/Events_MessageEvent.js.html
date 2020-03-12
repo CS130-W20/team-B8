@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Events/MessageEvent.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Events/MessageEvent.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from 'react';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import SendIcon from '@material-ui/icons/Send';
+import { IconButton } from '@material-ui/core';
+
+/**
+ * Function component that uses Google Material UI Dialog Boxes
+ * Uses IconButton to toggle display, and allows users to send Message onClick
+ * @see https://material-ui.com/components/dialogs/
+ * 
+ * @author Phipson Lee
+ * @since 2020-02-15
+ */
+export default function EventMessage(props) {
+/**
+   * @var dialogopen Hook set to false to indicate state of dashboard
+   * @var setDOpen Function that changes the state variable open
+   */
+  const [dialogopen, setDOpen] = React.useState(false);
+
+  const [textMessage, setText] = React.useState('');
+
+  /**
+   * @var handleClickOpen Function that sets the dialog box to close
+   */
+    const handleClickOpen = () => {
+        setDOpen(true);
+    };
+
+  /**
+   * @var handleClickClose Function that sets the dialog box to close
+   */
+    const handleClickClose = () => {
+        setDOpen(false);
+    };
+
+    const handleTextChange = (text) => {
+      setText(text.target.value);
+    }
+
+    const handleMessage = () => {
+      props.notifyFunction(textMessage, props.socket);
+      handleClickClose();
+      props.successAlert("Successfully notified all users!");
+    }
+
+  /**
+   * Renders event form based on button click and state changes. Creates event upon submission of form.
+   */
+  return (
+    &lt;div>
+      &lt;IconButton onClick={handleClickOpen}>
+        &lt;SendIcon />
+      &lt;/IconButton>
+      &lt;Dialog open={dialogopen} onClose={handleClickClose} aria-labelledby="form-dialog-title">
+        &lt;DialogTitle id="form-dialog-title">Send a Message to your Attendees&lt;/DialogTitle>
+        &lt;DialogContent>
+            &lt;TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Your Message"
+            type="email"
+            value={textMessage}
+            onChange={handleTextChange}
+            fullWidth/>
+        &lt;/DialogContent>
+        &lt;DialogActions>
+          &lt;Button onClick={handleClickClose} color="primary">
+            Cancel
+          &lt;/Button>
+          &lt;Button onClick={handleMessage} color="primary">
+            {/* TODO: ADD TO DB AND UPDATE */}
+            Send Message
+          &lt;/Button>
+        &lt;/DialogActions>
+      &lt;/Dialog>
+    &lt;/div>
+  );
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dashboard.html">Dashboard</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventForm.html">EventForm</a></li><li><a href="EventHistory.html">EventHistory</a></li><li><a href="EventList.html">EventList</a></li><li><a href="GMapFilter.html">GMapFilter</a></li><li><a href="LocationSearchInput.html">LocationSearchInput</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="SimpleMap.html">SimpleMap</a></li></ul><h3>Global</h3><ul><li><a href="global.html#classes">classes</a></li><li><a href="global.html#createEventHelperfunctiontoquerymongoDBserverandcreateeventobject">createEvent Helper function to query mongoDB server and create event object</a></li><li><a href="global.html#createEventHistoryRow">createEventHistoryRow</a></li><li><a href="global.html#createEventListRow">createEventListRow</a></li><li><a href="global.html#createEventMarker">createEventMarker</a></li><li><a href="global.html#createMapModal">createMapModal</a></li><li><a href="global.html#drawerWidth">drawerWidth</a></li><li><a href="global.html#handleAttendEventCallstheobservermethodinEventInterfacetoallowuserstoregisterusertoaneventandreceiveSMSnotificationsabouttheeventAlsoclosesthedialogboxsouserscankeepsearchingthroughevent">handleAttendEvent Calls the observer method in Event Interface to allow users to register user
+to an event and receive SMS notifications about the event
+Also closes the dialog box so users can keep searching through event</a></li><li><a href="global.html#handleChangeFunctionthatchangesthestatevariabletypebasedonselectedeventtype">handleChange Function that changes the state variable type based on selected event type</a></li><li><a href="global.html#handleClickClose">handleClickClose</a></li><li><a href="global.html#handleClickCloseFunctionthatsetsthedialogboxtoclose">handleClickClose Function that sets the dialog box to close</a></li><li><a href="global.html#handleClickOpen">handleClickOpen</a></li><li><a href="global.html#handleClickOpenFunctionthatsetsthedialogboxtoclose">handleClickOpen Function that sets the dialog box to close</a></li><li><a href="global.html#handleCloseFunctionthatsetstheselectboxtoopen">handleClose Function that sets the select box to open</a></li><li><a href="global.html#handleCloseFunctionthatsetstheselectmenutoclose">handleClose Function that sets the select menu to close</a></li><li><a href="global.html#handleDashboardMaphelperfunctionthatisusedtofetcheventstobedisplayedforthemap">handleDashboardMap helper function that is used to fetch events to be displayed for the map</a></li><li><a href="global.html#handleDateChangeFunctionthattakesinadateandupdatestheselecteddateforevent">handleDateChange Function that takes in a date and updates the selected date for event</a></li><li><a href="global.html#handleDescriptionChangeFunctionthattakesinadescriptionandupdatesitforevent">handleDescriptionChange Function that takes in a description and updates it for event</a></li><li><a href="global.html#handleEventHistoryFunctionthatfetchestheeventstobedisplayedforratingseparatesthelistintoeventsuserwillattend,anduserhasalreadyattended,basedontime">handleEventHistory Function that fetches the events to be displayed for rating
+separates the list into events user will attend, and user has already attended, based on time</a></li><li><a href="global.html#handleEventListhelperfunctionthatisusedtofetcheventstobedisplayedforEventList">handleEventList helper function that is used to fetch events to be displayed for EventList</a></li><li><a href="global.html#handleLocChangeFunctionthatsetstheselectboxtoopen">handleLocChange Function that sets the select box to open</a></li><li><a href="global.html#handleTextChangeFunctionthatsetstheselectboxtoopen">handleTextChange Function that sets the select box to open</a></li><li><a href="global.html#notifyUsers">notifyUsers</a></li><li><a href="global.html#refreshEventsEventhandlerthatfetcheseventsfromserverReturnsandupdatesthis.state.eventswiththeeventsthataretobesentover">refreshEvents
+Event handler that fetches events from server
+Returns and updates this.state.events with the events that are to be sent over</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#removeUser">removeUser</a></li><li><a href="global.html#renderDashboardHelperfunctiontorenderthedashboardbasedontheeventsthatarecreatedusingfactorypatternWillbepassedtoelementsofdashboarddependingonwhatisrendered">renderDashboard
+Helper function to render the dashboard based on the events that are created using factory pattern
+Will be passed to elements of dashboard depending on what is rendered</a></li><li><a href="global.html#resetListAhelperfunctionthatre-rendersthevisualcomponentwheneveraneventhasbeenedited/created">resetList A helper function that re-renders the visual component whenever an event has been edited/created</a></li><li><a href="global.html#setDOpen">setDOpen</a></li><li><a href="global.html#useStyle">useStyle</a></li><li><a href="global.html#useStyleFunctionobjectthatgeneratesastyleoffofdefaultMaterialsUITheme">useStyle Function object that generates a style off of default MaterialsUI Theme</a></li><li><a href="global.html#validEmail">validEmail</a></li><li><a href="global.html#validPassword">validPassword</a></li><li><a href="global.html#validPhone">validPhone</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Mar 12 2020 12:25:02 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

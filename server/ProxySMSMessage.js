@@ -6,8 +6,11 @@
  * @see https://www.twilio.com/docs/sms/send-messages
  * @see https://www.twilio.com/docs/chat/tutorials/chat-application-node-express
  */
+require("dotenv").config();
 
-const client = require('twilio')('AC8a8a7e613b05b1800074dcf7f1c35df8', 'b12bd0c6a5d53c48e9272f9578adc26f');
+console.log(process.env.REACT_APP_TWILIO_AUTH)
+
+const client = require('twilio')(process.env.REACT_APP_TWILIO_SID, process.env.REACT_APP_TWILIO_AUTH);
 
 // Base class that is used to send messages
 // Creates a message object based on twilio API but does not verify number or format message

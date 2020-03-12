@@ -7,7 +7,10 @@ import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import { eventTypes } from './../markerPrefab/mapMarker';
 import Switch from '@material-ui/core/Switch';
 
-
+/**
+ * A function that is used to pass MaterialUI objects and then stylize components along with user-defined styles
+ * @param {Object} theme MaterialUI theme object that will be passed and merged with user-defined styles
+ */
 const styles = theme => ({
     root: {
         padding: "5%",
@@ -56,11 +59,20 @@ function valuetext(value) {
 }
   
 /**
+ * React Component class for passing and handling filters for filtering through events on Google Maps
+ * @author Phipson Lee
+ * @since 03-08-2020
  * @see https://material-ui.com/components/toggle-button/
  * @see https://material-ui.com/components/slider/
  */
 class GMapFilter extends Component {
 
+    /**
+     * Constructor for component
+     * @constructor
+     * @param {Object} props Passes in class styles for rendering and also updateFilter function that calls 
+     * dashboard to re-render the map once the filters are set
+     */
     constructor(props) {
         super(props);
         this.state = {
@@ -73,6 +85,11 @@ class GMapFilter extends Component {
         this.handleToggle = this.handleToggle.bind(this);
     }
 
+    /**
+     * Helper function to pass and update the types of events to be displayed based on user's input to toggle buttons
+     * @param {Object} event Default javascript event listener object
+     * @param {Object} newTypes List of values based on user's input to toggle buttons
+     */
     handleType = (event, newTypes) => {
         if (newTypes.length) {
             console.log('GMapFilter newTypes: ', newTypes);
@@ -85,6 +102,12 @@ class GMapFilter extends Component {
         }
     }
 
+    /**
+     * Helper function to pass and update the distance radius filter for events; only updates if values are different 
+     * than what is already stored in the current component state.
+     * @param {Object} event Default javascript event listener object
+     * @param {Object} newTypes List of values based on user's input to toggle buttons
+     */
     handleDistance = (event, newVal) => {
         if (newVal !== this.state.eventDistance) {
             this.setState({
@@ -96,6 +119,11 @@ class GMapFilter extends Component {
         }
     }
 
+    /**
+     * Helper function to set whether or not the current filters should be applied to the Google Maps; 
+     * enabled if true, disabled otherwise
+     * @param {boolean} value The actual toggle boolean
+     */
     handleToggle = (value) => {
         this.setState({
             enableFilters: value,
@@ -105,6 +133,9 @@ class GMapFilter extends Component {
     }
 
   
+    /**
+     * Renders the component on DOM UI (default for all ReactJS Components)
+     */
     render() {
         const { classes } = this.props;
         return (

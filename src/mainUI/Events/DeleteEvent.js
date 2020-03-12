@@ -24,19 +24,22 @@ export default function EventDelete(props) {
     const [dialogopen, setDOpen] = React.useState(false);
 
   /**
-   * @var handleClickOpen Function that sets the dialog box to close
+   * Function that sets the dialog box to close
    */
     const handleClickOpen = () => {
         setDOpen(true);
     };
 
   /**
-   * @var handleClickClose Function that sets the dialog box to close
+   * Function that sets the dialog box to close
    */
     const handleClickClose = () => {
         setDOpen(false);
     };
 
+    /**
+     * Helper function to delete the event by querying database
+     */
     const handleDelete = () => {
       props.socket.emit('removeEvent', props._id);
       handleClickClose();
@@ -44,6 +47,9 @@ export default function EventDelete(props) {
       props.updateFunction();
     } 
 
+  /**
+   * Returns and renders the component onto UI
+   */
   return (
     <div>
       <IconButton onClick={handleClickOpen}>

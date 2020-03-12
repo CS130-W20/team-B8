@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Events/EventList.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Events/EventList.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { Component } from 'react';
+import { withStyles } from "@material-ui/core/styles";
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import EventForm from './EventForm';
+import Typography from '@material-ui/core/Typography';
+
+/**
+ * @var useStyle Function object that generates a style off of default MaterialsUI Theme
+ * @see https://material-ui.com/styles/basics/
+ */
+const styles = theme => ({
+    root: {
+        display: 'flex',
+    },
+    paperElement: {
+        padding: theme.spacing(2),
+        display: 'flex',
+        overflow: 'auto',
+        flexDirection: 'column',
+        height: "100%",
+        
+    },
+    seeMore: {
+        textAlign: 'center',
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2)
+    },
+});
+
+/**
+ * React Component used to display and visualize table of events that the user is currently hosting
+ * @author Phipson Lee
+ * @date 02-19-2020
+ */
+class EventList extends Component {
+
+    /**
+     * Default constructor for initializing state
+     * @param {Object} props 
+     * @var hostEvents An array of events that the user is a part of (queried from mongoDB server)
+     * @function resetList A helper function that re-renders the visual component whenever an event has been edited/created
+     */
+    constructor(props) {
+        super(props);
+        this.state = {
+            hostEvents: props.events,
+        }
+    };
+
+    /**
+     * called when the component is added to the DOM; we call resetList() to ensure that the component is updated
+     */
+    componentDidMount() {
+        this.setState({
+            hostEvents: this.props.events,
+        });
+    }
+
+    render() {
+    const { classes, events, refreshEvents, userID, socket, successAlert, failAlert} = this.props;
+    return (
+            &lt;Grid data-testid="Events" item xs={12}>
+              &lt;Paper className={classes.paper}>
+              &lt;React.Fragment>
+              &lt;EventForm updateFunction={refreshEvents} 
+                         userID={userID}
+                         socket={socket}
+                         successAlert={successAlert}
+                         failAlert={failAlert}/>
+                    &lt;Table size="small">
+                    &lt;TableHead>
+                        &lt;TableRow>
+                        &lt;TableCell>Date&lt;/TableCell>
+                        &lt;TableCell>Name&lt;/TableCell>
+                        &lt;TableCell>Location&lt;/TableCell>
+                        &lt;TableCell>Time&lt;/TableCell>
+                        &lt;TableCell>Attendees&lt;/TableCell>
+                        &lt;TableCell align="right">Edit&lt;/TableCell>
+                        &lt;/TableRow>
+                    &lt;/TableHead>
+                    &lt;TableBody>
+                        {events.length > 0 ?
+                            events.map(event => event.createEventListRow(refreshEvents, socket, successAlert, failAlert))
+                            :
+                            &lt;TableRow>
+                            &lt;TableCell align='center' colSpan='6'>
+                             &lt;Typography style={{padding: '10px'}}align="center">{"You currently aren't hosting any events"}&lt;/Typography>
+                            &lt;/TableCell>
+                            &lt;/TableRow>
+                        }
+                    &lt;/TableBody>
+                    &lt;/Table>
+                    {/*events.length > 0 &amp;&amp; &lt;div className={classes.seeMore}>
+                    &lt;Link color="primary" href="#">
+                        See more Events
+                    &lt;/Link>
+                    &lt;/div>*/}
+                &lt;/React.Fragment>
+              &lt;/Paper>
+            &lt;/Grid>     
+    );
+    }
+};
+
+export default withStyles(styles, {withTheme: true})(EventList);</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dashboard.html">Dashboard</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventForm.html">EventForm</a></li><li><a href="EventHistory.html">EventHistory</a></li><li><a href="EventList.html">EventList</a></li><li><a href="GMapFilter.html">GMapFilter</a></li><li><a href="LocationSearchInput.html">LocationSearchInput</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="SimpleMap.html">SimpleMap</a></li></ul><h3>Global</h3><ul><li><a href="global.html#classes">classes</a></li><li><a href="global.html#createEventHelperfunctiontoquerymongoDBserverandcreateeventobject">createEvent Helper function to query mongoDB server and create event object</a></li><li><a href="global.html#createEventHistoryRow">createEventHistoryRow</a></li><li><a href="global.html#createEventListRow">createEventListRow</a></li><li><a href="global.html#createEventMarker">createEventMarker</a></li><li><a href="global.html#createMapModal">createMapModal</a></li><li><a href="global.html#drawerWidth">drawerWidth</a></li><li><a href="global.html#handleAttendEventCallstheobservermethodinEventInterfacetoallowuserstoregisterusertoaneventandreceiveSMSnotificationsabouttheeventAlsoclosesthedialogboxsouserscankeepsearchingthroughevent">handleAttendEvent Calls the observer method in Event Interface to allow users to register user
+to an event and receive SMS notifications about the event
+Also closes the dialog box so users can keep searching through event</a></li><li><a href="global.html#handleChangeFunctionthatchangesthestatevariabletypebasedonselectedeventtype">handleChange Function that changes the state variable type based on selected event type</a></li><li><a href="global.html#handleClickClose">handleClickClose</a></li><li><a href="global.html#handleClickCloseFunctionthatsetsthedialogboxtoclose">handleClickClose Function that sets the dialog box to close</a></li><li><a href="global.html#handleClickOpen">handleClickOpen</a></li><li><a href="global.html#handleClickOpenFunctionthatsetsthedialogboxtoclose">handleClickOpen Function that sets the dialog box to close</a></li><li><a href="global.html#handleCloseFunctionthatsetstheselectboxtoopen">handleClose Function that sets the select box to open</a></li><li><a href="global.html#handleCloseFunctionthatsetstheselectmenutoclose">handleClose Function that sets the select menu to close</a></li><li><a href="global.html#handleDashboardMaphelperfunctionthatisusedtofetcheventstobedisplayedforthemap">handleDashboardMap helper function that is used to fetch events to be displayed for the map</a></li><li><a href="global.html#handleDateChangeFunctionthattakesinadateandupdatestheselecteddateforevent">handleDateChange Function that takes in a date and updates the selected date for event</a></li><li><a href="global.html#handleDescriptionChangeFunctionthattakesinadescriptionandupdatesitforevent">handleDescriptionChange Function that takes in a description and updates it for event</a></li><li><a href="global.html#handleEventHistoryFunctionthatfetchestheeventstobedisplayedforratingseparatesthelistintoeventsuserwillattend,anduserhasalreadyattended,basedontime">handleEventHistory Function that fetches the events to be displayed for rating
+separates the list into events user will attend, and user has already attended, based on time</a></li><li><a href="global.html#handleEventListhelperfunctionthatisusedtofetcheventstobedisplayedforEventList">handleEventList helper function that is used to fetch events to be displayed for EventList</a></li><li><a href="global.html#handleLocChangeFunctionthatsetstheselectboxtoopen">handleLocChange Function that sets the select box to open</a></li><li><a href="global.html#handleTextChangeFunctionthatsetstheselectboxtoopen">handleTextChange Function that sets the select box to open</a></li><li><a href="global.html#notifyUsers">notifyUsers</a></li><li><a href="global.html#refreshEventsEventhandlerthatfetcheseventsfromserverReturnsandupdatesthis.state.eventswiththeeventsthataretobesentover">refreshEvents
+Event handler that fetches events from server
+Returns and updates this.state.events with the events that are to be sent over</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#removeUser">removeUser</a></li><li><a href="global.html#renderDashboardHelperfunctiontorenderthedashboardbasedontheeventsthatarecreatedusingfactorypatternWillbepassedtoelementsofdashboarddependingonwhatisrendered">renderDashboard
+Helper function to render the dashboard based on the events that are created using factory pattern
+Will be passed to elements of dashboard depending on what is rendered</a></li><li><a href="global.html#resetListAhelperfunctionthatre-rendersthevisualcomponentwheneveraneventhasbeenedited/created">resetList A helper function that re-renders the visual component whenever an event has been edited/created</a></li><li><a href="global.html#setDOpen">setDOpen</a></li><li><a href="global.html#useStyle">useStyle</a></li><li><a href="global.html#useStyleFunctionobjectthatgeneratesastyleoffofdefaultMaterialsUITheme">useStyle Function object that generates a style off of default MaterialsUI Theme</a></li><li><a href="global.html#validEmail">validEmail</a></li><li><a href="global.html#validPassword">validPassword</a></li><li><a href="global.html#validPhone">validPhone</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Mar 12 2020 12:25:02 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

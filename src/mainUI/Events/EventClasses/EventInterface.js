@@ -208,7 +208,8 @@ export default class BMeetEvent{
         "host": this.host,
         "title": this.title,
         "locationName": this.locationName,
-        "hostNumber": this.host.phone
+        "hostNumber": this.host.phone,
+        "date": this.timeDate
         }
         socket.emit("messageUsers", req, event);
     }

@@ -42,8 +42,9 @@ const styles = theme => ({
  * @since 2020-02-15
  */
 class EventHistory extends React.Component{
+
     /**
-     * @var classes Calls useStyles to generate CSS style inherited from Materials UI Theme
+     * Renders by fetching the past and future events from Dashboard (passed as props via database query)
      */
     render = () => {
         const { classes, eventsPast, eventsFuture, userID, socket, refreshEvents, successAlert, failAlert } = this.props;

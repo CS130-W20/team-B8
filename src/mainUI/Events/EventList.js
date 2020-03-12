@@ -45,7 +45,7 @@ class EventList extends Component {
      * Default constructor for initializing state
      * @param {Object} props 
      * @var hostEvents An array of events that the user is a part of (queried from mongoDB server)
-     * @function resetList A helper function that re-renders the visual component whenever an event has been edited/created
+     * @constructor
      */
     constructor(props) {
         super(props);
@@ -63,6 +63,9 @@ class EventList extends Component {
         });
     }
 
+    /**
+     * Default render function for react component
+     */
     render() {
     const { classes, events, refreshEvents, userID, socket, successAlert, failAlert} = this.props;
     return (

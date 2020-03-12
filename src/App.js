@@ -18,8 +18,17 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
+/**
+ * Default app component to be rendered on screen when users open the app
+ * Sets to dashboard, landing page, or registration page based on state
+ */
 export default class App extends React.Component{
 
+  /**
+   * @constructor
+   * Default constructor for props; sets the default state to be on the login page unless a token is stored locally
+   * @param {Object} props Default object containing all the properties for component
+   */
   constructor(props){
     super(props);
     this.state = {
@@ -35,7 +44,6 @@ export default class App extends React.Component{
     this.login= this.login.bind(this);
     this.register = this.register.bind(this);
     this.returnToLogin = this.returnToLogin.bind(this);
-    this.handleOpen = this.handleOpen.bind(this);
     this.handleClose = this.handleClose.bind(this);
     this.isTokenExpired = this.isTokenExpired.bind(this);
     this.logout = this.logout.bind(this);
@@ -44,6 +52,9 @@ export default class App extends React.Component{
     this.loginError = this.loginError.bind(this)
   }
 
+  /**
+   * React state function that checks whether a valid token has been stored locally since previous access to web app
+   */
   componentDidMount() {
     var user = localStorage.getItem('id_user');
     var token = localStorage.getItem('id_token');
@@ -55,6 +66,11 @@ export default class App extends React.Component{
     }
   }
 
+  /**
+   * Helper function that logs user in based on existing token or userID
+   * @param {String} token a uniquely generated JWT token that is verified before being used
+   * @param {String} userID the user email that is used to key and search through user in database
+   */
   login = (userID, token) => {
     localStorage.setItem('id_token', token);
     localStorage.setItem('id_user', userID);
@@ -63,16 +79,25 @@ export default class App extends React.Component{
       () => this.returnSuccessMessage("Successfully logged in. Have fun!"));
   }
 
+  /**
+   * Helper function that is used to log the user out on query
+   */
   logout = () => {
     this.setState({loggedIn: false, user: ""},
       () => this.returnSuccessMessage("Successfully logged out. Hope to see you soon!"));
   }
 
+  /**
+   * Helper function to alert user of any error with login
+   */
   loginError = () => {
     this.setState({loggedIn: false, user: ""},
       () => this.returnFailMessage("Couldn't find user. Please register or try to login again"));
   }
 
+  /**
+   * Helper function to switch app state to register
+   */
   register = () => {
     this.setState({
       loggedIn: false,
@@ -80,6 +105,9 @@ export default class App extends React.Component{
     })
   }
 
+  /**
+   * Helper function to return user from register page to login page
+   */
   returnToLogin = () => {
     this.setState({
       loggedIn: false,
@@ -87,12 +115,9 @@ export default class App extends React.Component{
     })
   }
 
-  handleOpen = () => {
-    this.setState({
-      open: true
-    })
-  }
-
+  /** 
+   * Helper function to close the notification/alert dialog at the bottom of the screen
+   */
   handleClose = () => {
     this.setState({
       open: false,
@@ -101,6 +126,10 @@ export default class App extends React.Component{
     })
   }
 
+  /**
+   * Helper function to check whether the token is expired (for over 2 hours)
+   * @param {String} token JWT Token to be generated and used for logging in if valid
+   */
   isTokenExpired = token => {
     try {
       const decodedToken = decode(token);
@@ -116,6 +145,10 @@ export default class App extends React.Component{
     }
   }
 
+  /**
+   * Helper function to display success (green) message (notification/dialog at bottom of screen)
+   * @param {String} message The string to be displayed in the dialog/notification
+   */
   returnSuccessMessage = (message) => {
     this.setState({
       displayMessage: message,
@@ -124,6 +157,10 @@ export default class App extends React.Component{
     });
   }
 
+  /**
+   * Helper function to display error (red) message (notification/dialog at bottom of screen)
+   * @param {String} message The string to be displayed in the dialog/notification
+   */
   returnFailMessage = (message) => {
     this.setState({
       displayMessage: message,
@@ -132,6 +169,9 @@ export default class App extends React.Component{
     });
   }
 
+  /**
+   * Default render function for react components
+   */
   render() {
     return (
       <div>

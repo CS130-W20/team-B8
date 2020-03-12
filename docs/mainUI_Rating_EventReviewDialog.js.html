@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: mainUI/Rating/EventReviewDialog.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: mainUI/Rating/EventReviewDialog.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from 'react';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import Rating from '@material-ui/lab/Rating';
+import { withStyles } from '@material-ui/core/styles';
+import EventReview  from './EventReview';
+
+/**
+ * @var useStyle Function object that generates a style off of default MaterialsUI Theme
+ * @see https://material-ui.com/styles/basics/
+ */
+const StyledRating = withStyles({
+    iconFilled: {
+      color: '#ff6d75',
+    },
+    iconHover: {
+      color: '#ff3d47',
+    },
+})(Rating);
+
+/**
+ * Function component that uses Google Material UI Dialog Boxes
+ * Uses IconButton to toggle display, and allows users to rate events they have attended
+ * @see https://material-ui.com/components/dialogs/
+ * @see https://material-ui.com/components/pickers/
+ * @see EventHistory
+ * 
+ * @author Lawrence Lee
+ * @since 2020-02-15
+ */
+export default class EventReviewDialog extends React.Component{
+
+  constructor(props){
+    super(props);
+    this.state = {
+      dialogopen: false,
+    }
+  }
+
+  /**
+   * @var handleClickOpen Function that sets the dialog box to close
+   */
+    handleClickOpen = () => {
+        this.setState({dialogopen: true});
+    };
+
+  /**
+   * @var handleClickClose Function that sets the dialog box to close
+   */
+    handleClickClose = () => {
+        this.setState({dialogopen: false});
+    };
+    handleRatingChange = (e, newRating) => {
+      this.setState({rating: newRating});
+    }
+
+    handleTextChange = (label, e) => {
+      let currentReview = this.state.review;
+      currentReview[label] = e.target.value;
+      this.setState({review: currentReview});
+    }
+
+  render = () => {
+  /**
+   * Renders a form onclick that allows users to offer ratings and review for host based on event
+   */
+  const { id, rating, review, user } = this.props;
+
+  return (
+      &lt;div>
+      &lt;div style={{cursor: 'pointer', textAlign: 'left', float: 'right'}}onClick={this.handleClickOpen}>
+      &lt;StyledRating
+        name={'rating-' + id}
+        value={rating}
+        getLabelText={value => `${value} Heart${value !== 1 ? 's' : ''}`}
+        precision={0.5}
+        icon={&lt;FavoriteIcon fontSize="inherit" />}
+        disabled={true}
+      />
+      &lt;/div>
+      &lt;Dialog open={this.state.dialogopen} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
+        &lt;DialogTitle id="form-dialog-title">{"Reviewed by " + user.name}&lt;/DialogTitle>
+        &lt;DialogContent>
+            &lt;EventReview rating={rating} review={review}/>
+        &lt;/DialogContent>
+        &lt;DialogActions>
+          &lt;Button onClick={this.handleClickClose} color="primary">
+            Done
+          &lt;/Button>
+        &lt;/DialogActions>
+      &lt;/Dialog>
+      &lt;/div>
+  );
+  
+}
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dashboard.html">Dashboard</a></li><li><a href="Default%2520constructor%2520for%2520props;%2520sets%2520the%2520default%2520state%2520to%2520be%2520on%2520the%2520login%2520page%2520unless%2520a%2520token%2520is%2520stored%2520locally.html">Default constructor for props; sets the default state to be on the login page unless a token is stored locally</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventForm.html">EventForm</a></li><li><a href="EventHistory.html">EventHistory</a></li><li><a href="EventList.html">EventList</a></li><li><a href="GMap.html">GMap</a></li><li><a href="GMapFilter.html">GMapFilter</a></li><li><a href="hostEvents.html">hostEvents</a></li><li><a href="LocationSearchInput.html">LocationSearchInput</a></li><li><a href="Login.html">Login</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="Registration.html">Registration</a></li><li><a href="SimpleMap.html">SimpleMap</a></li></ul><h3>Global</h3><ul><li><a href="global.html#classes">classes</a></li><li><a href="global.html#componentDidMount">componentDidMount</a></li><li><a href="global.html#createEventHistoryRow">createEventHistoryRow</a></li><li><a href="global.html#createEventListRow">createEventListRow</a></li><li><a href="global.html#createEventMarker">createEventMarker</a></li><li><a href="global.html#createMapModal">createMapModal</a></li><li><a href="global.html#drawerWidth">drawerWidth</a></li><li><a href="global.html#handleAttendEventCallstheobservermethodinEventInterfacetoallowuserstoregisterusertoaneventandreceiveSMSnotificationsabouttheeventAlsoclosesthedialogboxsouserscankeepsearchingthroughevent">handleAttendEvent Calls the observer method in Event Interface to allow users to register user
+to an event and receive SMS notifications about the event
+Also closes the dialog box so users can keep searching through event</a></li><li><a href="global.html#handleClickClose">handleClickClose</a></li><li><a href="global.html#handleClickCloseFunctionthatsetsthedialogboxtoclose">handleClickClose Function that sets the dialog box to close</a></li><li><a href="global.html#handleClickOpen">handleClickOpen</a></li><li><a href="global.html#notifyUsers">notifyUsers</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#removeUser">removeUser</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#setDOpen">setDOpen</a></li><li><a href="global.html#styles">styles</a></li><li><a href="global.html#useStyle">useStyle</a></li><li><a href="global.html#useStyleFunctionobjectthatgeneratesastyleoffofdefaultMaterialsUITheme">useStyle Function object that generates a style off of default MaterialsUI Theme</a></li><li><a href="global.html#validEmail">validEmail</a></li><li><a href="global.html#validPassword">validPassword</a></li><li><a href="global.html#validPhone">validPhone</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Mar 12 2020 13:39:05 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

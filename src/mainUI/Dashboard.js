@@ -30,7 +30,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import BMLogo from './BruinMeetLogo.png';
 
 /**
- * @var drawerWidth CSS Style for setting width of dashboard drawer
+ * CSS Style for setting width of dashboard drawer
  */
 const drawerWidth = 240;
 
@@ -129,7 +129,7 @@ const styles = theme => ({
 });
 
 /**
- * Function component that uses Google Material UI Dashboard Template
+ * @class Dashboard: Function component that uses Google Material UI Dashboard Template
  * Customized to include a state machine that switches views on button click
  * @see https://material-ui.com/getting-started/templates/dashboard/
  * @see https://github.com/mui-org/material-ui/tree/master/docs/src/pages/getting-started/templates/dashboard
@@ -142,8 +142,9 @@ class Dashboard extends Component {
   /**
    * The follow constructor binds all the methods to the object and also declares socket event handlers
    * which are used to handle different types of server replies and responses
-   * @param {Object} props the parameters passed on by the declaring component (i.e. App.js)
-   * Contains the userID (i.e. user email) and socket object
+   * @param {Object} props the parameters passed on by the declaring component (i.e. App.js).
+   * Contains the userID (i.e. user email) and socket object.
+   * Also holds functions as objects to call for displaying success and fail messages
    */
   constructor(props) {
     super(props);
@@ -308,10 +309,9 @@ class Dashboard extends Component {
   }
 
   /**
-   * @function renderDashboard
    * Helper function to render the dashboard based on the events that are created using factory pattern
    * Will be passed to elements of dashboard depending on what is rendered
-   * @return Rendered element for dashboard that is selected on click
+   * Returns the rendered element for dashboard that is selected on click
    */
   renderDashboard() {
     console.log('Updated Dashboard: ', this.state.events);
@@ -350,8 +350,9 @@ class Dashboard extends Component {
   }
 
   /**
-   * 
-   * @param {Object} newEvents 
+   * Helper function that is called every time an update is made from this user to the database.
+   * It updates the current state of the dashboard with the new events, which are then passed as props to subsequent components.
+   * @param {Object} newEvents The list of new events that we will be displaying either for the map or for other pages
    */
   handleEventsIn(newEvents) {
     this.setState({
@@ -360,6 +361,7 @@ class Dashboard extends Component {
   }
 
   /**
+   * A helper function that sets the page displayed on the dashboard based on click
    * 
    * @param {String} newPage The string tag for the new page that we will be showing
    */
@@ -369,6 +371,11 @@ class Dashboard extends Component {
     }, () => {this.refreshEvents()});
   }
 
+  /**
+   * Helper function that sets the user location on the map based on data retrieved from google maps API
+   * 
+   * @param {Object} newLocation Contains longitude and latitude coordinates of the user's current position; null otherwise
+   */
   setUserLoc (newLocation) {
     console.log('Dashboard newUserLocation: ', newLocation);
     if (newLocation.lat !== this.state.userLocation.lat || newLocation.lng !== this.state.userLocation.lng) {
@@ -379,6 +386,11 @@ class Dashboard extends Component {
     }
   }
 
+  /**
+   * Helper function that filters through the events based on user's input in mapFilters {@link GMap}
+   * 
+   * @param {Object} newFilter Contains both the list of event types the user wants to display and the distance of the event
+   */
   setNewFilter (newFilter) {
     //console.log('Dashboard setNewFilter: ', newFilter);
     this.setState({
@@ -389,12 +401,8 @@ class Dashboard extends Component {
     });
   }
 
-  resetFilter () {
-    this.setState({filters: []});
-  }
-
   /**
-   * @function handleDrawerOpen Function that sets the state of open. Passed to onClick events.
+   * Function that sets the state of open. Passed to onClick events. Used to set this.state.open for div display
    */
     handleDrawerOpen = () => {
       this.setState({
@@ -403,7 +411,7 @@ class Dashboard extends Component {
     };
 
   /**
-   * @function handleDrawerOpen Function that sets the state of open. Passed to onClick events.
+   * Function that sets the state of open. Passed to onClick events.
    */
     handleDrawerClose = () => {
       this.setState({
@@ -412,7 +420,6 @@ class Dashboard extends Component {
     };
 
   /**
-   * @function refreshEvents
    * Event handler that fetches events from server
    * Returns and updates this.state.events with the events that are to be sent over
    */
@@ -421,7 +428,7 @@ class Dashboard extends Component {
   }
 
   /**
-   * @function handleEventHistory Function that fetches the events to be displayed for rating
+   * Function that fetches the events to be displayed for rating
    * separates the list into events user will attend, and user has already attended, based on time
    */
   handleEventHistory() {
@@ -432,7 +439,7 @@ class Dashboard extends Component {
   }
 
   /**
-   * @function handleEventList helper function that is used to fetch events to be displayed for EventList
+   * Helper function that is used to fetch events to be displayed for EventList
    */
   handleEventList() {
     let date = new Date();
@@ -445,7 +452,7 @@ class Dashboard extends Component {
   }
 
   /**
-   * @function handleDashboardMap helper function that is used to fetch events to be displayed for the map
+   * Helper function that is used to fetch events to be displayed for the map
    */
   handleDashboardMap() {
     /**

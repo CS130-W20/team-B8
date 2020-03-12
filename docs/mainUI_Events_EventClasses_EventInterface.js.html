@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: mainUI/Events/EventClasses/EventInterface.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: mainUI/Events/EventClasses/EventInterface.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from 'react';
+import EventListRow from '../EventListRow';
+import EventHistoryRow from '../EventHistoryRow';
+import { Marker } from 'google-maps-react';
+import { getMarkerType } from '../../markerPrefab/mapMarker';
+import { DialogContent } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
+
+const io = require("socket.io-client"),
+socket = io.connect("http://localhost:8000");
+
+
+//const TEST_NUMBER = "+15005550006"; // Won't actually send message, but will give you success response
+const TRIAL_NUMBER = "17205753789"; // Actual trial number you can use to test message sending
+
+// BMeetEvent: A base class type that is used to generate event objects
+// Uses an observer pattern to notify and update attendees of event changes
+export default class BMeetEvent{
+    constructor(props) {
+        this._id = props._id;
+        this.title =  props.title;
+        this.image = props.image;
+        this.description = props.description;
+        this.timeDate = props.timeDate;
+        this.location = props.location;
+        this.locationName = props.locationName;
+        this.host =  props.host;
+        this.attendees = props.attendees;
+        this.reviews = props.reviews;
+        this.type = props.type;
+        this.questions = [{id: 'name', label: "What was your experience like?"}]
+
+        console.log('BMeetEvent: ',props);
+        console.log('this.attendees: ', this.attendees, this.attendees.length);
+
+        this.notifyUsers = this.notifyUsers.bind(this);
+        this.createEventListRow = this.createEventListRow.bind(this);
+        this.createEventMarker = this.createEventMarker.bind(this);
+        this.registerUser = this.registerUser.bind(this);
+        this.removeUser = this.removeUser.bind(this);
+    }
+
+   /**
+   * this method is used to generate an event list row used by EventList
+   * @param none
+   * @return EventListRow component corresponding to this Event
+   */
+    createEventListRow(updateFunction, socket, successAlert, failAlert) {
+        return (
+            &lt;EventListRow
+                key={this._id} 
+                _id={this._id}
+                title={this.title}
+                image={this.image}
+                description={this.description}
+                timeDate={this.timeDate}
+                locationName={this.locationName}
+                attendees={this.attendees}
+                type={this.type}
+                updateFunction={updateFunction}
+                notifyFunction={this.notifyUsers}
+                socket={socket}
+                successAlert={successAlert}
+                failAlert={failAlert}/>
+        )
+    }
+
+   /**
+   * this method is used to generate an event history row used by EventHistory
+   * @param none
+   * @return EventHistoryRow component corresponding to this Event
+   */
+    createEventHistoryRow(user, socket, hasPassed, refreshEvents, successAlert, failAlert){
+        console.log(this.reviews);
+        let userReview = this.reviews.reduce((userReview, reviewObj) => {
+            return (reviewObj.user._id === user._id) ? reviewObj : userReview
+        }, null);
+        console.log("user review: ", userReview);
+
+        console.log("creating event history row");
+        return (
+            &lt;EventHistoryRow
+                key={this._id} 
+                _id={this._id}
+                title={this.title}
+                timeDate={this.timeDate}
+                locationName={this.locationName}
+                attendees={this.attendees}
+                host={this.host}
+                questions={this.questions}
+                userReview={userReview}
+                user={user}
+                refreshEvents={refreshEvents}
+                submitReview={this.submitReview}
+                review={hasPassed}
+                successAlert={successAlert}
+                failALert={failAlert}
+                leaveEvent={() => {
+                    this.removeUser(user, socket);
+                    refreshEvents();
+                }}/>)
+    }
+    /**
+   * this method is used to generate an event list row used by EventHistory
+   * @param handleClickOpen callback to open modal relating to this marker
+   * @param key unique index of this marker
+   * @return Marker component corresponding to this Event
+   */
+    createEventMarker(handleClickOpen, key){
+        console.log(this.type);
+        console.log(this.location);
+        console.log('URL for Marker: ', getMarkerType(this.type));
+        return(
+          &lt;Marker
+            onClick={handleClickOpen}
+            position={{ lat: this.location.lat, lng: this.location.lng}}
+            name={this.title}
+            key={key}
+            icon={{url: getMarkerType(this.type), scaleSize: (.5, .5)}}/>
+        )
+    }
+
+    /**
+   * this method is used to generate an event list row used by EventHistory
+   * @param none
+   * @return EventHistoryRow component corresponding to this Event
+   */
+    createMapModal(){
+        return (
+        &lt;DialogContent>
+            &lt;Typography gutterBottom>
+                Event Details
+            &lt;/Typography>
+            &lt;Typography gutterBottom>
+                Event Host
+            &lt;/Typography>
+            &lt;Typography gutterBottom>
+                Event Description
+            &lt;/Typography>
+        &lt;/DialogContent>
+        );
+    }
+
+    /**
+   * this method is used to register a user an observer of this event
+   * @param user object
+   * 
+   */
+    registerUser(user, socket) {
+        // add user to event object
+        socket.emit("addEventAttendee", this._id, user);
+        // add event to user object
+        socket.emit("addUserAttendingEvent", user.email, this._id);
+
+        let req = {
+            "sender": TRIAL_NUMBER,//this.host.phone, // You can use TRIAL_NUMBER to send an actual message not using your phone number
+            "recipients": [user.phone],
+            "message": "This is your receipt for attending this event. Please show this when you arrive! Hope to see you there!"
+            }
+        let event = {
+        "host": this.host,
+        "title": this.title,
+        "locationName": this.locationName,
+        "hostNumber": this.host.phone
+        }
+
+        socket.emit("messageUsers", req, event);
+    }
+
+    /**
+    * this method is used to remove a user as an observer of this event
+    * @param user: user OBJECT
+    *
+    */
+    removeUser(user, socket) {
+        console.log("Removing user: ", user, "from event: ", this._id);
+        // remove user from event object
+        socket.emit("removeUserAttendingEvent", user.email, this._id);
+        // remove event from user object
+        socket.emit("removeEventAttendee", this._id, user._id);
+    }
+
+    submitReview(user, rating, review, refreshEvents){
+        socket.emit('addEventReview', this._id, user, rating, review);
+        refreshEvents();
+    }
+
+    /**
+    * this method calls update() on all observers
+    * @param msg: msg to be sent to everyone
+    */
+    notifyUsers(msg, socket) {
+        let recipients = []
+        console.log('attendees for Message: ', this.attendees);
+        this.attendees.forEach(user => {
+            console.log('messaging: ', user);
+            recipients.push(user["phone"]);
+        })
+
+        console.log('recipientPhones: ', recipients);
+
+        let req = {
+        "sender": TRIAL_NUMBER,//this.host.phone, // You can use TRIAL_NUMBER to send an actual message not using your phone number
+        "recipients": recipients,
+        "message": msg
+        }
+        let event = {
+        "host": this.host,
+        "title": this.title,
+        "locationName": this.locationName,
+        "hostNumber": this.host.phone,
+        "date": this.timeDate
+        }
+        socket.emit("messageUsers", req, event);
+    }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dashboard.html">Dashboard</a></li><li><a href="Default%2520constructor%2520for%2520props;%2520sets%2520the%2520default%2520state%2520to%2520be%2520on%2520the%2520login%2520page%2520unless%2520a%2520token%2520is%2520stored%2520locally.html">Default constructor for props; sets the default state to be on the login page unless a token is stored locally</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventForm.html">EventForm</a></li><li><a href="EventHistory.html">EventHistory</a></li><li><a href="EventList.html">EventList</a></li><li><a href="GMap.html">GMap</a></li><li><a href="GMapFilter.html">GMapFilter</a></li><li><a href="hostEvents.html">hostEvents</a></li><li><a href="LocationSearchInput.html">LocationSearchInput</a></li><li><a href="Login.html">Login</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="Registration.html">Registration</a></li><li><a href="SimpleMap.html">SimpleMap</a></li></ul><h3>Global</h3><ul><li><a href="global.html#classes">classes</a></li><li><a href="global.html#componentDidMount">componentDidMount</a></li><li><a href="global.html#createEventHistoryRow">createEventHistoryRow</a></li><li><a href="global.html#createEventListRow">createEventListRow</a></li><li><a href="global.html#createEventMarker">createEventMarker</a></li><li><a href="global.html#createMapModal">createMapModal</a></li><li><a href="global.html#drawerWidth">drawerWidth</a></li><li><a href="global.html#handleAttendEventCallstheobservermethodinEventInterfacetoallowuserstoregisterusertoaneventandreceiveSMSnotificationsabouttheeventAlsoclosesthedialogboxsouserscankeepsearchingthroughevent">handleAttendEvent Calls the observer method in Event Interface to allow users to register user
+to an event and receive SMS notifications about the event
+Also closes the dialog box so users can keep searching through event</a></li><li><a href="global.html#handleClickClose">handleClickClose</a></li><li><a href="global.html#handleClickCloseFunctionthatsetsthedialogboxtoclose">handleClickClose Function that sets the dialog box to close</a></li><li><a href="global.html#handleClickOpen">handleClickOpen</a></li><li><a href="global.html#notifyUsers">notifyUsers</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#removeUser">removeUser</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#setDOpen">setDOpen</a></li><li><a href="global.html#styles">styles</a></li><li><a href="global.html#useStyle">useStyle</a></li><li><a href="global.html#useStyleFunctionobjectthatgeneratesastyleoffofdefaultMaterialsUITheme">useStyle Function object that generates a style off of default MaterialsUI Theme</a></li><li><a href="global.html#validEmail">validEmail</a></li><li><a href="global.html#validPassword">validPassword</a></li><li><a href="global.html#validPhone">validPhone</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Mar 12 2020 13:39:05 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

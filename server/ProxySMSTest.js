@@ -1,6 +1,6 @@
+require("dotenv").config();
 var ProxySMSMessage = require('./ProxySMSMessage')
 var assert = require('assert');
-
 
 setTimeout(function(){
     // Test 1: Error if there is no from number or to number

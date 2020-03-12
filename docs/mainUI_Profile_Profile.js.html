@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: mainUI/Profile/Profile.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: mainUI/Profile/Profile.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from 'react';
+import Avatar from '@material-ui/core/Avatar';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Grid from '@material-ui/core/Grid';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import Typography from '@material-ui/core/Typography';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import Paper from '@material-ui/core/Paper';
+import Rating from '@material-ui/lab/Rating';
+import Title from './Title';
+
+const StyledRating = withStyles({
+  iconFilled: {
+    color: '#ff6d75',
+  },
+  iconHover: {
+    color: '#ff3d47',
+  },
+})(Rating);
+
+/**
+ * @var useStyle Function object that generates a style off of default MaterialsUI Theme
+ * @see https://github.com/mui-org/material-ui/tree/master/docs/src/pages/getting-started/templates/dashboard
+ * @see https://material-ui.com/styles/basics/
+ */
+const useStyles = makeStyles(theme => ({
+    paper: {
+      paddingTop: theme.spacing(2),
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
+    avatar: {
+      margin: theme.spacing(1),
+      backgroundColor: theme.palette.secondary.main,
+    },
+    form: {
+      width: '100%', // Fix IE 11 issue.
+      marginTop: theme.spacing(1),
+    },
+    submit: {
+      margin: theme.spacing(3, 0, 2),
+    },
+}));
+
+/**
+ * Function component that uses Google Material UI
+ * Displays a simple user profile 
+ * Still working in progress as we have yet to integrate with database/backend
+ * 
+ * @author Phipson Lee
+ * @since 2020-02-15
+ */
+export default function Profile(props) {
+    /**
+   * @var classes Calls Material-UI useStyles to generate/inherit material UI styles generated from a default theme
+   */
+    const classes = useStyles();
+
+    /**
+   * Renders User profile onto screen
+   */
+    return (
+      &lt;Container data-testid="Profile" component="main" maxWidth="xs">
+        &lt;Grid item xs={12}>
+            &lt;Paper className={classes.paper} style={{padding: '10% 0'}}>
+        &lt;CssBaseline />
+        &lt;div className={classes.paper}>
+          &lt;Avatar className={classes.avatar}>
+            &lt;LockOutlinedIcon />
+          &lt;/Avatar>
+          &lt;Typography component="h1" variant="h5" style={{padding: '10% 0'}}>
+            {props.userID.name}
+          &lt;/Typography>
+          &lt;Title>Rating&lt;/Title>
+          {!props.userID.avgScore || props.userID.avgScore.length === 0 ?
+            &lt;Title>You haven't been rated yet&lt;/Title>
+            :
+            &lt;StyledRating
+              name="customized-color"
+              defaultValue={props.userID.avgScore}
+              getLabelText={value => `${value} Heart${value !== 1 ? 's' : ''}`}
+              precision={0.5}
+              icon={&lt;FavoriteIcon fontSize="inherit" />}
+              disabled={true}
+              />
+          }
+        &lt;/div>
+        &lt;/Paper>
+        &lt;/Grid>
+      &lt;/Container>
+    );
+  }
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dashboard.html">Dashboard</a></li><li><a href="Default%2520constructor%2520for%2520props;%2520sets%2520the%2520default%2520state%2520to%2520be%2520on%2520the%2520login%2520page%2520unless%2520a%2520token%2520is%2520stored%2520locally.html">Default constructor for props; sets the default state to be on the login page unless a token is stored locally</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventForm.html">EventForm</a></li><li><a href="EventHistory.html">EventHistory</a></li><li><a href="EventList.html">EventList</a></li><li><a href="GMap.html">GMap</a></li><li><a href="GMapFilter.html">GMapFilter</a></li><li><a href="hostEvents.html">hostEvents</a></li><li><a href="LocationSearchInput.html">LocationSearchInput</a></li><li><a href="Login.html">Login</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="Registration.html">Registration</a></li><li><a href="SimpleMap.html">SimpleMap</a></li></ul><h3>Global</h3><ul><li><a href="global.html#classes">classes</a></li><li><a href="global.html#componentDidMount">componentDidMount</a></li><li><a href="global.html#createEventHistoryRow">createEventHistoryRow</a></li><li><a href="global.html#createEventListRow">createEventListRow</a></li><li><a href="global.html#createEventMarker">createEventMarker</a></li><li><a href="global.html#createMapModal">createMapModal</a></li><li><a href="global.html#drawerWidth">drawerWidth</a></li><li><a href="global.html#handleAttendEventCallstheobservermethodinEventInterfacetoallowuserstoregisterusertoaneventandreceiveSMSnotificationsabouttheeventAlsoclosesthedialogboxsouserscankeepsearchingthroughevent">handleAttendEvent Calls the observer method in Event Interface to allow users to register user
+to an event and receive SMS notifications about the event
+Also closes the dialog box so users can keep searching through event</a></li><li><a href="global.html#handleClickClose">handleClickClose</a></li><li><a href="global.html#handleClickCloseFunctionthatsetsthedialogboxtoclose">handleClickClose Function that sets the dialog box to close</a></li><li><a href="global.html#handleClickOpen">handleClickOpen</a></li><li><a href="global.html#notifyUsers">notifyUsers</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#removeUser">removeUser</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#setDOpen">setDOpen</a></li><li><a href="global.html#styles">styles</a></li><li><a href="global.html#useStyle">useStyle</a></li><li><a href="global.html#useStyleFunctionobjectthatgeneratesastyleoffofdefaultMaterialsUITheme">useStyle Function object that generates a style off of default MaterialsUI Theme</a></li><li><a href="global.html#validEmail">validEmail</a></li><li><a href="global.html#validPassword">validPassword</a></li><li><a href="global.html#validPhone">validPhone</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Mar 12 2020 13:39:05 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: mainUI/LoginReg/Login.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: mainUI/LoginReg/Login.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { Component } from 'react';
+//import { Link } from 'react-router-dom';
+//import LoginService from '../services/LoginService';
+import {
+  REGISTRATION_FIELDS,
+} from '../MessageBundle';
+import Button from '@material-ui/core/Button';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import TextField from '@material-ui/core/TextField';
+import Paper from '@material-ui/core/Paper';
+import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
+import { withStyles } from '@material-ui/core/styles';
+import Link from '@material-ui/core/Link';
+import BMLogo from './../BruinMeetLogo.png';
+
+//const io = require("socket.io-client"),
+//socket = io.connect("http://localhost:8000");
+//socket.emit('getAllEvents');
+
+const styles = theme => ({
+  root: {
+    height: '100vh',
+  },
+  image: {
+    backgroundImage: 'url(https://source.unsplash.com/random)',
+    backgroundRepeat: 'no-repeat',
+    backgroundColor:
+      theme.palette.type === 'dark' ? theme.palette.grey[900] : theme.palette.grey[50],
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  },
+  paper: {
+    margin: theme.spacing(8, 4),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+});
+
+/**
+ * Login class component that lets user input login information and then pass on to database
+ * @author Phipson Lee
+ * @since 03-05-2020
+ */
+class Login extends Component {
+  /**
+   * @constructor
+   * @param {Object} props default props for constructor
+   */
+  constructor(props) {
+    super(props);
+    this.state = {
+      user_name: '',
+      password: '',
+      error: false,
+      loginSuccess: false,
+      socket: props.socket
+    };
+
+    this.handleOnChangeUserName = this.handleOnChangeUserName.bind(this);
+    this.handleOnChangePassword = this.handleOnChangePassword.bind(this);
+    this.handleSubmission = this.handleSubmission.bind(this);
+
+    this.props.socket.on("authReply", (status, userID, token) => {
+      console.log("serverReply: ", status);
+      if (status === "SUCCESS") {
+        this.props.login(userID, token);
+        this.setState({
+          error: false,
+          loginSuccess: true,
+        });
+      }
+      else if (status === "FAIL") {
+        this.props.error();
+        this.setState({
+          loginSuccess: false,
+          error: true,
+        });
+      }
+    });
+  }
+
+  /**
+   * Helper function to handle changes in name
+   * @param {Object} e On text change event listener from Javascript
+   */
+  handleOnChangeUserName = (e) => {
+    this.setState({
+      user_name: e.target.value,
+    });
+  };
+
+    /**
+   * Helper function to handle changes in password
+   * @param {Object} e On text change event listener from Javascript
+   */
+  handleOnChangePassword = (e) => {
+    this.setState({
+      password: e.target.value,
+    });
+  };
+
+  /**
+   * Helper function to submit login info to database
+   */
+  handleSubmission = () => {
+    console.log("onsubmit @login");
+    const data = {
+      username: this.state.user_name,
+      password: this.state.password,
+    };
+    this.state.socket.emit("authenticate", data.username, data.password);
+  };
+
+  /**
+   * Default component render function for ReactJS Components
+   */
+  render() {
+    const { classes } = this.props;
+
+    return (
+      &lt;Grid 
+        data-testid="login-div"
+        container component="main" className={classes.root}>
+      &lt;CssBaseline />
+      &lt;Grid item xs={false} sm={4} md={7} className={classes.image} />
+      &lt;Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+        &lt;div className={classes.paper}>
+          &lt;img alt={"BruinMeet Logo"}style={{width: 250, height: 250}}src={BMLogo}/>
+          &lt;form className={classes.form} noValidate>
+            &lt;TextField
+              data-testid="login-email"
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              value={this.state.user_name}
+              onChange={this.handleOnChangeUserName}
+              autoFocus/>
+            &lt;TextField
+              data-testid="login-password"
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              value={this.state.password}
+              onChange={this.handleOnChangePassword}
+              autoComplete="current-password"/>
+            &lt;Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              onClick={this.handleSubmission}>
+              Sign In
+            &lt;/Button>
+            &lt;Grid container>
+              &lt;Grid item xs>
+              &lt;/Grid>
+              &lt;Grid item>
+              &lt;Link 
+                    data-testid="create-account"
+                    onClick={this.props.registerUser}>
+                     {REGISTRATION_FIELDS.REGISTER} &lt;/Link>  {' '}
+              &lt;/Grid>
+            &lt;/Grid>
+            &lt;Box mt={5}>
+            &lt;/Box>
+          &lt;/form>
+        &lt;/div>
+      &lt;/Grid>
+      {/*&lt;div className="Login">
+        &lt;h1> {LOGIN_FIELDS.LOGIN_HEADING} &lt;/h1> {' '}
+        &lt;form onSubmit={this.onSubmit}>
+          &lt;div>
+            &lt;div className="fields">
+              &lt;p> {"Name"} &lt;/p>    {' '}
+              &lt;input
+                type="text"
+                name="Username"
+                onChange={this.handleOnChangeUserName}
+                autoComplete="Username"
+                required
+              />
+            &lt;/div>{' '}
+            {' '}
+            &lt;div className="fields">
+              {' '}
+              &lt;p> {COMMON_FIELDS.PASSWORD} &lt;/p>    {' '}
+              &lt;input
+                type="password"
+                name="Password"
+                onChange={this.handleOnChangePassword}
+                autoComplete="Password"
+                required
+              />{' '}
+                  {' '}
+            &lt;/div>{' '}
+            {' '}
+            &lt;div className="buttons">
+              {' '}
+              &lt;button
+                type="button"
+                onClick={this.onSubmit}
+                className="btn btn-primary"
+              >
+                {' '}
+                  {LOGIN_FIELDS.LOGIN}    {' '}
+              &lt;/button>{' '}
+                 &lt;Link to="/register">
+                     {REGISTRATION_FIELDS.REGISTER} &lt;/Link>  {' '}
+               {' '}
+            &lt;/div>{' '}
+               {' '}
+          &lt;/div>{' '}
+           {' '}
+        &lt;/form>{' '}
+            {loginSuccess &amp;&amp; &lt;Message message={LOGIN_MESSAGE} />}    {' '}
+        {error &amp;&amp; &lt;Error message={ERROR_IN_LOGIN} />}    {' '}
+    &lt;/div>*/}
+    &lt;/Grid>
+    );
+  }
+}
+export default withStyles(styles, {withTheme: true})(Login);</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dashboard.html">Dashboard</a></li><li><a href="Default%2520constructor%2520for%2520props;%2520sets%2520the%2520default%2520state%2520to%2520be%2520on%2520the%2520login%2520page%2520unless%2520a%2520token%2520is%2520stored%2520locally.html">Default constructor for props; sets the default state to be on the login page unless a token is stored locally</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventForm.html">EventForm</a></li><li><a href="EventHistory.html">EventHistory</a></li><li><a href="EventList.html">EventList</a></li><li><a href="GMap.html">GMap</a></li><li><a href="GMapFilter.html">GMapFilter</a></li><li><a href="hostEvents.html">hostEvents</a></li><li><a href="LocationSearchInput.html">LocationSearchInput</a></li><li><a href="Login.html">Login</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="Registration.html">Registration</a></li><li><a href="SimpleMap.html">SimpleMap</a></li></ul><h3>Global</h3><ul><li><a href="global.html#classes">classes</a></li><li><a href="global.html#componentDidMount">componentDidMount</a></li><li><a href="global.html#createEventHistoryRow">createEventHistoryRow</a></li><li><a href="global.html#createEventListRow">createEventListRow</a></li><li><a href="global.html#createEventMarker">createEventMarker</a></li><li><a href="global.html#createMapModal">createMapModal</a></li><li><a href="global.html#drawerWidth">drawerWidth</a></li><li><a href="global.html#handleAttendEventCallstheobservermethodinEventInterfacetoallowuserstoregisterusertoaneventandreceiveSMSnotificationsabouttheeventAlsoclosesthedialogboxsouserscankeepsearchingthroughevent">handleAttendEvent Calls the observer method in Event Interface to allow users to register user
+to an event and receive SMS notifications about the event
+Also closes the dialog box so users can keep searching through event</a></li><li><a href="global.html#handleClickClose">handleClickClose</a></li><li><a href="global.html#handleClickCloseFunctionthatsetsthedialogboxtoclose">handleClickClose Function that sets the dialog box to close</a></li><li><a href="global.html#handleClickOpen">handleClickOpen</a></li><li><a href="global.html#notifyUsers">notifyUsers</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#removeUser">removeUser</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#setDOpen">setDOpen</a></li><li><a href="global.html#styles">styles</a></li><li><a href="global.html#useStyle">useStyle</a></li><li><a href="global.html#useStyleFunctionobjectthatgeneratesastyleoffofdefaultMaterialsUITheme">useStyle Function object that generates a style off of default MaterialsUI Theme</a></li><li><a href="global.html#validEmail">validEmail</a></li><li><a href="global.html#validPassword">validPassword</a></li><li><a href="global.html#validPhone">validPhone</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Mar 12 2020 13:39:05 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

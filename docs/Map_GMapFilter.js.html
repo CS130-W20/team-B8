@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Map/GMapFilter.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Map/GMapFilter.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { Component } from 'react';
+import { withStyles } from "@material-ui/core/styles";
+import Typography from '@material-ui/core/Typography';
+import Slider from '@material-ui/core/Slider';
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import { eventTypes } from './../markerPrefab/mapMarker';
+import Switch from '@material-ui/core/Switch';
+
+
+const styles = theme => ({
+    root: {
+        padding: "5%",
+        width: "100%",
+        height: "100%",
+    },
+    margin: {
+      height: theme.spacing(3),
+    },
+    toggleContainer: {
+        margin: theme.spacing(2, 0),
+        width: "100%",
+        justifyContent: "center"
+      },
+    typography: {
+        fontSize: 10
+    }
+  });
+  
+  const marks = [
+    {
+      value: 1,
+      label: '1km',
+    },
+    {
+      value: 2,
+      label: '2km',
+    },
+    {
+      value: 3,
+      label: '3km',
+    },
+    {
+      value: 4,
+      label: '4km',
+    },
+    {
+        value: 5,
+        label: '5km',
+    }
+  ];
+
+  
+function valuetext(value) {
+    return `${value}km`;
+}
+  
+/**
+ * @see https://material-ui.com/components/toggle-button/
+ * @see https://material-ui.com/components/slider/
+ */
+class GMapFilter extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            enableFilters: false,
+            eventTypes: [eventTypes.music],
+            eventDistance: 1,
+        }
+        this.handleType = this.handleType.bind(this);
+        this.handleDistance = this.handleDistance.bind(this);
+        this.handleToggle = this.handleToggle.bind(this);
+    }
+
+    handleType = (event, newTypes) => {
+        if (newTypes.length) {
+            console.log('GMapFilter newTypes: ', newTypes);
+            this.setState({
+                eventTypes: newTypes,
+            }, () => {
+                console.log('GMapFilter updatedTypes:', this.state.eventTypes);
+                this.props.updateFilter(this.state);
+            });
+        }
+    }
+
+    handleDistance = (event, newVal) => {
+        if (newVal !== this.state.eventDistance) {
+            this.setState({
+                eventDistance: newVal,
+            }, () => {
+                this.props.updateFilter(this.state);
+            }
+            );
+        }
+    }
+
+    handleToggle = (value) => {
+        this.setState({
+            enableFilters: value,
+        }, () => {
+            this.props.updateFilter(this.state);
+        });
+    }
+
+  
+    render() {
+        const { classes } = this.props;
+        return (
+        &lt;div className={classes.root}>
+            &lt;Typography id="discrete-slider-always" style={{paddingTop: 10}}gutterBottom>
+            Enable Filters
+            &lt;/Typography>
+            &lt;div className={classes.toggleContainer}>
+                &lt;Switch
+                    checked={this.state.enableFilters}
+                    onChange={() => {this.handleToggle(!this.state.enableFilters)}}
+                    value={this.state.enableFilters}
+                    inputProps={{ 'aria-label': 'toggle filter'}}/>
+            &lt;/div>
+            &lt;Typography id="discrete-slider-always" style={{paddingBottom: 30}}gutterBottom>
+            Distance
+            &lt;/Typography>
+            &lt;Slider
+                value={this.state.eventDistance}
+                onChange={this.handleDistance}
+                getAriaValueText={valuetext}
+                aria-labelledby="discrete-slider-always"
+                step={1}
+                marks={marks}
+                valueLabelDisplay="on"
+                min={1}
+                max={5}
+                disabled={!this.state.enableFilters}
+            />
+            &lt;Typography id="discrete-slider-always" style={{paddingTop: 10}}gutterBottom>
+            Event Types
+            &lt;/Typography>
+            &lt;div className={classes.toggleContainer}>
+            &lt;ToggleButtonGroup
+                value={this.state.eventTypes} 
+                onChange={this.handleType}
+                aria-label="eventFilters"
+                style={{width: "100%", justifyContent: "center"}}
+            >
+                &lt;ToggleButton value={eventTypes.barHopping} aria-label={eventTypes.barHopping} 
+                disabled={!this.state.enableFilters}>
+                &lt;Typography className={classes.typography}>Bars&lt;/Typography>
+                &lt;/ToggleButton>
+                &lt;ToggleButton value={eventTypes.rave} aria-label={eventTypes.rave}
+                disabled={!this.state.enableFilters}>
+                    &lt;Typography className={classes.typography}>Raves&lt;/Typography>
+                &lt;/ToggleButton>
+                &lt;ToggleButton value={eventTypes.houseParty} aria-label={eventTypes.houseParty}
+                disabled={!this.state.enableFilters}>
+                    &lt;Typography className={classes.typography}>Party&lt;/Typography>
+                &lt;/ToggleButton>
+                &lt;ToggleButton value={eventTypes.music} aria-label={eventTypes.music}
+                disabled={!this.state.enableFilters}>
+                    &lt;Typography className={classes.typography}>Music&lt;/Typography>
+                &lt;/ToggleButton>
+            &lt;/ToggleButtonGroup>
+            &lt;/div>
+        &lt;/div>
+        );
+    }
+  }
+
+export default withStyles(styles, {withTheme: true})(GMapFilter);</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dashboard.html">Dashboard</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventForm.html">EventForm</a></li><li><a href="EventHistory.html">EventHistory</a></li><li><a href="EventList.html">EventList</a></li><li><a href="GMapFilter.html">GMapFilter</a></li><li><a href="LocationSearchInput.html">LocationSearchInput</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="SimpleMap.html">SimpleMap</a></li></ul><h3>Global</h3><ul><li><a href="global.html#classes">classes</a></li><li><a href="global.html#createEventHelperfunctiontoquerymongoDBserverandcreateeventobject">createEvent Helper function to query mongoDB server and create event object</a></li><li><a href="global.html#createEventHistoryRow">createEventHistoryRow</a></li><li><a href="global.html#createEventListRow">createEventListRow</a></li><li><a href="global.html#createEventMarker">createEventMarker</a></li><li><a href="global.html#createMapModal">createMapModal</a></li><li><a href="global.html#drawerWidth">drawerWidth</a></li><li><a href="global.html#handleAttendEventCallstheobservermethodinEventInterfacetoallowuserstoregisterusertoaneventandreceiveSMSnotificationsabouttheeventAlsoclosesthedialogboxsouserscankeepsearchingthroughevent">handleAttendEvent Calls the observer method in Event Interface to allow users to register user
+to an event and receive SMS notifications about the event
+Also closes the dialog box so users can keep searching through event</a></li><li><a href="global.html#handleChangeFunctionthatchangesthestatevariabletypebasedonselectedeventtype">handleChange Function that changes the state variable type based on selected event type</a></li><li><a href="global.html#handleClickClose">handleClickClose</a></li><li><a href="global.html#handleClickCloseFunctionthatsetsthedialogboxtoclose">handleClickClose Function that sets the dialog box to close</a></li><li><a href="global.html#handleClickOpen">handleClickOpen</a></li><li><a href="global.html#handleClickOpenFunctionthatsetsthedialogboxtoclose">handleClickOpen Function that sets the dialog box to close</a></li><li><a href="global.html#handleCloseFunctionthatsetstheselectboxtoopen">handleClose Function that sets the select box to open</a></li><li><a href="global.html#handleCloseFunctionthatsetstheselectmenutoclose">handleClose Function that sets the select menu to close</a></li><li><a href="global.html#handleDashboardMaphelperfunctionthatisusedtofetcheventstobedisplayedforthemap">handleDashboardMap helper function that is used to fetch events to be displayed for the map</a></li><li><a href="global.html#handleDateChangeFunctionthattakesinadateandupdatestheselecteddateforevent">handleDateChange Function that takes in a date and updates the selected date for event</a></li><li><a href="global.html#handleDescriptionChangeFunctionthattakesinadescriptionandupdatesitforevent">handleDescriptionChange Function that takes in a description and updates it for event</a></li><li><a href="global.html#handleEventHistoryFunctionthatfetchestheeventstobedisplayedforratingseparatesthelistintoeventsuserwillattend,anduserhasalreadyattended,basedontime">handleEventHistory Function that fetches the events to be displayed for rating
+separates the list into events user will attend, and user has already attended, based on time</a></li><li><a href="global.html#handleEventListhelperfunctionthatisusedtofetcheventstobedisplayedforEventList">handleEventList helper function that is used to fetch events to be displayed for EventList</a></li><li><a href="global.html#handleLocChangeFunctionthatsetstheselectboxtoopen">handleLocChange Function that sets the select box to open</a></li><li><a href="global.html#handleTextChangeFunctionthatsetstheselectboxtoopen">handleTextChange Function that sets the select box to open</a></li><li><a href="global.html#notifyUsers">notifyUsers</a></li><li><a href="global.html#refreshEventsEventhandlerthatfetcheseventsfromserverReturnsandupdatesthis.state.eventswiththeeventsthataretobesentover">refreshEvents
+Event handler that fetches events from server
+Returns and updates this.state.events with the events that are to be sent over</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#removeUser">removeUser</a></li><li><a href="global.html#renderDashboardHelperfunctiontorenderthedashboardbasedontheeventsthatarecreatedusingfactorypatternWillbepassedtoelementsofdashboarddependingonwhatisrendered">renderDashboard
+Helper function to render the dashboard based on the events that are created using factory pattern
+Will be passed to elements of dashboard depending on what is rendered</a></li><li><a href="global.html#resetListAhelperfunctionthatre-rendersthevisualcomponentwheneveraneventhasbeenedited/created">resetList A helper function that re-renders the visual component whenever an event has been edited/created</a></li><li><a href="global.html#setDOpen">setDOpen</a></li><li><a href="global.html#useStyle">useStyle</a></li><li><a href="global.html#useStyleFunctionobjectthatgeneratesastyleoffofdefaultMaterialsUITheme">useStyle Function object that generates a style off of default MaterialsUI Theme</a></li><li><a href="global.html#validEmail">validEmail</a></li><li><a href="global.html#validPassword">validPassword</a></li><li><a href="global.html#validPhone">validPhone</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Mar 12 2020 12:25:02 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

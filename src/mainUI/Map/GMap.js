@@ -19,6 +19,11 @@ const styles = theme => ({
     }
 });
 
+/**
+ * Renders the component on DOM UI (Default for all ReactJS Components)
+ * @author Phipson Lee
+ * @since 03-08-2020
+ */
 class GMap extends Component {
     render() {
         const {classes, events, updateLocation, updateFilter, refreshMap, socket, userID} = this.props;

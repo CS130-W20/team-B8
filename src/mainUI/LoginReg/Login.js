@@ -49,7 +49,16 @@ const styles = theme => ({
   },
 });
 
+/**
+ * Login class component that lets user input login information and then pass on to database
+ * @author Phipson Lee
+ * @since 03-05-2020
+ */
 class Login extends Component {
+  /**
+   * @constructor
+   * @param {Object} props default props for constructor
+   */
   constructor(props) {
     super(props);
     this.state = {
@@ -83,18 +92,29 @@ class Login extends Component {
     });
   }
 
+  /**
+   * Helper function to handle changes in name
+   * @param {Object} e On text change event listener from Javascript
+   */
   handleOnChangeUserName = (e) => {
     this.setState({
       user_name: e.target.value,
     });
   };
 
+    /**
+   * Helper function to handle changes in password
+   * @param {Object} e On text change event listener from Javascript
+   */
   handleOnChangePassword = (e) => {
     this.setState({
       password: e.target.value,
     });
   };
 
+  /**
+   * Helper function to submit login info to database
+   */
   handleSubmission = () => {
     console.log("onsubmit @login");
     const data = {
@@ -103,6 +123,10 @@ class Login extends Component {
     };
     this.state.socket.emit("authenticate", data.username, data.password);
   };
+
+  /**
+   * Default component render function for ReactJS Components
+   */
   render() {
     const { classes } = this.props;
 

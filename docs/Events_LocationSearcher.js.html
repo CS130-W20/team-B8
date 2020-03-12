@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Events/LocationSearcher.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Events/LocationSearcher.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, {Component} from 'react';
+import PlacesAutocomplete, {
+  geocodeByAddress,
+} from 'react-places-autocomplete';
+import TextField from '@material-ui/core/TextField';
+import { GoogleApiWrapper } from 'google-maps-react';
+
+
+/**
+ * Helper class/module that references example code obtained from external npm library
+ * @see react-places-autocomplete https://www.npmjs.com/package/react-places-autocomplete
+ * 
+ * Used to fetch location based on search query to give users a list of potential auto-complete locations
+ * Integrated with Material-UI
+ */ 
+class LocationSearchInput extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { address: this.props.default };
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSelect = this.handleSelect.bind(this);
+  }
+ 
+  handleChange = newAddress => {
+    this.setState({ address: newAddress });
+    //this.props.updateFunction(newAddress);
+  };
+ 
+  handleSelect = newAddress => {
+    this.setState({ address: newAddress });
+    geocodeByAddress(newAddress)
+    this.props.updateFunction(newAddress);
+  };
+ 
+  render() {
+    return (
+      &lt;PlacesAutocomplete
+        value={this.state.address}
+        onChange={this.handleChange}
+        onSelect={this.handleSelect}>
+        {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+          &lt;div style={{paddingTop: "2.5%", paddingBottom: "2.5%"}}>
+              &lt;TextField
+                autoFocus
+                margin="dense"
+                inputProps={{
+                  "data-testid":"event-location"
+                }}
+                id="event-location"
+                value={this.state.address}
+                type="email"
+                fullWidth
+                {...getInputProps({
+                    placeholder: 'Location',
+                    className: 'location-search-input',
+                })}/>
+            &lt;div className="autocomplete-dropdown-container">
+              {loading &amp;&amp; &lt;div>Loading...&lt;/div>}
+              {suggestions.map(suggestion => {
+                const className = suggestion.active
+                  ? 'suggestion-item--active'
+                  : 'suggestion-item';
+                // inline style for demonstration purpose
+                const style = suggestion.active
+                  ? { backgroundColor: '#fafafa', cursor: 'pointer' }
+                  : { backgroundColor: '#ffffff', cursor: 'pointer' };
+                return (
+                  &lt;div
+                    {...getSuggestionItemProps(suggestion, {
+                      className,
+                      style,
+                    })}
+                    onClick={() => {this.handleSelect(suggestion.description)}}
+                  >
+                    &lt;span>{suggestion.description}&lt;/span>
+                  &lt;/div>
+                );
+              })}
+            &lt;/div>
+          &lt;/div>
+        )}
+      &lt;/PlacesAutocomplete>
+    );
+  }
+}
+
+export default (GoogleApiWrapper({
+  apiKey: "AIzaSyD2EzcDG507GgPgPHVEoVpgFngvsMGIElg"
+})(LocationSearchInput));</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dashboard.html">Dashboard</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventForm.html">EventForm</a></li><li><a href="EventHistory.html">EventHistory</a></li><li><a href="EventList.html">EventList</a></li><li><a href="GMapFilter.html">GMapFilter</a></li><li><a href="LocationSearchInput.html">LocationSearchInput</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="SimpleMap.html">SimpleMap</a></li></ul><h3>Global</h3><ul><li><a href="global.html#classes">classes</a></li><li><a href="global.html#createEventHelperfunctiontoquerymongoDBserverandcreateeventobject">createEvent Helper function to query mongoDB server and create event object</a></li><li><a href="global.html#createEventHistoryRow">createEventHistoryRow</a></li><li><a href="global.html#createEventListRow">createEventListRow</a></li><li><a href="global.html#createEventMarker">createEventMarker</a></li><li><a href="global.html#createMapModal">createMapModal</a></li><li><a href="global.html#drawerWidth">drawerWidth</a></li><li><a href="global.html#handleAttendEventCallstheobservermethodinEventInterfacetoallowuserstoregisterusertoaneventandreceiveSMSnotificationsabouttheeventAlsoclosesthedialogboxsouserscankeepsearchingthroughevent">handleAttendEvent Calls the observer method in Event Interface to allow users to register user
+to an event and receive SMS notifications about the event
+Also closes the dialog box so users can keep searching through event</a></li><li><a href="global.html#handleChangeFunctionthatchangesthestatevariabletypebasedonselectedeventtype">handleChange Function that changes the state variable type based on selected event type</a></li><li><a href="global.html#handleClickClose">handleClickClose</a></li><li><a href="global.html#handleClickCloseFunctionthatsetsthedialogboxtoclose">handleClickClose Function that sets the dialog box to close</a></li><li><a href="global.html#handleClickOpen">handleClickOpen</a></li><li><a href="global.html#handleClickOpenFunctionthatsetsthedialogboxtoclose">handleClickOpen Function that sets the dialog box to close</a></li><li><a href="global.html#handleCloseFunctionthatsetstheselectboxtoopen">handleClose Function that sets the select box to open</a></li><li><a href="global.html#handleCloseFunctionthatsetstheselectmenutoclose">handleClose Function that sets the select menu to close</a></li><li><a href="global.html#handleDashboardMaphelperfunctionthatisusedtofetcheventstobedisplayedforthemap">handleDashboardMap helper function that is used to fetch events to be displayed for the map</a></li><li><a href="global.html#handleDateChangeFunctionthattakesinadateandupdatestheselecteddateforevent">handleDateChange Function that takes in a date and updates the selected date for event</a></li><li><a href="global.html#handleDescriptionChangeFunctionthattakesinadescriptionandupdatesitforevent">handleDescriptionChange Function that takes in a description and updates it for event</a></li><li><a href="global.html#handleEventHistoryFunctionthatfetchestheeventstobedisplayedforratingseparatesthelistintoeventsuserwillattend,anduserhasalreadyattended,basedontime">handleEventHistory Function that fetches the events to be displayed for rating
+separates the list into events user will attend, and user has already attended, based on time</a></li><li><a href="global.html#handleEventListhelperfunctionthatisusedtofetcheventstobedisplayedforEventList">handleEventList helper function that is used to fetch events to be displayed for EventList</a></li><li><a href="global.html#handleLocChangeFunctionthatsetstheselectboxtoopen">handleLocChange Function that sets the select box to open</a></li><li><a href="global.html#handleTextChangeFunctionthatsetstheselectboxtoopen">handleTextChange Function that sets the select box to open</a></li><li><a href="global.html#notifyUsers">notifyUsers</a></li><li><a href="global.html#refreshEventsEventhandlerthatfetcheseventsfromserverReturnsandupdatesthis.state.eventswiththeeventsthataretobesentover">refreshEvents
+Event handler that fetches events from server
+Returns and updates this.state.events with the events that are to be sent over</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#removeUser">removeUser</a></li><li><a href="global.html#renderDashboardHelperfunctiontorenderthedashboardbasedontheeventsthatarecreatedusingfactorypatternWillbepassedtoelementsofdashboarddependingonwhatisrendered">renderDashboard
+Helper function to render the dashboard based on the events that are created using factory pattern
+Will be passed to elements of dashboard depending on what is rendered</a></li><li><a href="global.html#resetListAhelperfunctionthatre-rendersthevisualcomponentwheneveraneventhasbeenedited/created">resetList A helper function that re-renders the visual component whenever an event has been edited/created</a></li><li><a href="global.html#setDOpen">setDOpen</a></li><li><a href="global.html#useStyle">useStyle</a></li><li><a href="global.html#useStyleFunctionobjectthatgeneratesastyleoffofdefaultMaterialsUITheme">useStyle Function object that generates a style off of default MaterialsUI Theme</a></li><li><a href="global.html#validEmail">validEmail</a></li><li><a href="global.html#validPassword">validPassword</a></li><li><a href="global.html#validPhone">validPhone</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Mar 12 2020 12:25:02 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

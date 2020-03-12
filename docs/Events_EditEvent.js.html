@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Events/EditEvent.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Events/EditEvent.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { Component } from 'react';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import { withStyles } from '@material-ui/core/styles';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Select from '@material-ui/core/Select';
+import FormControl from '@material-ui/core/FormControl';
+import {
+    MuiPickersUtilsProvider,
+    KeyboardTimePicker,
+    KeyboardDatePicker,
+  } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import EditIcon from '@material-ui/icons/Edit';
+import { IconButton } from '@material-ui/core';
+import LocationSearchInput from './LocationSearcher';
+import Geocode from "react-geocode";
+import { eventTypes } from './../markerPrefab/mapMarker';
+ 
+const
+    io = require("socket.io-client"),
+    socket = io.connect("http://localhost:8000");
+
+/**
+ * @function useStyle Function object that generates a style off of default MaterialsUI Theme
+ * @see https://github.com/mui-org/material-ui/tree/master/docs/src/pages/getting-started/templates/dashboard
+ * @see https://material-ui.com/styles/basics/
+ */
+const styles = theme => ({
+    formControl: {
+      margin: theme.spacing(1),
+      minWidth: 120,
+    },
+  });
+
+// set Google Maps Geocoding API for purposes of quota management. Its optional but recommended.
+Geocode.setApiKey("AIzaSyD2EzcDG507GgPgPHVEoVpgFngvsMGIElg");
+ 
+// set response language. Defaults to english.
+Geocode.setLanguage("en");
+ 
+// Enable or disable logs. Its optional.
+Geocode.enableDebug();
+
+/**
+ * React component that uses Google Material UI Dialog Boxes
+ * Uses IconButton to toggle display, and allows users update/Edit Events.
+ * Currently incomplete, as we still need to display event information.
+ * @see https://material-ui.com/components/dialogs/
+ * @see https://material-ui.com/components/pickers/
+ * 
+ * @author Phipson Lee
+ * @since 2020-02-15
+ */
+class EventEdit extends Component{
+/**
+ * Default constructor for component, as with all ReactJS Components
+ * this.state is used to keep track of any changes in the FormInput and also (by default)
+ * store the existing information of the event (in case the user wants to cancel)
+ * 
+ * Constructor also uses Google Maps API to fetch user's current location.
+ * @param props This is a key-value object that is maintained to pass arguments
+ * on construction; we are passing 1. the Event object and 2. a function object to update the EventList
+ * @see google-maps-react For more information on navigator.geolocation
+ * @see markerTypes
+ */
+  constructor(props) {
+    super(props);
+    this.state = {
+      id: 0,
+      date: '',
+      location: '',
+      title: '',
+      dialogopen: false,
+      open: false,
+      type: '',
+      description: '',
+      image: null,
+      previewImage: '',
+    }
+    this.handleClickOpen = this.handleClickOpen.bind(this);
+    this.handleClickClose = this.handleClickClose.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+    this.handleOpen = this.handleOpen.bind(this);
+    this.updateEvent = this.updateEvent.bind(this);
+    this.handleLocChange = this.handleLocChange.bind(this);
+    this.handleTextChange = this.handleTextChange.bind(this);
+  }
+
+  /**
+   * Function is called when component is loaded onto DOM. In particular, we use this to 
+   * Pass the arguments from the event (given in props) to the state
+   */
+  componentDidMount() {
+    let previewImage = '';
+    if(this.props.image){
+      previewImage = 'data:image/jpeg;base64,' + this.props.image;
+    }
+    this.setState({
+      id: this.props._id,
+      date: this.props.date,
+      location: this.props.location,
+      title: this.props.title,
+      type: this.props.type,
+      description: this.props.description,
+      previewImage: previewImage,
+    })
+  }
+
+  updateEvent() {
+    Geocode.fromAddress(this.state.location).then(
+      response => {
+        const { lat, lng } = response.results[0].geometry.location;
+
+        var newEvent = {
+          eventId: this.state.id,
+          title: this.state.title,
+          date: this.state.date,
+          location: {lat: lat, lng: lng},
+          locationName: this.state.location,
+          type: this.state.type,
+          description: this.state.description,
+        }
+
+        socket.emit('updateEvent', newEvent.eventId, newEvent.title, newEvent.date, newEvent.location, newEvent.locationName, newEvent.type, newEvent.description);
+
+        socket.on('updateEventReply', (event) => {
+          var file = this.state.image
+          if(file){
+            var reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            reader.onload = function(){
+              var dataBuffer = new Buffer(new Uint8Array(reader.result)); 
+              socket.emit('addImage', newEvent.eventId, dataBuffer);
+            }
+          }
+          console.log("updateEventReply: ", event);
+          this.props.successAlert("Successfully updated the event: " + newEvent.title + "!");
+          this.props.updateFunction();
+        })
+
+      },
+      error => {
+        console.error(error);
+      }
+    );
+    this.handleClickClose();
+  }
+
+
+  /**
+   * @function handleClickOpen Function that sets the dialog box to close
+   */
+    handleClickOpen = () => {
+      this.setState({
+        dialogopen: true
+      })    
+    };
+
+  /**
+   * @function handleClickClose Function that sets the dialog box to close
+   */
+    handleClickClose = () => {
+      this.setState({
+        dialogopen: false
+      })    
+    };
+
+  /**
+   * @function handleDateChange Function that takes in a date and updates the selected date for event
+   * @param {String} date Date of the anticipated event passed as a string
+   */
+    handleDateChange = date => {
+      this.setState({
+        date: date
+      })    
+    };
+
+  /**
+   * @function handleDescriptionChange Function that takes in a description and updates it for event
+   * @param {String} date Description of event
+   */
+  handleDescriptionChange = description => {
+    this.setState({
+      description: description.target.value
+    })    
+  };
+
+  /**
+   * @function handleChange Function that changes the state variable type based on selected event type
+   * @param {String} event Type of event based on onClick event listener
+   */
+  
+    handleChange = event => {
+      console.log(event.target.value)
+      this.setState({
+        type: event.target.value
+      })    
+    };
+
+  /**
+   * @function handleClose Function that sets the select menu to close
+   */
+    handleClose = () => {
+      this.setState({
+        open: false,
+      })    
+    };
+
+  /**
+   * @function handleClose Function that sets the select box to open
+   */
+    handleOpen = () => {
+      this.setState({
+        open: true
+      })    
+    };
+
+  /**
+   * @function handleLocChange Function that sets the select box to open
+   */
+    handleLocChange = address => {
+      this.setState({
+        location: address
+      })
+    }
+
+  /**
+   * @function handleTextChange Function that sets the select box to open
+   */
+    handleTextChange = text => {
+      this.setState({
+        title: text.target.value
+      })
+    }
+
+    uploadImage = (e) => {
+      var files = e.target.files
+      if(files.length > 0){
+        var reader = new FileReader();
+        reader.onload = (e) => {
+          this.setState({previewImage: e.target.result});
+        }
+        reader.readAsDataURL(files[0]);
+        this.setState({image: files[0]});
+      }
+    }
+
+    getImageContainerStyle = () => ({
+      width: '550px',
+      height: '200px',
+      overflow: 'hidden',
+      marginBottom: '-40px',
+  })
+  getImageStyle = () => ({
+      height: 'auto',
+      width: '550px',
+  });
+
+  /**
+   * Renders event form based on button click and state changes. Creates event upon submission of form.
+   */
+  render() {
+    const {classes} = this.props;
+    return (
+      &lt;div>
+        &lt;IconButton onClick={this.handleClickOpen}>
+          &lt;EditIcon />
+        &lt;/IconButton>
+        &lt;Dialog open={this.state.dialogopen} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
+          &lt;DialogTitle id="form-dialog-title">Update Your Event&lt;/DialogTitle>
+          &lt;DialogContent>
+          &lt;div style={this.getImageContainerStyle()}>
+            &lt;img style={this.getImageStyle()} alt={"Event Representation"} src={this.state.previewImage ? 
+            this.state.previewImage
+            : 'https://lh3.googleusercontent.com/proxy/Qe8V5Hwb-cD6ZXzkehYtxggyL9ODf86fvHXoIflZM-27jbbL8V5qcsXS1MkeHJMZsiWpm5n5FS2cL9MrIDCjV1Y-_y99c263BBYayegnQnAAz_nhPG44rWhaWE3k'}/>
+            &lt;/div>
+            &lt;Button style={{height: '50px', position: 'relative', top:'0px', left: '400px', marginBottom: '0px'}}
+                variant="contained"
+                component="label"
+                >
+                  Upload image
+                  &lt;input
+                    type="file"
+                    style={{display: "none"}}
+                    onChange={this.uploadImage}
+                  />
+              &lt;/Button>
+              &lt;TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              label="Name of Event"
+              value={this.state.title}
+              onChange={this.handleTextChange}
+              type="email"
+              fullWidth/>
+              &lt;LocationSearchInput
+              default={this.state.location}
+              updateFunction={this.handleLocChange}/>
+              &lt;MuiPickersUtilsProvider utils={DateFnsUtils}>
+              &lt;KeyboardDatePicker
+              margin="normal"
+              id="date-picker-dialog"
+              format="MM/dd/yyyy"
+              value={this.state.date}
+              onChange={this.handleDateChange}
+              KeyboardButtonProps={{
+              'aria-label': 'change date',
+              }}/>
+              &lt;KeyboardTimePicker
+              margin="normal"
+              id="time-picker"
+              value={this.state.date}
+              onChange={this.handleDateChange}
+              KeyboardButtonProps={{
+              'aria-label': 'change time',
+              }}/>
+              &lt;/MuiPickersUtilsProvider>
+              &lt;TextField
+                margin="dense"
+                label="Description"
+                value={this.state.description}
+                multiline
+                rows={2}
+                rowsMax={4}
+                onChange={this.handleDescriptionChange}
+                fullWidth
+              />
+              &lt;FormControl className={classes.formControl}>
+              &lt;InputLabel id="demo-controlled-open-select-label">Event Type&lt;/InputLabel>
+              &lt;Select
+              labelId="demo-controlled-open-select-label"
+              id="demo-controlled-open-select"
+              open={this.state.open}
+              onClose={this.handleClose}
+              onOpen={this.handleOpen}
+              value={this.state.type}
+              onChange={this.handleChange}>
+              &lt;MenuItem value="">
+                  &lt;em>None&lt;/em>
+              &lt;/MenuItem>
+              &lt;MenuItem value={eventTypes.barHopping}>Bar Hopping&lt;/MenuItem>
+              &lt;MenuItem value={eventTypes.rave}>Rave&lt;/MenuItem>
+              &lt;MenuItem value={eventTypes.houseParty}>House Party&lt;/MenuItem>
+              &lt;MenuItem value={eventTypes.music}>Music Concert/Festival&lt;/MenuItem>
+              &lt;/Select>
+              &lt;/FormControl>
+          &lt;/DialogContent>
+          &lt;DialogActions>
+            &lt;Button onClick={this.handleClickClose} color="primary">
+              Cancel
+            &lt;/Button>
+            &lt;Button onClick={this.updateEvent} color="primary">
+              {/* TODO: ADD TO DB AND UPDATE */}
+              Update
+            &lt;/Button>
+          &lt;/DialogActions>
+        &lt;/Dialog>
+      &lt;/div>
+    )
+  };
+}
+
+export default withStyles(styles, {withTheme: true})(EventEdit);
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dashboard.html">Dashboard</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventForm.html">EventForm</a></li><li><a href="EventHistory.html">EventHistory</a></li><li><a href="EventList.html">EventList</a></li><li><a href="GMapFilter.html">GMapFilter</a></li><li><a href="LocationSearchInput.html">LocationSearchInput</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="SimpleMap.html">SimpleMap</a></li></ul><h3>Global</h3><ul><li><a href="global.html#classes">classes</a></li><li><a href="global.html#createEventHelperfunctiontoquerymongoDBserverandcreateeventobject">createEvent Helper function to query mongoDB server and create event object</a></li><li><a href="global.html#createEventHistoryRow">createEventHistoryRow</a></li><li><a href="global.html#createEventListRow">createEventListRow</a></li><li><a href="global.html#createEventMarker">createEventMarker</a></li><li><a href="global.html#createMapModal">createMapModal</a></li><li><a href="global.html#drawerWidth">drawerWidth</a></li><li><a href="global.html#handleAttendEventCallstheobservermethodinEventInterfacetoallowuserstoregisterusertoaneventandreceiveSMSnotificationsabouttheeventAlsoclosesthedialogboxsouserscankeepsearchingthroughevent">handleAttendEvent Calls the observer method in Event Interface to allow users to register user
+to an event and receive SMS notifications about the event
+Also closes the dialog box so users can keep searching through event</a></li><li><a href="global.html#handleChangeFunctionthatchangesthestatevariabletypebasedonselectedeventtype">handleChange Function that changes the state variable type based on selected event type</a></li><li><a href="global.html#handleClickClose">handleClickClose</a></li><li><a href="global.html#handleClickCloseFunctionthatsetsthedialogboxtoclose">handleClickClose Function that sets the dialog box to close</a></li><li><a href="global.html#handleClickOpen">handleClickOpen</a></li><li><a href="global.html#handleClickOpenFunctionthatsetsthedialogboxtoclose">handleClickOpen Function that sets the dialog box to close</a></li><li><a href="global.html#handleCloseFunctionthatsetstheselectboxtoopen">handleClose Function that sets the select box to open</a></li><li><a href="global.html#handleCloseFunctionthatsetstheselectmenutoclose">handleClose Function that sets the select menu to close</a></li><li><a href="global.html#handleDashboardMaphelperfunctionthatisusedtofetcheventstobedisplayedforthemap">handleDashboardMap helper function that is used to fetch events to be displayed for the map</a></li><li><a href="global.html#handleDateChangeFunctionthattakesinadateandupdatestheselecteddateforevent">handleDateChange Function that takes in a date and updates the selected date for event</a></li><li><a href="global.html#handleDescriptionChangeFunctionthattakesinadescriptionandupdatesitforevent">handleDescriptionChange Function that takes in a description and updates it for event</a></li><li><a href="global.html#handleEventHistoryFunctionthatfetchestheeventstobedisplayedforratingseparatesthelistintoeventsuserwillattend,anduserhasalreadyattended,basedontime">handleEventHistory Function that fetches the events to be displayed for rating
+separates the list into events user will attend, and user has already attended, based on time</a></li><li><a href="global.html#handleEventListhelperfunctionthatisusedtofetcheventstobedisplayedforEventList">handleEventList helper function that is used to fetch events to be displayed for EventList</a></li><li><a href="global.html#handleLocChangeFunctionthatsetstheselectboxtoopen">handleLocChange Function that sets the select box to open</a></li><li><a href="global.html#handleTextChangeFunctionthatsetstheselectboxtoopen">handleTextChange Function that sets the select box to open</a></li><li><a href="global.html#notifyUsers">notifyUsers</a></li><li><a href="global.html#refreshEventsEventhandlerthatfetcheseventsfromserverReturnsandupdatesthis.state.eventswiththeeventsthataretobesentover">refreshEvents
+Event handler that fetches events from server
+Returns and updates this.state.events with the events that are to be sent over</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#removeUser">removeUser</a></li><li><a href="global.html#renderDashboardHelperfunctiontorenderthedashboardbasedontheeventsthatarecreatedusingfactorypatternWillbepassedtoelementsofdashboarddependingonwhatisrendered">renderDashboard
+Helper function to render the dashboard based on the events that are created using factory pattern
+Will be passed to elements of dashboard depending on what is rendered</a></li><li><a href="global.html#resetListAhelperfunctionthatre-rendersthevisualcomponentwheneveraneventhasbeenedited/created">resetList A helper function that re-renders the visual component whenever an event has been edited/created</a></li><li><a href="global.html#setDOpen">setDOpen</a></li><li><a href="global.html#useStyle">useStyle</a></li><li><a href="global.html#useStyleFunctionobjectthatgeneratesastyleoffofdefaultMaterialsUITheme">useStyle Function object that generates a style off of default MaterialsUI Theme</a></li><li><a href="global.html#validEmail">validEmail</a></li><li><a href="global.html#validPassword">validPassword</a></li><li><a href="global.html#validPhone">validPhone</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Mar 12 2020 12:25:02 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

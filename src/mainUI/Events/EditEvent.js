@@ -114,6 +114,9 @@ class EventEdit extends Component{
     })
   }
 
+  /**
+   * Helper function to update the existing event with all the new parameters and information
+   */
   updateEvent() {
     Geocode.fromAddress(this.state.location).then(
       response => {
@@ -156,7 +159,7 @@ class EventEdit extends Component{
 
 
   /**
-   * @function handleClickOpen Function that sets the dialog box to close
+   * Function that sets the dialog box to close
    */
     handleClickOpen = () => {
       this.setState({
@@ -165,7 +168,7 @@ class EventEdit extends Component{
     };
 
   /**
-   * @function handleClickClose Function that sets the dialog box to close
+   * Function that sets the dialog box to close
    */
     handleClickClose = () => {
       this.setState({
@@ -174,7 +177,7 @@ class EventEdit extends Component{
     };
 
   /**
-   * @function handleDateChange Function that takes in a date and updates the selected date for event
+   * Function that takes in a date and updates the selected date for event
    * @param {String} date Date of the anticipated event passed as a string
    */
     handleDateChange = date => {
@@ -184,7 +187,7 @@ class EventEdit extends Component{
     };
 
   /**
-   * @function handleDescriptionChange Function that takes in a description and updates it for event
+   * Function that takes in a description and updates it for event
    * @param {String} date Description of event
    */
   handleDescriptionChange = description => {
@@ -194,7 +197,7 @@ class EventEdit extends Component{
   };
 
   /**
-   * @function handleChange Function that changes the state variable type based on selected event type
+   * Function that changes the state variable type based on selected event type
    * @param {String} event Type of event based on onClick event listener
    */
   
@@ -206,7 +209,7 @@ class EventEdit extends Component{
     };
 
   /**
-   * @function handleClose Function that sets the select menu to close
+   * Function that sets the select menu to close
    */
     handleClose = () => {
       this.setState({
@@ -215,7 +218,7 @@ class EventEdit extends Component{
     };
 
   /**
-   * @function handleClose Function that sets the select box to open
+   * Function that sets the select box to open
    */
     handleOpen = () => {
       this.setState({
@@ -224,7 +227,7 @@ class EventEdit extends Component{
     };
 
   /**
-   * @function handleLocChange Function that sets the select box to open
+   * Function that sets the select box to open
    */
     handleLocChange = address => {
       this.setState({
@@ -233,7 +236,7 @@ class EventEdit extends Component{
     }
 
   /**
-   * @function handleTextChange Function that sets the select box to open
+   * Function that sets the select box to open
    */
     handleTextChange = text => {
       this.setState({

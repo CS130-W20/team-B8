@@ -42,7 +42,7 @@ function validPhone (num) {
 
 /**
  * check if email address is valid
- * @param email: string of email addr.
+ * @param {String} email: string of email addr.
  */
 function validEmail (email) {
   if (!email) {
@@ -53,7 +53,7 @@ function validEmail (email) {
 
 /**
  * check if password is valid
- * @ param pwd: string of password
+ * @param {String} pwd: string of password
  */
 function validPassword (pwd) {
   if (!pwd) {
@@ -63,7 +63,16 @@ function validPassword (pwd) {
 }
 
 
+/**
+ * ReactJS Class component for registering a user to the database
+ * @author Phipson Lee
+ * @since 03-05-2020
+ */
 class Registration extends Component {
+  /**
+   * @constructor
+   * @param {Object} props Default object for constructor
+   */
   constructor (props) {
     console.log("setting up socket");
     const io = require("socket.io-client"),
@@ -86,24 +95,35 @@ class Registration extends Component {
     this.handleOnChangeFirstName = this.handleOnChangeFirstName.bind(this);
     this.handleOnChangeLastName = this.handleOnChangeLastName.bind(this);
     this.handleOnChangePhone = this.handleOnChangePhone.bind(this);
-    this.handleOnChangeUserName = this.handleOnChangeUserName.bind(this);
     this.handleOnChangePassword = this.handleOnChangePassword.bind(this);
     this.handleOnChangeEmail = this.handleOnChangeEmail.bind(this);
     this.handleRegistration = this.handleRegistration.bind(this);
   }
 
+  /**
+   * Helper function to change first name
+   * @param {String} e Event for on text change
+   */
   handleOnChangeFirstName = e => {
     this.setState ({
       first_name: e.target.value,
     });
   };
 
+    /**
+   * Helper function to change last name
+   * @param {String} e Event for on text change
+   */
   handleOnChangeLastName = e => {
     this.setState ({
       last_name: e.target.value,
     });
   };
 
+    /**
+   * Helper function to change Phone number name
+   * @param {String} e Event for on text change
+   */
   handleOnChangePhone = e => {
     this.setState ({
       phone: e.target.value,
@@ -122,12 +142,10 @@ class Registration extends Component {
 
   };
 
-  handleOnChangeUserName = e => {
-    this.setState ({
-      user_name: e.target.value,
-    });
-  };
-
+  /**
+   * Helper function to change password
+   * @param {String} e Event for on text change
+   */
   handleOnChangePassword = e => {
     this.setState ({
       password: e.target.value,
@@ -145,6 +163,10 @@ class Registration extends Component {
     }
   };
 
+  /**
+   * Helper function to change email
+   * @param {String} e Event for on text change
+   */
   handleOnChangeEmail = e => {
     this.setState ({
       email: e.target.value,
@@ -162,12 +184,10 @@ class Registration extends Component {
     }
   };
 
-  handleOnBlur = async e => {
-    this.setState ({
-      user_name: e.target.value,
-    });
-  };
 
+  /**
+   * Helper function to add user to database
+   */
   handleRegistration = () => {
     // console.log("onsubmit: reg", this.props.socket);
     //e.preventDefault ();
@@ -188,6 +208,9 @@ class Registration extends Component {
     }
   };
 
+  /**
+   * Default render function for component
+   */
   render () {
     const {classes} = this.props;
     return (

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: mainUI/Map/simpleMap.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: mainUI/Map/simpleMap.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { Component } from 'react';
+import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
+import Dimensions from 'react-dimensions';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import Button from '@material-ui/core/Button';
+import EventPage from '../Events/EventPage';
+import { markerTypes } from './../markerPrefab/mapMarker';
+
+/**
+* SimpleMap is a ReactJS Component that displays events on a google map
+* Uses Google Maps API and will also integrate Google Places API for directions
+*
+* @author  Phipson Lee
+* @since   2020-02-18
+*/
+class SimpleMap extends Component {
+
+/**
+ * Default constructor for component, as with all ReactJS Components
+ * SimpleMap uses state.markers as a method of tracking the events declared
+ * Also uses state.open to maintain UI for whether a marker has been clicked.
+ * Also uses state.userLocation and state.loading to determine user's GPS position
+ * 
+ * Constructor also uses Google Maps API to fetch user's current location.
+ * @param props This is a key-value object that is maintained to pass arguments
+ * on construction
+ * @see google-maps-react For more information on navigator.geolocation
+ * @see markerTypes
+ */
+    constructor(props){
+      super(props);
+      this.current = React.createRef();
+      this.state = {
+          open: false,
+          currEvent: {},
+          avgScore: [],
+          reviews: [],
+      }
+    
+      this.handleClickClose = this.handleClickClose.bind(this);
+      this.handleClickOpen = this.handleClickOpen.bind(this);
+      this.getMarkerType = this.getMarkerType.bind(this);
+      this.handleAttendEvent = this.handleAttendEvent.bind(this);
+
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const { latitude, longitude } = position.coords;
+
+          this.setState({
+            userLocation: { lat: latitude, lng: longitude },
+            loading: false,
+          }, () => {this.props.updateLocation(this.state.userLocation)}
+          );
+        },
+        () => {
+          this.setState({ loading: false });
+        }
+      );
+
+      this.props.socket.on("getHostReply", (user) => {
+        console.log('Event host: ', user);
+        if ("avgScore" in user &amp;&amp; "reviews" in user) {
+          this.setState({avgScore: user.avgScore, reviews: user.reviews});
+        }
+    });
+    }
+
+  /**
+   * Sets the state of the component when it mounts. Default function that is available for all reactJS components
+   * In particular, we will get all events and then push them onto a buffer before updating our state
+   * this.state.markers will then be rendered on the DOM
+   */
+  getMarkerType = (eventType) => {
+    switch(eventType){
+      case "bar":
+        return markerTypes.food;
+      case "house":
+        return markerTypes.gaming;
+      case "rave":
+        return markerTypes.dj;
+      case "concert":
+        return markerTypes.dance;
+      default:
+        return markerTypes.hats;
+    }
+  }
+
+  /**
+   * Event function that will be used for detecting button click and display event details
+   */
+  handleClickOpen(event) {
+    this.props.socket.emit("getHost", event.host.email);
+    this.setState({
+      open: true,
+      currEvent: event
+    });
+  };
+
+  /**
+   * Event function that will be used for detecting 'Cancel' option to close/hide event details
+   */
+  handleClickClose() {
+    this.setState({
+      open: false,
+    })
+  };
+
+  /**
+   * @function handleAttendEvent Calls the observer method in Event Interface to allow users to register user
+   * to an event and receive SMS notifications about the event
+   * Also closes the dialog box so users can keep searching through event
+   */
+  handleAttendEvent() {
+    console.log('simpleMap registering user: ', this.props.userID);
+    //this.props.socket.emit("addEventAttendee", this.state.currEvent._id, this.props.userID);
+    //this.props.socket.emit("addUserAttendingEvent", this.props.userID.name, this.state.currEvent._id);
+    this.state.currEvent.registerUser(this.props.userID, this.props.socket);
+    this.props.successAlert("You have confirmed your attendance to " + this.state.currEvent.title + "!");
+    this.handleClickClose();
+    this.props.refreshMap();
+  }
+
+  /**
+   * Default function to load and display component on DOM
+   * Renders Google Map and also a hidden Dialog/popup that will show event details when a user clicks on a marker
+   */
+  render() {
+    const { loading, userLocation } = this.state;
+
+    if (loading) {
+      return null;
+    }
+
+    const {events} = this.props;
+    console.log('simpleMap events: ', events);
+
+    return (
+      &lt;div>
+        &lt;Map
+          google={this.props.google}
+          zoom={15}
+          style={{
+            width: this.props.containerWidth,
+            height: this.props.containerHeight
+          }}
+          center={ userLocation }>
+          &lt;Marker
+            position={userLocation}/>
+          {events.map((marker, i) =>{
+                //this.renderMarker(marker, i);
+                if(!marker) 
+                  return null;
+                return marker &amp;&amp; (
+                  &lt;Marker
+                    onClick={() => this.handleClickOpen(marker)}
+                    position={{ lat: marker.location.lat, lng: marker.location.lng}}
+                    name={marker.title}
+                    key={i}
+                    icon={{url: this.getMarkerType(marker.type), scaleSize: (.5, .5)}}/>
+                )
+          })}
+        &lt;/Map>
+        &lt;Dialog data-testid="map-dialog" open={this.state.open} onClose={this.handleClickClose} aria-labelledby="form-dialog-title">
+          &lt;EventPage currEvent={this.state.currEvent} avgScore={this.state.avgScore} reviews={this.state.reviews}>&lt;/EventPage>
+          &lt;DialogActions>
+              &lt;Button onClick={this.handleClickClose} color="primary">
+                  Cancel
+              &lt;/Button>
+              &lt;Button onClick={this.handleAttendEvent} color="primary">
+                  Attend
+              &lt;/Button>
+          &lt;/DialogActions>
+          &lt;/Dialog>
+      &lt;/div>
+    );
+  }
+}
+
+// Add API Key as String
+// AIzaSyD2EzcDG507GgPgPHVEoVpgFngvsMGIElg
+export default Dimensions({elementResize: true, className: 'react-dimensions-wrapper'})(GoogleApiWrapper({
+  apiKey: "AIzaSyD2EzcDG507GgPgPHVEoVpgFngvsMGIElg"
+})(SimpleMap));
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dashboard.html">Dashboard</a></li><li><a href="Default%2520constructor%2520for%2520props;%2520sets%2520the%2520default%2520state%2520to%2520be%2520on%2520the%2520login%2520page%2520unless%2520a%2520token%2520is%2520stored%2520locally.html">Default constructor for props; sets the default state to be on the login page unless a token is stored locally</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventForm.html">EventForm</a></li><li><a href="EventHistory.html">EventHistory</a></li><li><a href="EventList.html">EventList</a></li><li><a href="GMap.html">GMap</a></li><li><a href="GMapFilter.html">GMapFilter</a></li><li><a href="hostEvents.html">hostEvents</a></li><li><a href="LocationSearchInput.html">LocationSearchInput</a></li><li><a href="Login.html">Login</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="Registration.html">Registration</a></li><li><a href="SimpleMap.html">SimpleMap</a></li></ul><h3>Global</h3><ul><li><a href="global.html#classes">classes</a></li><li><a href="global.html#componentDidMount">componentDidMount</a></li><li><a href="global.html#createEventHistoryRow">createEventHistoryRow</a></li><li><a href="global.html#createEventListRow">createEventListRow</a></li><li><a href="global.html#createEventMarker">createEventMarker</a></li><li><a href="global.html#createMapModal">createMapModal</a></li><li><a href="global.html#drawerWidth">drawerWidth</a></li><li><a href="global.html#handleAttendEventCallstheobservermethodinEventInterfacetoallowuserstoregisterusertoaneventandreceiveSMSnotificationsabouttheeventAlsoclosesthedialogboxsouserscankeepsearchingthroughevent">handleAttendEvent Calls the observer method in Event Interface to allow users to register user
+to an event and receive SMS notifications about the event
+Also closes the dialog box so users can keep searching through event</a></li><li><a href="global.html#handleClickClose">handleClickClose</a></li><li><a href="global.html#handleClickCloseFunctionthatsetsthedialogboxtoclose">handleClickClose Function that sets the dialog box to close</a></li><li><a href="global.html#handleClickOpen">handleClickOpen</a></li><li><a href="global.html#notifyUsers">notifyUsers</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#removeUser">removeUser</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#setDOpen">setDOpen</a></li><li><a href="global.html#styles">styles</a></li><li><a href="global.html#useStyle">useStyle</a></li><li><a href="global.html#useStyleFunctionobjectthatgeneratesastyleoffofdefaultMaterialsUITheme">useStyle Function object that generates a style off of default MaterialsUI Theme</a></li><li><a href="global.html#validEmail">validEmail</a></li><li><a href="global.html#validPassword">validPassword</a></li><li><a href="global.html#validPhone">validPhone</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Mar 12 2020 13:39:05 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
