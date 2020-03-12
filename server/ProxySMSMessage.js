@@ -7,12 +7,7 @@
  * @see https://www.twilio.com/docs/chat/tutorials/chat-application-node-express
  */
 
-const TWILIO_SID_TEST = 'AC513454963ff517f3e07b90baf8f5d8e1';
-const TWILIO_AUTH_TEST = 'cb93ae1bbfca766b1f00410a257e06da';
-const TWILIO_SID = 'AC8a8a7e613b05b1800074dcf7f1c35df8';
-const TWILIO_AUTH = '4dd8f302aa01e33b974f723a9b458222';
-
-const client = require('twilio')(TWILIO_SID, TWILIO_AUTH);
+const client = require('twilio')('AC8a8a7e613b05b1800074dcf7f1c35df8', 'b12bd0c6a5d53c48e9272f9578adc26f');
 
 // Base class that is used to send messages
 // Creates a message object based on twilio API but does not verify number or format message
@@ -85,7 +80,7 @@ class ProxySMSMessage extends SMSMessage {
      * Assumes that countryCode of numbers are all US
      * Removes invalid numbers otherwise
      */
-    verifyNumbers() {
+    async verifyNumbers() {
       try {
         client.lookups.phoneNumbers(this.sender)
                         .fetch({countryCode: 'US'})
@@ -96,16 +91,20 @@ class ProxySMSMessage extends SMSMessage {
                         })
 
         for (var i = 0; i < this.recipients.length; i++) {
-          client.lookups.phoneNumbers(this.recipients[i])
+          var number = this.recipients[i]
+          await client.lookups.phoneNumbers(number)
                         .fetch({countryCode: 'US'})
                         .then(result => {
-                          if (result.phoneNumber == null) {
-                            this.recipients.splice(i, 1);
-                            console.log(this.recipients[i] + " is invalid. Removing...");
-                            i--;
-                          }
+                          console.log("Result: ", result);
+                        }, error => {
+                          console.log("Error: ", error);
+                          this.recipients.splice(i, 1);
+                          console.log(number + " is invalid. Removing...");
+                          i--;
                         });
         }
+
+        console.log(this.recipients);
       } catch (error) {
         throw Error(error);
       }
