@@ -14,7 +14,7 @@ const dbName = 'ServiceDb';
 // Database connection
 let db = null;
 
-// Use connect method to connect to the server
+/ Use connect method to connect to the server
 MongoClient.connect(url, function(err, client) {
   assert.equal(null, err);
   console.log("Connected successfully to server");
@@ -23,19 +23,11 @@ MongoClient.connect(url, function(err, client) {
 });
 
 
-/*
-//Users Schema
-
-{
-	name: String,
-	email: String,
-	password: String,
-	phone: String,
-	eventsAttending: [int],
-	eventsHosting:[int]
-}
-*/
-
+/**
+ * Gets a user's information
+ * @param {string} email
+ * @returns {Promise} Promise object representing user
+ */
 module.exports.getUser = function(email){
 	return new Promise(
 		function (resolve, reject) {
@@ -56,6 +48,15 @@ module.exports.getUser = function(email){
 		});
 	});
 };
+
+/**
+ * Adds a User to the database
+ * @param {string} name 
+ * @param {string} email 
+ * @param {string} password 
+ * @param {string} phone 
+ * @returns {Promise} Promise object representing completion of adding the user
+ */
 
 module.exports.addUser = function(name, email, password, phone){
 	return new Promise(
@@ -81,6 +82,12 @@ module.exports.addUser = function(name, email, password, phone){
 	});
 };
 
+/**
+ * Replaces a user's password
+ * @param {string} email - User's email
+ * @param {string} password - new password to replace old password
+ * @returns {Promise} Promise object representing completion of password change
+ */
 
 module.exports.updateUserPassword = function(email, password){
 	return new Promise(
@@ -101,6 +108,12 @@ module.exports.updateUserPassword = function(email, password){
 	});
 };
 
+/**
+ * Updates a user's information
+ * @param {string} name 
+ * @param {string} phone 
+ * @returns {Promise} Promise object representing completion of update
+ */
 module.exports.updateUserDetails = function(email, phone){
 	return new Promise(
 		function (resolve, reject) {
@@ -120,6 +133,12 @@ module.exports.updateUserDetails = function(email, phone){
 	});
 };
 
+/**
+ * Adds a event to the list of event a User attends
+ * @param {string} email
+ * @param {string} eventID
+ * @returns {Promise} Promise object representing completion of update
+ */
 module.exports.addUserAttendingEvent = function(email, eventID){
 	return new Promise(
 		function (resolve, reject) {
@@ -144,6 +163,12 @@ module.exports.addUserAttendingEvent = function(email, eventID){
 	});
 };
 
+/**
+ * Removes a event to the list of event a User attends
+ * @param {string} name 
+ * @param {string} eventID
+ * @returns {Promise} Promise object representing completion of update
+ */
 module.exports.removeUserAttendingEvent = function(email, eventID){
 	return new Promise(
 		function (resolve, reject) {
@@ -168,6 +193,12 @@ module.exports.removeUserAttendingEvent = function(email, eventID){
 	});
 };
 
+/**
+ * Adds a event to the list of event a User is hosting
+ * @param {string} email 
+ * @param {string} eventID
+ * @returns {Promise} Promise object representing completion of update
+ */
 module.exports.addUserHostingEvent = function(email, eventID){
 	return new Promise(
 		function (resolve, reject) {
@@ -191,7 +222,12 @@ module.exports.addUserHostingEvent = function(email, eventID){
 		});
 	});
 };
-
+/**
+ * Removes a event to the list of event a User is hosting
+ * @param {string} email 
+ * @param {string} eventID
+ * @returns {Promise} Promise object representing completion of update
+ */
 module.exports.removeUserHostingEvent = function(email, eventID){
 	return new Promise(
 		function (resolve, reject) {
@@ -216,8 +252,8 @@ module.exports.removeUserHostingEvent = function(email, eventID){
 	});
 };
 
-/*
-//Events Schema
+/**
+Events Schema
 {
 	eventID: int
 	title: String
@@ -231,6 +267,11 @@ module.exports.removeUserHostingEvent = function(email, eventID){
 	reviews:[{user: String, score:Int, review:String}]
 }
 */
+
+/**
+ * Gets all events in database
+ * @returns {Promise} Promise object representing array of all existing events
+ */
 
 module.exports.getAllEvents = function(){
 	return new Promise(
@@ -254,6 +295,16 @@ module.exports.getAllEvents = function(){
 	});
 };
 
+/**
+ * Queries for events meeting search criteria. Unused parameters can be set to null.
+ * @param {RegExp} keywordRegex - regex to search title of event
+ * @param {Array} tags - event type tags to filter out
+ * @param {Date} upperBound - Find all events before the given date
+ * @param {Date} lowerBound - Find all events after the given date
+ * @param {number} numberBound - Limit the number of events queried
+ * @param {Array.string} eventIDs - specific eventIDs
+ * @returns {Promise} Promise object representing result of query. Results are sorted in ascending timeDate order.
+ */
 module.exports.queryEvents = function(keywordRegex, tags, upperBound, lowerBound, numberBound, eventIDs){
 	// keywordRegex is a RegExp Obj corresponding to the keywords
 	return new Promise(
@@ -306,6 +357,12 @@ module.exports.queryEvents = function(keywordRegex, tags, upperBound, lowerBound
 	});
 };
 
+
+/**
+ * Gets a single event by eventID
+ * @param {string} eventID
+ * @returns {Promise} Promise object representing event
+ */
 module.exports.getEvent = function(eventID){
 	return new Promise(
 		function (resolve, reject) {
@@ -326,6 +383,12 @@ module.exports.getEvent = function(eventID){
 		});
 	});
 };
+
+/**
+ * Removes a single event by eventID
+ * @param {string} eventID
+ * @returns {Promise} Promise object representing success of removal
+ */
 
 module.exports.removeEvent = function(eventID){
 	return new Promise(
@@ -348,6 +411,12 @@ module.exports.removeEvent = function(eventID){
 	});
 };
 
+/**
+ * Gets a single event by the user hosting it
+ * @param {string} host - host's email
+ * @param {Date} lowerBound - Find all events after than a certain date
+ * @returns {Promise} Promise object representing array of all existing events
+ */
 module.exports.getEventByHost = function(host, lowerBound){
 	return new Promise(
 		function (resolve, reject) {
@@ -377,6 +446,12 @@ module.exports.getEventByHost = function(host, lowerBound){
 		}
 	)
 }
+
+/**
+ * Returns the aggregate score of a host
+ * @param {string} host - host email
+ * @returns {Promise} Promise object representing the result
+ */
 
 module.exports.getHostAvgRating = function(host){
 	return new Promise(
@@ -408,6 +483,18 @@ module.exports.getHostAvgRating = function(host){
 	)
 }
 
+
+/**
+ * Adds a new event to database
+ * @param {string} title - Title of event
+ * @param {Date} timeDate - Date of event
+ * @param {Object} location - Google Maps location information
+ * @param {string} locationName - name of location
+ * @param {string} type - type of event
+ * @param {string} host - host email
+ * @param {string} description - description of event
+ * @returns {Promise} Promise object representing success of update
+ */
 module.exports.addEvent = function(title, timeDate, location, locationName, type, host,description){
 	return new Promise(
 		function (resolve, reject) {
@@ -435,6 +522,17 @@ module.exports.addEvent = function(title, timeDate, location, locationName, type
 	});
 };
 
+/**
+ * Updates information for a new event
+ * @param {string} eventID - event id
+ * @param {string} title - Title of event
+ * @param {Date} timeDate - Date of event
+ * @param {Object} location - Google Maps location information
+ * @param {string} locationName - name of location
+ * @param {string} type - type of event
+ * @param {string} description - description of event
+ * @returns {Promise} Promise object representing success of update
+ */
 module.exports.updateEvent = function(eventID, title, timeDate, location, locationName, type, description){
 	return new Promise(
 		function (resolve, reject) {
@@ -460,6 +558,12 @@ module.exports.updateEvent = function(eventID, title, timeDate, location, locati
 	});
 };
 
+/**
+ * Removes user from event's attendling lis
+ * @param {string} eventID - event id
+ * @param {string} attendee - User email
+ * @returns {Promise} Promise object representing success of update
+ */
 module.exports.addEventAttendee = function(eventID, attendee){
 	return new Promise(
 		function (resolve, reject) {
@@ -480,6 +584,12 @@ module.exports.addEventAttendee = function(eventID, attendee){
 	});
 };
 
+/**
+ * Removes user from event's attendling list
+ * @param {string} eventID - event id
+ * @param {string} attendee - User email
+ * @returns {Promise} Promise object representing success of update
+ */
 module.exports.removeEventAttendee = function(eventID, attendeeID){
 	return new Promise(
 		function (resolve, reject) {
@@ -500,6 +610,15 @@ module.exports.removeEventAttendee = function(eventID, attendeeID){
 	});
 };
 
+
+/**
+ * Adds review for event
+ * @param {string} eventID - event id
+ * @param {string} user - User email
+ * @param {Number} score - User's score for event
+ * @param {review} score - User's descriptive review
+ * @returns {Promise} Promise object representing success of update
+ */
 module.exports.addEventReview = function(eventID, user, score, review){
 	return new Promise(
 		function (resolve, reject) {
@@ -523,7 +642,12 @@ module.exports.addEventReview = function(eventID, user, score, review){
 		});
 	});
 };
-
+/**
+ * Adds image for event
+ * @param {string} eventID - event id
+ * @param {Object} imageArrayBuffer - ArrayBuffer or Buffer object representing image
+ * @returns {Promise} Promise object representing success of update
+ */
 module.exports.addImage = function(eventID, imageArrayBuffer){
 	
 	return new Promise(
@@ -544,7 +668,11 @@ module.exports.addImage = function(eventID, imageArrayBuffer){
 		});
 	});
 };
-
+/**
+ * Remove image for event
+ * @param {string} eventID - event id
+ * @returns {Promise} Promise object representing success of update
+ */
 module.exports.removeImage = function(eventID){
 	return new Promise(
 		function (resolve, reject) {

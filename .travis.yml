@@ -9,3 +9,4 @@ script:
   - npm run build --no-fail-on-warnings
   - node ./server/dbtest.js
   - node ./server/ProxySMSTest.js
+
