@@ -29,8 +29,8 @@ server.listen(8000, ()=> {
 
 /**
   * SOCKET EVENT INTERACTIONS
+  @param: socket : socket.io object to generate socket connection
   */
-
 io.on("connection", (socket) => {
     //handshake with client
     console.log("Server connected to socket!");
@@ -42,6 +42,9 @@ io.on("connection", (socket) => {
   /**
   Add a new user to the "Users" collection in the DB.
   Other event listeners are similar to this.
+  @param email: str user email
+  @param password: str user password
+  @return "authReply" event. returns update status, email, and token
   */
   socket.on('authenticate', (email, password) => {
     let prom = dbInterface.getUser(email);
@@ -74,6 +77,12 @@ io.on("connection", (socket) => {
     })
   })
 
+
+  /**
+   * authenticateToken function.
+   @param: token. takes authentication token
+   @return: "authTokenReply" response: {"FAIL", "TRUE"}
+   */
   socket.on('authenticateToken', (token) => {
     content = authToken.decode(token);
     if (content.isValid == false){
@@ -101,6 +110,14 @@ io.on("connection", (socket) => {
   })
 
 
+  /**
+   * addUser function
+   @param name: str. user's name
+   @paramm email: str. user's email
+   @param password: str. user's password
+   @param phone: str. user's phone number
+   @return "addUserReply" or "serverError" event emit. returns mongoDB obj or err
+   */
   socket.on('addUser', (name, email, password, phone) => {
     console.log("on add user", name, email, password, phone);
     //on the "addUser" socket event, recieve the tuple and request the promise:
@@ -118,6 +135,12 @@ io.on("connection", (socket) => {
     })
   })
 
+  /**
+   * getUser function.
+   @param email: user's email that you wish to retrieve
+   @return: "getUserReply" or "getUserError" event emitted. Either user mongo
+   object or error
+   */
   socket.on('getUser', (email) => {
     let prom = dbInterface.getUser(email);
     prom.then( (docs) => {
@@ -137,6 +160,11 @@ io.on("connection", (socket) => {
     })
   });
 
+  /**
+   * getHost function
+   @param email: str. host's email that you wish to retrieve
+   @return "getHostReply" or "serverError" error. user mongodb object or error
+   */
   socket.on('getHost', (email) => {
     let prom = dbInterface.getUser(email);
     prom.then( (docs) => {
@@ -158,6 +186,13 @@ io.on("connection", (socket) => {
     })
   });
 
+  /**
+   * updateUserPassword function.
+   @param email: str. user's email (the user that you wish to update)
+   @param newpass: str. the new password
+   @return: "updateUserPasswordReply" or "serverError" events. returns newUser
+   mongo object (updated) or error obj
+   */
   socket.on('updateUserPassword', (email, newpass) => {
     let prom = dbInterface.updateUserPassword(email, newpass);
     prom.then( (docs) => {
@@ -170,6 +205,14 @@ io.on("connection", (socket) => {
     })
   })
 
+  /**
+   * updateUserInterests
+   @param email: str. user's email
+   @param interestList. [string]. list of interests (str)
+   @param phone: str. user's phone number
+   @return: "updateUserInterestsReply" or "serverError" events emitted.
+   either updated mongodb user object or error obj
+   */
   socket.on('updateUserInterests', (email, interestList, phone) => {
     let prom = dbInterface.updateUserDetails(email, interestList, phone);
     prom.then( (docs) => {
@@ -182,6 +225,12 @@ io.on("connection", (socket) => {
     })
   })
 
+  /**
+   * @param email: str. user's email
+   @param eventId: str. event mongodb ID as a string.
+   @return: "addUserAttendingEventReply" or "serverError" emit event. either
+   event mongodb object or error
+   */
   socket.on('addUserAttendingEvent', (email, eventId) => {
     let prom = dbInterface.addUserAttendingEvent(email, eventId);
     prom.then( (docs) => {
@@ -194,6 +243,13 @@ io.on("connection", (socket) => {
     })
   })
 
+  /**
+   * Remove user from event
+   @param email: str. user's email.
+   @param eventId: str. event mongodb Id
+   @return "removeUserAttendingEventRelpy" or "serverError" events emitted.
+   returns event mongodb objet or err obj
+   */
   socket.on('removeUserAttendingEvent', (email, eventId) => {
     let prom = dbInterface.removeUserAttendingEvent(email, eventId);
     prom.then( (docs) => {
@@ -206,6 +262,13 @@ io.on("connection", (socket) => {
     })
   })
 
+  /**
+   * add an event to a user's "hosting" list
+   @param email: str. host's email
+   @param eventId: str. new event's mognodb event Id
+   @return: "addUserHostingEventReply" or "serverError" events emitted with
+   respective event obj or error obj
+   */
   socket.on('addUserHostingEvent', (email, eventId) => {
     let prom = dbInterface.addUserHostingEvent(email, eventId);
     prom.then( (docs) => {
@@ -218,6 +281,13 @@ io.on("connection", (socket) => {
     })
   })
 
+  /**
+   * Remove a user's hosted event
+   @param email: str. host's email
+   @param eventId: str. mongodb event id
+   @return "removeUserHostingEventReply" or "serverError" events emitted. Returns
+   updated host user mongodb object or error
+   */
   socket.on('removeUserHostingEvent', (email, eventId) => {
     let prom = dbInterface.removeUserHostingEvent(email, eventId);
     prom.then( (docs) => {
@@ -230,6 +300,11 @@ io.on("connection", (socket) => {
     })
   })
 
+  /**
+   * retrieve all event objects from mongodb
+   @return: "getAllEventsReply" list of mongodb event objects (JSON)
+   or "serverError" error obj.
+   */
   socket.on('getAllEvents', () => {
     let prom = dbInterface.getAllEvents();
     prom.then( (docs) => {
@@ -242,6 +317,17 @@ io.on("connection", (socket) => {
     })
   })
 
+  /**
+   * Searches for events based on regex, tags, bounds, or eventIDs
+   @param keywordRegex: str. regular expression
+   @param tags: str. list of tags
+   @param upperBound: Date() object. LATEST date to search
+   @param lowerBound: Date() object. EARLIEST date to search
+   @param numberBound: int. limit number of events to be returned
+   @param eventIds: [string]. EventIds to query for.
+   @return "queryEventsIDReply" or "serverError" with a list of events or
+   error obj
+   */
   socket.on('queryEvents', (keywordRegex, tags, upperBound, lowerBound, numberBound, eventIDs) => {
     if (eventIDs != null && eventIDs.length == 0) {
         console.log("NO EVENTS");
@@ -263,6 +349,12 @@ io.on("connection", (socket) => {
     }
   })
 
+  /**
+   * Get event by eventId
+   @param: eventId str. mongodb eventId
+   @return: "getEventReply" or "serverError" event emitted. event mongodb object
+   (JSON) or error obj.
+   */
   socket.on('getEvent', (eventId) => {
     let prom = dbInterface.getEvent(eventId);
     prom.then( (docs) => {
@@ -275,6 +367,12 @@ io.on("connection", (socket) => {
     })
   })
 
+  /**
+   * Remove event (delete)
+   @param eventId: str. mongo eventId of event to be deleted
+   @return "removeEventReply" or "serverError" events emitted. mongodb JSOn reply
+   or error obj.
+   */
   socket.on('removeEvent', (eventId) => {
     let prom = dbInterface.removeEvent(eventId);
     prom.then( (docs) => {
@@ -286,8 +384,13 @@ io.on("connection", (socket) => {
       socket.emit("serverError", error)
     })
   })
-  
 
+
+  /**
+   * get events hosted by a user
+   @param host: str. host's email
+   @return: getEventsReply event emit. list of mongodb  event objects or error
+   */
   socket.on('getEvents', (host) => {
     let prom = dbInterface.getEventByHost(host);
     prom.then( (docs) => {
@@ -300,6 +403,12 @@ io.on("connection", (socket) => {
     })
   })
 
+  /**
+   * get all events that a specific user has attended
+   @param user: str. of username
+   @return: "getAttendedEventsReply" event. list of mongodb event objects or
+   "serverError" event
+   */
   socket.on('getAttendedEvents', (user) => {
     let prom = dbInterface.getAllEvents();
     prom.then( (docs) => {
@@ -313,6 +422,17 @@ io.on("connection", (socket) => {
     })
   })
 
+  /**
+   * create new event
+   @param title: str. title of event
+   @param date: Date() object of event date
+   @loocation: location string from google maps api
+   @locationName: str. location description
+   @type: str. type of event
+   @host: str. host name
+   @description: str. descr. of event
+   @return: "addEventReply" event emitted. mognodb event object or "serverError"
+   */
   socket.on('addEvent', (title, date, location, locationName, type, host, description) => {
     let prom = dbInterface.addEvent(title, date, location, locationName, type, host, description);
     prom.then( (docs) => {
@@ -325,6 +445,18 @@ io.on("connection", (socket) => {
     })
   })
 
+/**
+ * update event with new information
+ @param eventId: str of mongoid of event to be updated
+ @param title: str. new title of event
+ @param timeDate: Date() obj. new date of event
+ @param location: location string from maps api.
+ @locationName: str. location description
+ @type: str. type of event
+ @host: str. host name
+ @description: str. descr. of event
+ @return: "updateEventReply" doc of updated mongo event object or "serverError"
+ */
   socket.on('updateEvent', (eventID, title, timeDate, location, locationName, type, description) => {
     let prom = dbInterface.updateEvent(eventID, title, timeDate, location, locationName, type, description);
     prom.then( (docs) => {
@@ -337,8 +469,13 @@ io.on("connection", (socket) => {
     })
   })
 
+  /**
+   * add an attendee to an event
+   @param eventId: str of event mongo id obj
+   @param attendee: str. name of user
+   return "addEventAttendeeReply" with new event obj. or "serverError"
+   */
   socket.on('addEventAttendee', (eventID, attendee) => {
-    //TODO: does the db call overwrite with one attendee or append?
     let prom = dbInterface.addEventAttendee(eventID, attendee);
     prom.then( (docs) => {
       console.log("NEW ATTENDEE", docs);
@@ -350,6 +487,12 @@ io.on("connection", (socket) => {
     })
   })
 
+  /**
+   * remove an attendee to an event
+   @param eventId: str of event mongo id obj
+   @param attendee: str. name of user
+   return "removeEventAttendeeReply" with new event obj. or "serverError"
+   */
   socket.on('removeEventAttendee', (eventID, attendee) => {
     let prom = dbInterface.removeEventAttendee(eventID, attendee);
     prom.then( (docs) => {
@@ -362,6 +505,15 @@ io.on("connection", (socket) => {
     })
   })
 
+/**
+ * add event review from a user
+ @param eventID: str mongo id of event
+ @param user: str. username of user leaving the review
+ @param score: str. score of review
+ @param review; Str. review text
+ @return "addEventReply" event with upated event with new review added or
+ "serverError"
+ */
   socket.on('addEventReview', (eventID, user, score, review) => {
     let prom = dbInterface.addEventReview(eventID, user, score, review);
     prom.then( (docs) => {
@@ -373,6 +525,13 @@ io.on("connection", (socket) => {
       socket.emit("serverError", error)
     })
   })
+
+  /**
+   * add an image to an event's thumbnail
+   @param eventID; str. mongodb id for event
+   @param imageArrayBuffer: ArrayBuffer() or Buffer() objects representing image
+   @return "serverReply" or "serverError" events returning mongodb event obj
+   */
   socket.on('addImage', (eventID, imageArrayBuffer) => {
     let prom = dbInterface.addImage(eventID, imageArrayBuffer);
     prom.then( (docs) => {
@@ -384,6 +543,12 @@ io.on("connection", (socket) => {
       socket.emit("serverError", error)
     })
   })
+
+  /**
+   * Remove image that has been previously added to an event
+   @param eventID: str mongodb id
+   @reply "serverReply" or "serverError" with updated mongo event obj
+   */
   socket.on('removeImage', (eventID) => {
     let prom = dbInterface.addImage(eventID);
     prom.then( (docs) => {

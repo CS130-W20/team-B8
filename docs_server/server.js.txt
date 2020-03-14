@@ -1,0 +1,153 @@
+## API for server.js socket events
+
+# 'Event Name', (param1, param2,...)
+
+# 'authenticate', (email, password)
+Add a new user to the "Users" collection in the DB.
+Other event listeners are similar to this.
+@param email: str user email
+@param password: str user password
+@return "authReply" event. returns update status, email, and token
+
+# 'authenticateToken', (token)
+authenticateToken function.
+@param: token. takes authentication token
+@return: "authTokenReply" response: {"FAIL", "TRUE"}
+
+# 'addUser', (name, email, password, phone)
+@param name: str. user's name
+@paramm email: str. user's email
+@param password: str. user's password
+@param phone: str. user's phone number
+@return "addUserReply" or "serverError" event emit. returns mongoDB obj or err
+
+# 'getUser', (email)
+@param email: user's email that you wish to retrieve
+@return: "getUserReply" or "getUserError" event emitted. Either user mongo
+object or error
+
+# 'getHost', (email)
+@param email: str. host's email that you wish to retrieve
+@return "getHostReply" or "serverError" error. user mongodb object or error
+
+# 'updateUserPassword', (email, newpass)
+@param email: str. user's email (the user that you wish to update)
+@param newpass: str. the new password
+@return: "updateUserPasswordReply" or "serverError" events. returns newUser
+mongo object (updated) or error obj
+
+# 'updateUserInterests', (email, interestList, phone)
+@param email: str. user's email
+@param interestList. [string]. list of interests (str)
+@param phone: str. user's phone number
+@return: "updateUserInterestsReply" or "serverError" events emitted.
+either updated mongodb user object or error obj
+
+# 'addUserAttendingEvent', (email, eventId)
+@param email: str. user's email
+@param eventId: str. event mongodb ID as a string.
+@return: "addUserAttendingEventReply" or "serverError" emit event. either
+event mongodb object or error
+
+# 'removeUserAttendingEvent', (email, eventId)
+@param email: str. user's email.
+@param eventId: str. event mongodb Id
+@return "removeUserAttendingEventRelpy" or "serverError" events emitted.
+returns event mongodb objet or err obj
+
+# 'addUserHostingEvent', (email, eventId)
+@param email: str. host's email
+@param eventId: str. new event's mognodb event Id
+@return: "addUserHostingEventReply" or "serverError" events emitted with
+respective event obj or error obj
+
+# 'removeUserHostingEvent', (email, eventId)
+@param email: str. host's email
+@param eventId: str. mongodb event id
+@return "removeUserHostingEventReply" or "serverError" events emitted. Returns
+updated host user mongodb object or error
+
+# 'getAllEvents', ()
+retrieve all event objects from mongodb
+@return: "getAllEventsReply" list of mongodb event objects (JSON)
+or "serverError" error obj.
+
+# 'queryEvents', (keywordRegex, tags, upperBound, lowerBound, numberBound, eventIDs)
+@param keywordRegex: str. regular expression
+@param tags: str. list of tags
+@param upperBound: Date() object. LATEST date to search
+@param lowerBound: Date() object. EARLIEST date to search
+@param numberBound: int. limit number of events to be returned
+@param eventIds: [string]. EventIds to query for.
+@return "queryEventsIDReply" or "serverError" with a list of events or
+error obj
+
+# 'getEvent', (eventId)
+@param: eventId str. mongodb eventId
+@return: "getEventReply" or "serverError" event emitted. event mongodb object
+(JSON) or error obj.
+
+# 'removeEvent', (eventId)
+@param eventId: str. mongo eventId of event to be deleted
+@return "removeEventReply" or "serverError" events emitted. mongodb JSOn reply
+or error obj.
+
+# 'getEvents', (host)
+@param host: str. host's email
+@return: getEventsReply event emit. list of mongodb  event objects or error
+
+# 'getAttendedEvents', (user)
+get all events that a specific user has attended
+@param user: str. of username
+@return: "getAttendedEventsReply" event. list of mongodb event objects or
+"serverError" event
+
+# 'addEvent', (title, date, location, locationName, type, host, description)
+@param title: str. title of event
+@param date: Date() object of event date
+@loocation: location string from google maps api
+@locationName: str. location description
+@type: str. type of event
+@host: str. host name
+@description: str. descr. of event
+@return: "addEventReply" event emitted. mognodb event object or "serverError"
+
+# 'updateEvent', (eventID, title, timeDate, location, locationName, type, description)
+@param eventId: str of mongoid of event to be updated
+@param title: str. new title of event
+@param timeDate: Date() obj. new date of event
+@param location: location string from maps api.
+@locationName: str. location description
+@type: str. type of event
+@host: str. host name
+@description: str. descr. of event
+@return: "updateEventReply" doc of updated mongo event object or "serverError"
+
+# 'addEventAttendee', (eventID, attendee)
+@param eventId: str of event mongo id obj
+@param attendee: str. name of user
+return "addEventAttendeeReply" with new event obj. or "serverError"
+
+# 'removeEventAttendee', (eventID, attendee)
+@param eventId: str of event mongo id obj
+@param attendee: str. name of user
+return "removeEventAttendeeReply" with new event obj. or "serverError"
+
+# 'addEventReview', (eventID, user, score, review)
+@param eventID: str mongo id of event
+@param user: str. username of user leaving the review
+@param score: str. score of review
+@param review; Str. review text
+@return "addEventReply" event with upated event with new review added or
+"serverError"
+
+# 'addImage', (eventID, imageArrayBuffer)
+* add an image to an event's thumbnail
+@param eventID; str. mongodb id for event
+@param imageArrayBuffer: ArrayBuffer() or Buffer() objects representing image
+@return "serverReply" or "serverError" events returning mongodb event obj
+
+# 'removeImage', (eventID)
+Remove image that has been previously added to an event
+@param eventID: str mongodb id
+@reply "serverReply" or "serverError" with updated mongo event obj
